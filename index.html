@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONPlan2SNU27 | ONFINE</title>
+    <link rel="icon" href="icon.ico">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+
+    <style>
+        :root {
+            /* ✅ 적당히 어둡고 차분한 모던 그레이(Gray-600) 팔레트 */
+            --primary: #4B5563;
+            --primary-dark: #374151;
+            --text-main: #111827;
+            --text-sub: #4B5563;
+            --text-outer: #F9FAFB;
+            --border-outer: rgba(255, 255, 255, 0.5);
+            --border-inner: rgba(0, 0, 0, 0.08);
+            --success: #10B981;
+            --danger: #EF4444;
+            --accent: #2563EB;
+            --gemini: #A855F7;
+            --radius-box: 0px;
+            --radius-item: 8px;
+
+            /* 눈이 편안한 미디엄 다크 그레이 배경 */
+            --bg-outer-glass: rgba(75, 85, 99, 0.1);
+            --bg-inner-solid: #FFFFFF;
+            --bg-offwhite: #F8FAFC;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: "Pretendard Variable", -apple-system, sans-serif !important; }
+
+        body { font-size: 16px; height: 100vh; display: flex; justify-content: center; align-items: center; padding: 0; margin: 0; overflow: hidden; background-color: #D1D5DB; letter-spacing: -0.01em; }
+
+        .bg-shapes { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; pointer-events: none; }
+        .shape { position: absolute; opacity: 0.2; border-radius: 50%; filter: blur(70px); transition: all 1s ease; }
+        .shape-1 { width: 80vw; height: 80vw; background: radial-gradient(circle, #2563EB 0%, rgba(37, 99, 235, 0) 70%); bottom: -20%; left: -10%; }
+        .shape-2 { width: 70vw; height: 70vw; background: radial-gradient(circle, #E0005A 0%, rgba(224, 0, 90, 0) 70%); top: -30%; right: -20%; }
+
+        #loadingScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s ease; }
+
+        .dashboard {
+            width: 100vw; height: 100vh;
+            background: var(--bg-outer-glass);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            display: grid;
+            grid-template-rows: auto 1fr 45px;
+            overflow: hidden; position: relative;
+        }
+
+        header { padding: 1.2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; background: transparent; z-index: 10; flex-shrink: 0; border-bottom: 1px solid var(--border-outer);}
+        .brand { display: flex; align-items: center; gap: 2rem; }
+        .brand-text h1 { font-size: 1.5rem; font-weight: 800; color: #000/*var(--text-outer)*/; letter-spacing: -0.03em; }
+        .brand-text .subtitle { font-size: 0.75rem; color: rgb(37, 99, 235)/*93C5FD*/; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+        .view-toggles { display: flex; background: rgba(255,255,255,0.15); padding: 4px; border-radius: 8px; border: 1px solid var(--border-outer); }
+        .view-btn { border: none; background: transparent; padding: 6px 16px; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.7); border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
+        .view-btn.active { background: #FFFFFF; color: var(--primary-dark); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .header-actions { display: flex; align-items: center; gap: 0.8rem; }
+        .btn-action { font-size: 0.85rem; color: #333/*var(--text-outer)*/; background: rgba(255,255,255,0.15); border: 2px solid #999/*var(--border-outer)*/; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; }
+        .btn-action:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px);}
+
+        .btn-gemini { background: #FFFFFF; color: var(--text-main); border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .btn-gemini span { font-size: 1.2rem; color: var(--gemini); }
+        .btn-gemini:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5); }
+
+        .main-grid { display: flex; gap: 1.5rem; padding: 0 1.5rem 1.5rem 1.5rem; height: 100%; min-height: 0; overflow: hidden; }
+
+        .calendar-panel { flex: 1; padding: 1.5rem 2rem 2rem 2rem; display: flex; flex-direction: column; background: var(--bg-inner-solid); border-radius: 20px; min-height: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.15); margin-top: 1.5rem;}
+
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
+        .month-title { font-size: 1.8rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; transition: 0.3s ease; }
+        .cal-nav { display: flex; gap: 0.4rem; }
+        .btn-nav { width: 34px; height: 34px; border-radius: 6px; background: transparent; border: 1px solid var(--border-inner); font-size: 1.1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; color: var(--text-sub); }
+        .btn-nav:hover { background: var(--bg-offwhite); color: var(--text-main); border-color: var(--text-main); }
+
+        #calendarBody { flex: 1; display: flex; flex-direction: column; min-height: 0; transition: opacity 0.25s ease; opacity: 1; }
+
+        /* Month View Styles */
+        /* ✅ minmax(0, 1fr) 적용: 내용물이 길어도 칸을 억지로 넓히지 못하도록 봉인! */
+        .cal-grid-header { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-weight: 700; color: var(--text-sub); margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; border-bottom: 2px solid var(--bg-offwhite); padding-bottom: 0.5rem;}
+        .cal-grid { flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(80px, 1fr)); gap: 1px; min-height: 0; background: var(--border-inner); border: 1px solid var(--border-inner); border-radius: 8px; overflow-y: auto;}
+        .cal-grid::-webkit-scrollbar { width: 6px; }
+        .cal-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+
+        .cal-cell { background: #FFFFFF; padding: 8px 10px; display: flex; flex-direction: column; cursor: pointer; transition: 0.15s ease; position: relative; overflow: hidden; min-height: 0; min-width: 0; }
+        .cal-cell:hover { background: #F8FAFC; z-index: 2; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+        .cal-cell.today { background: #FFFFFF; box-shadow: inset 0 0 0 2px var(--accent); z-index: 3;}
+        .cal-cell.selected { background: #F1F5F9; box-shadow: inset 0 0 0 2px var(--primary-dark); z-index: 2; }
+        .cal-cell.other-month { background: #FAFAFA; }
+        .cal-cell.other-month .date-num { color: #94A3B8; }
+
+        .cell-top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; flex-shrink: 0; }
+        .date-num { font-size: 1.05rem; font-weight: 600; color: var(--text-main); transition: 0.2s;}
+        .cal-cell.today .date-num { color: var(--accent); font-weight: 800; background: #EFF6FF; padding: 0 6px; border-radius: 12px; }
+
+        .cell-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .color-dots { display: flex; gap: 3px; margin-top: 4px;}
+        .color-dot { width: 6px; height: 6px; border-radius: 50%; opacity: 0.9; }
+        .task-count-badge { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); background: #E2E8F0; padding: 1px 5px; border-radius: 4px; }
+
+        .task-preview { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding-right: 4px;}
+        .task-preview::-webkit-scrollbar { width: 0px; }
+
+        /* ✅ 캘린더 안에서는 길면 가차 없이 잘림 */
+        .truncate-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
+
+        .mini-schedule { font-size: 0.8rem; color: var(--danger); font-weight: 700; padding: 2px; cursor: pointer; transition: 0.2s;}
+        .mini-schedule:hover { opacity: 0.7; }
+        .mini-task { font-size: 0.8rem; background: #F1F5F9; padding: 4px 6px; border-radius: 4px; font-weight: 600; color: var(--text-main); border-left: 3px solid #1E293B; flex-shrink: 0; cursor: pointer; transition: 0.2s;}
+        .mini-task:hover { background: #E2E8F0; }
+        .mini-task.done { opacity: 0.4; text-decoration: line-through; border-left-color: var(--success); }
+        .more-tasks { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; text-align: center; margin-top: 2px; flex-shrink: 0;}
+
+        /* Week & Day View 공통 (미니 캘린더) */
+        .split-view-container { display: flex; height: 100%; min-height: 0; gap: 1.5rem; }
+
+        .mini-cal-container { width: 250px; flex-shrink: 0; border-right: 1px solid var(--border-inner); padding-right: 1.5rem; display: flex; flex-direction: column; }
+        .mini-cal-month { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; }
+        .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .mini-cal-dayname { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); text-align: center; margin-bottom: 6px;}
+        .mini-cal-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; font-weight: 600; border-radius: 50%; cursor: pointer; transition: 0.2s; color: var(--text-main);}
+        .mini-cal-cell:hover { background: var(--bg-offwhite); }
+        .mini-cal-cell.today { background: var(--accent); color: white; }
+        .mini-cal-cell.selected { border: 1.5px solid var(--primary); }
+        .mini-cal-cell.other-month { color: #94A3B8; opacity: 0.5;}
+
+        /* ✅ Week View (minmax 0 1fr 적용: 가로 길이 폭발 방지) */
+        .week-view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+        .week-grid-header { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border-inner); border-bottom: 1px solid var(--border-inner); flex-shrink: 0;}
+        .week-header-cell { background: #fff; padding: 10px; text-align: center; }
+        .week-day-name { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+        .week-day-num { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-top: 4px; }
+        .week-header-cell.today .week-day-num { color: var(--accent); }
+
+        /* 그리드 바디 스크롤 확보 */
+        .week-grid-body { flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border-inner); overflow-y: auto; min-height: 0; align-items: start; }
+        .week-grid-body::-webkit-scrollbar { width: 6px; }
+        .week-grid-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+        .week-col { background: #fff; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 100%; cursor: pointer; min-width: 0; }
+        .week-col .mini-schedule, .week-col .mini-task { font-size: 0.9rem; padding: 6px 8px; }
+
+        /* Day View Styles */
+        .day-view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; padding-left: 1.5rem;}
+        .day-hero-date { font-size: 4rem; font-weight: 900; color: var(--text-main); letter-spacing: -0.04em; margin-bottom: 0.2rem; flex-shrink: 0;}
+        .day-hero-day { font-size: 1.2rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem; flex-shrink: 0;}
+
+        .day-items-list { flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 10px; min-height: 0;}
+        .day-items-list::-webkit-scrollbar { width: 6px; }
+        .day-items-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+        .day-item-card { background: #fff; border: 1px solid var(--border-inner); padding: 1.2rem; border-radius: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; flex-shrink: 0; min-width: 0;}
+        .day-item-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15);}
+
+        /* ✅ 우측 패널 (오늘 할 일: 상세 내역 전부 노출) */
+        .detail-panel { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; background: var(--bg-offwhite); border-radius: 20px; min-height: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; margin-top: 1.5rem;}
+        .detail-header { padding: 1.5rem 2rem; text-align: left; border-bottom: 1px solid var(--border-inner); flex-shrink: 0; background: #fff;}
+        .selected-day-display { font-size: 0.85rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+        .selected-date-display { font-size: 2rem; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.03em; margin-top: 4px; }
+
+        .split-sections { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 1.5rem 1.5rem; gap: 1.5rem; }
+        .section-wrapper { display: flex; flex-direction: column; min-height: 0; }
+        .section-schedules { flex: 0.35; }
+        .section-plans { flex: 1.65; }
+
+        .section-title { font-size: 0.85rem; font-weight: 800; color: var(--text-sub); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .btn-add-sm { background: var(--accent); color: white; border: none; padding: 0.35rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);}
+        .btn-add-sm:hover { background: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);}
+        .btn-add-sch { background: #FFFFFF; color: var(--text-main); border: 1px solid var(--border-inner); box-shadow: 0 1px 2px rgba(0,0,0,0.02);}
+        .btn-add-sch:hover { background: #F8FAFC; border-color: rgba(0,0,0,0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.05); color: var(--primary);}
+
+        .item-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; padding-right: 4px;}
+        .item-list::-webkit-scrollbar { width: 5px; }
+        .item-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+
+        .list-card { background: #FFFFFF; border: 1px solid var(--border-inner); padding: 0.8rem 1rem; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.01); flex-shrink: 0; gap: 12px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .list-card:hover { border-color: rgba(0,0,0,0.15); box-shadow: 0 4px 10px rgba(0,0,0,0.06); transform: translateX(2px);}
+
+        .custom-checkbox { width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; background: transparent; transition: 0.2s; position: relative; z-index: 5;}
+        .custom-checkbox:hover { border-color: var(--accent); transform: scale(1.1);}
+        .list-card.done .custom-checkbox { background: var(--success); border-color: var(--success); }
+        .list-card.done .custom-checkbox::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+
+        /* ✅ 우측 패널 텍스트: 말줄임표 없이 줄바꿈하여 모두 보여줌 */
+        .list-content { flex: 1; font-weight: 600; color: var(--text-main); font-size: 0.95rem; line-height: 1.4; word-break: break-word; transition: 0.2s;}
+        .list-card.done .list-content { text-decoration: line-through; color: var(--text-sub); opacity: 0.6; }
+
+        .sch-content { flex: 1; display: flex; align-items: flex-start; gap: 10px; }
+        .sch-text { font-weight: 700; color: var(--text-main); font-size: 0.95rem; line-height: 1.4; flex: 1; word-break: break-word; }
+
+        .btn-icon-group { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: 0.2s; }
+        .list-card:hover .btn-icon-group { opacity: 1; }
+        .btn-icon { background: transparent; border: none; color: var(--text-sub); cursor: pointer; transition: 0.2s; padding: 4px; display: flex; justify-content: center; align-items: center; border-radius: 4px;}
+        .btn-icon:hover { background: #F1F5F9; color: var(--accent); }
+        .btn-icon.delete:hover { color: var(--danger); }
+
+        /* ✅ 하단 고정 푸터 (진척도 등) */
+        .app-footer { background: rgba(30, 41, 59, 0.6); color: #F1F5F9; display: flex; justify-content: space-between; align-items: center; padding: 0 2.5rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; font-weight: 600; z-index: 10; flex-shrink: 0; height: 45px;}
+        .footer-left { display: flex; align-items: center; gap: 15px; }
+        .sync-status { display: flex; align-items: center; gap: 6px; color: #10B981; }
+        .sync-dot { width: 8px; height: 8px; background: #10B981; border-radius: 50%; box-shadow: 0 0 8px #10B981; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        .footer-center { display: flex; align-items: center; gap: 15px; }
+        .progress-container { width: 250px; display: flex; align-items: center; gap: 10px; }
+        .progress-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease-out; }
+
+        .footer-right span { color: #FFFFFF; font-weight: 800; font-size: 0.95rem; margin-left: 5px;}
+
+        /* ✨ 모달 공통 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        .modal-content { background: #FFFFFF; padding: 2.5rem; width: 420px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); transform: scale(0.95) translateY(10px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid var(--border-inner); }
+        .modal-overlay.show .modal-content { transform: scale(1) translateY(0); }
+
+        h3 { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.8rem; letter-spacing: -0.02em; }
+        .form-group { margin-bottom: 1.4rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-sub); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-input, .form-select { width: 100%; padding: 0.9rem 1rem; border: 1px solid rgba(0,0,0,0.15); border-radius: 10px; font-size: 1rem; background: #FFFFFF; color: var(--text-main); transition: all 0.2s; font-weight: 600; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);}
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+
+        .color-picker-wrap { display: flex; align-items: center; gap: 12px; }
+        .color-input { border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; padding: 0; background: none; }
+        .color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-input::-webkit-color-swatch { border: none; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+        .modal-footer { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+        .btn-cancel { padding: 0.7rem 1.4rem; border-radius: 8px; border: 1px solid var(--border-inner); background: transparent; cursor: pointer; font-weight: 700; color: var(--text-sub); transition: 0.2s; }
+        .btn-cancel:hover { background: #F8FAFC; color: var(--text-main); }
+        .btn-save { padding: 0.7rem 1.4rem; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 700; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
+        .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2);}
+
+        /* ✨ 거대한 팝업으로 재탄생한 Gemini AI 패널 */
+        #geminiModal .modal-content { width: 50vw; min-width: 600px; max-width: 900px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; }
+        .gemini-header { padding: 1.8rem 2.5rem; background: #F8FAFC; border-bottom: 1px solid var(--border-inner); font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; justify-content: space-between; color: var(--primary); }
+        .gemini-header-title { display: flex; align-items: center; gap: 12px; }
+        .gemini-header-title span { color: var(--gemini); font-size: 1.8rem; text-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);}
+        .btn-close-gemini { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text-sub); transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .btn-close-gemini:hover { color: var(--danger); transform: scale(1.1); }
+
+        .gemini-chat-area { flex: 1; overflow-y: auto; padding: 2.5rem; display: flex; flex-direction: column; gap: 18px; background: #FFFFFF; }
+        .gemini-chat-area::-webkit-scrollbar { width: 6px; }
+        .gemini-chat-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+        .chat-bubble { max-width: 80%; padding: 16px 20px; border-radius: 16px; font-size: 1.05rem; font-weight: 500; line-height: 1.6; word-break: break-word; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
+        @keyframes popIn { 0% { opacity: 0; transform: translateY(10px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .chat-bot { background: #F1F5F9; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);}
+        .chat-user { background: var(--gemini); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 6px 15px rgba(168, 85, 247, 0.25); }
+
+        .gemini-input-area { padding: 1.5rem 2.5rem; border-top: 1px solid var(--border-inner); display: flex; gap: 12px; background: #FFFFFF; }
+        .gemini-input { flex: 1; padding: 16px 20px; border-radius: 14px; border: 1px solid var(--border-inner); background: #F8FAFC; outline: none; font-size: 1.05rem; font-weight: 500; transition: 0.2s;}
+        .gemini-input:focus { border-color: var(--gemini); background: #fff; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);}
+        .gemini-send { background: var(--gemini); color: white; border: none; width: 60px; border-radius: 14px; cursor: pointer; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.3);}
+        .gemini-send:hover { background: #9333EA; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(168, 85, 247, 0.4);}
+
+        /* ✨ 상세 보기 팝업 */
+        #detailViewModal .modal-content { width: 400px; padding: 2rem; }
+        .detail-view-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; margin-bottom: 1.2rem; color: white;}
+        .detail-view-text { font-size: 1.15rem; font-weight: 600; color: var(--text-main); line-height: 1.6; word-break: break-word; margin-bottom: 2rem; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+
+    <div id="loadingScreen">
+        <div style="font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.03em; color: #000;">ONPlan2SNU27</div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: #888;">생태계 동기화 중...</div>
+    </div>
+
+    <div class="dashboard">
+        <header>
+            <div class="brand">
+                <div class="brand-text">
+                    <h1>ONPlan2SNU27</h1>
+                    <div class="subtitle">Visual Planner Ecosystem</div>
+                </div>
+                <!-- 뷰 전환 -->
+                <div class="view-toggles">
+                    <button class="view-btn active" id="btnViewMonth" onclick="changeViewMode('month')">Month</button>
+                    <button class="view-btn" id="btnViewWeek" onclick="changeViewMode('week')">Week</button>
+                    <button class="view-btn" id="btnViewDay" onclick="changeViewMode('day')">Day</button>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-action" onclick="window.goToToday()">Today</button>
+                <button class="btn-gemini" onclick="openModal('geminiModal')" title="AI 멘토 열기"><span>✨</span> Ask AI</button>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <section class="calendar-panel">
+                <div class="cal-header">
+                    <div class="month-title" id="monthDisplay">May 2026</div>
+                    <div class="cal-nav">
+                        <button class="btn-nav" onclick="changeDateRange(-1)">&lt;</button>
+                        <button class="btn-nav" onclick="changeDateRange(1)">&gt;</button>
+                    </div>
+                </div>
+                <div id="calendarBody"></div>
+            </section>
+
+            <aside class="detail-panel">
+                <div class="detail-header">
+                    <div class="selected-day-display" id="selectedDayName">FRIDAY</div>
+                    <div class="selected-date-display" id="selectedDateDisplay">2026.05.02</div>
+                </div>
+
+                <div class="split-sections">
+                    <div class="section-wrapper section-schedules">
+                        <div class="section-title">
+                            Schedules
+                            <button class="btn-add-sm btn-add-sch" onclick="openModal('scheduleAddModal')">Add</button>
+                        </div>
+                        <div class="item-list" id="scheduleList"></div>
+                    </div>
+
+                    <div class="section-wrapper section-plans">
+                        <div class="section-title">
+                            Plans & Tasks
+                            <button class="btn-add-sm" onclick="openPlanAddModal()">Add</button>
+                        </div>
+                        <div class="item-list" id="planList"></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- ✅ 하단 고정 푸터 복구 -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span style="color: #eee;">ONStudy Ecosystem</span>
+                <div class="sync-status">
+                    <div class="sync-dot"></div> Live Sync Active
+                </div>
+            </div>
+            <div class="footer-center">
+                <div class="progress-container">
+                    <span id="footerProgressText">Today's Tasks: 0 / 0</span>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="footerProgressBar"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-right">
+              D-DAY <span id="footerDday">2026.11.19</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 상세 보기 팝업 -->
+    <div id="detailViewModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="detailViewBadge" class="detail-view-badge">Task</div>
+            <div id="detailViewText" class="detail-view-text">상세 내용이 여기에 표시됩니다.</div>
+            <div class="modal-footer" style="margin-top: 0;">
+                <button class="btn-cancel" onclick="closeModal('detailViewModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini 패널 모달 -->
+    <div id="geminiModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="gemini-header">
+                <div class="gemini-header-title"><span>✨</span> ONStudy AI Mentor</div>
+                <button class="btn-close-gemini" onclick="closeModal('geminiModal')">×</button>
+            </div>
+            <div class="gemini-chat-area" id="chatArea"></div>
+            <div class="gemini-input-area">
+                <input type="text" id="geminiInput" class="gemini-input" placeholder="학습 계획이나 현재 고민에 대해 자유롭게 질문해보세요..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                <button class="gemini-send" onclick="sendChatMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. 일정 추가 모달 -->
+    <div id="scheduleAddModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Add Schedule</h3>
+            <div class="form-group">
+                <label class="form-label">일정 내용</label>
+                <input type="text" id="addSchInput" class="form-input" placeholder="예: 6월 모의평가">
+            </div>
+            <div class="form-group">
+                <label class="form-label">라벨 색상</label>
+                <div class="color-picker-wrap">
+                    <input type="color" id="addSchColor" class="color-input" value="#EF4444">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('scheduleAddModal')">Cancel</button>
+                <button class="btn-save" onclick="saveNewSchedule()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 일정 수정 모달 -->
+    <div id="scheduleEditModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Edit Schedule</h3>
+            <div class="form-group">
+                <label class="form-label">일정 내용</label>
+                <input type="text" id="editSchInput" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">날짜 수정</label>
+                <input type="date" id="editSchDate" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">라벨 색상</label>
+                <div class="color-picker-wrap">
+                    <input type="color" id="editSchColor" class="color-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('scheduleEditModal')">Cancel</button>
+                <button class="btn-save" onclick="saveEditedSchedule()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 계획 추가 모달 -->
+    <div id="planAddModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Add Plan</h3>
+            <div class="form-group">
+                <label class="form-label">계획 유형</label>
+                <select id="addPlanType" class="form-select" onchange="toggleAddPlanType()">
+                    <option value="normal">일반 할 일 (General Task)</option>
+                    <option value="study">문제집 진도 연동 (Study Quest)</option>
+                </select>
+            </div>
+            <div id="addStudyGroup" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label">문제집 선택</label>
+                    <select id="addPlanBook" class="form-select" onchange="updateAddChapterSelect()"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">단원 선택</label>
+                    <select id="addPlanChapter" class="form-select"></select>
+                </div>
+            </div>
+            <div id="addNormalGroup" class="form-group">
+                <label class="form-label">할 일 내용</label>
+                <input type="text" id="addPlanInput" class="form-input" placeholder="어떤 공부를 계획할까요?">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('planAddModal')">Cancel</button>
+                <button class="btn-save" onclick="saveNewPlan()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 계획 수정 모달 -->
+    <div id="planEditModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Edit Plan</h3>
+            <div class="form-group">
+                <label class="form-label">내용 수정</label>
+                <input type="text" id="editPlanInput" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">날짜 수정</label>
+                <input type="date" id="editPlanDate" class="form-input">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('planEditModal')">Cancel</button>
+                <button class="btn-save" onclick="saveEditedPlan()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDW4xa4Qn5EI1AGlOyAUHwlB6Dtl3NHxHE",
+          authDomain: "onstudytosnu27-851e8.firebaseapp.com",
+          projectId: "onstudytosnu27-851e8",
+          storageBucket: "onstudytosnu27-851e8.firebasestorage.app",
+          messagingSenderId: "695549162437",
+          appId: "1:695549162437:web:6cf537b21da18d63e591ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const USER_DOC_ID = "minchan_data";
+
+        let appData = { dailyPlanner: {}, books: [], chatHistory: [] };
+        let currentViewMode = 'month';
+        let currentDisplayDate = new Date();
+        let miniDisplayDate = new Date();
+        let selectedDateStr = getRealTodayString();
+        let editTarget = { type: '', oldDate: '', idx: -1 };
+
+        const ICON_EDIT = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+        const ICON_TRASH = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+
+        function getFixedDateKey(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}.${m}.${d}`;
+        }
+
+        function getStudyDateString(dateObj = new Date()) {
+            const temp = new Date(dateObj);
+            if (dateObj.toDateString() === new Date().toDateString() && temp.getHours() < 5) {
+                temp.setDate(temp.getDate() - 1);
+            }
+            return getFixedDateKey(temp);
+        }
+
+        function getRealTodayString() { return getFixedDateKey(new Date()); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            onSnapshot(doc(db, "users", USER_DOC_ID), (docSnap) => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 500);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.dailyPlanner) appData.dailyPlanner = data.dailyPlanner;
+                    if (data.books) appData.books = data.books;
+                    if (data.chatHistory) appData.chatHistory = data.chatHistory;
+                }
+                renderCalendarBody();
+                renderDetailPanel();
+                if (typeof window.renderChatHistory === 'function') window.renderChatHistory();
+            });
+        });
+
+        window.changeViewMode = function(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btnView' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+
+            miniDisplayDate = new Date(currentDisplayDate);
+
+            const body = document.getElementById('calendarBody');
+            body.style.opacity = '0';
+            setTimeout(() => {
+                renderCalendarBody();
+                body.style.opacity = '1';
+            }, 200);
+        };
+
+        window.changeDateRange = function(offset) {
+            const body = document.getElementById('calendarBody');
+            body.style.opacity = '0';
+            setTimeout(() => {
+                if (currentViewMode === 'month') {
+                    currentDisplayDate.setMonth(currentDisplayDate.getMonth() + offset);
+                } else if (currentViewMode === 'week') {
+                    let d = new Date(selectedDateStr.replace(/\./g, '-'));
+                    d.setDate(d.getDate() + (offset * 7));
+                    selectedDateStr = getFixedDateKey(d);
+                    currentDisplayDate = new Date(d);
+                } else if (currentViewMode === 'day') {
+                    let d = new Date(selectedDateStr.replace(/\./g, '-'));
+                    d.setDate(d.getDate() + offset);
+                    selectedDateStr = getFixedDateKey(d);
+                    currentDisplayDate = new Date(d);
+                }
+                miniDisplayDate = new Date(currentDisplayDate);
+                renderCalendarBody();
+                renderDetailPanel();
+                body.style.opacity = '1';
+            }, 200);
+        };
+
+        window.changeMiniMonth = function(offset) {
+            miniDisplayDate.setMonth(miniDisplayDate.getMonth() + offset);
+            renderMiniCalendar(document.getElementById('miniCalContainer'));
+        };
+
+        window.goToToday = function() {
+            currentDisplayDate = new Date();
+            miniDisplayDate = new Date();
+            selectedDateStr = getRealTodayString();
+
+            const body = document.getElementById('calendarBody');
+            body.style.opacity = '0';
+            setTimeout(() => {
+                renderCalendarBody();
+                renderDetailPanel();
+                body.style.opacity = '1';
+            }, 200);
+        }
+
+        window.selectDate = function(dateKey) {
+            selectedDateStr = dateKey;
+            currentDisplayDate = new Date(dateKey.replace(/\./g, '-'));
+            renderCalendarBody();
+            renderDetailPanel();
+        }
+
+        // ✨ 클릭 시 상세 보기 팝업
+        window.showItemDetail = function(type, dateKey, idx, event) {
+            event.stopPropagation();
+            const data = appData.dailyPlanner[dateKey];
+            if(!data) return;
+
+            const badge = document.getElementById('detailViewBadge');
+            const textEl = document.getElementById('detailViewText');
+
+            if (type === 'schedule') {
+                const sch = data.schedules[idx];
+                badge.innerText = "Schedule";
+                badge.style.backgroundColor = sch.color || '#EF4444';
+                textEl.innerText = sch.content;
+            } else if (type === 'task') {
+                const task = data.tasks[idx];
+                badge.innerText = "Plan & Task";
+                badge.style.backgroundColor = 'var(--accent)';
+                textEl.innerText = task.content;
+            }
+            openModal('detailViewModal');
+        };
+
+        function renderCalendarBody() {
+            const container = document.getElementById('calendarBody');
+            const monthDisplay = document.getElementById('monthDisplay');
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            if (currentViewMode === 'month') {
+                monthDisplay.innerText = `${monthNames[currentDisplayDate.getMonth()]} ${currentDisplayDate.getFullYear()}`;
+                container.innerHTML = `
+                    <div class="cal-grid-header">
+                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                    </div>
+                    <div class="cal-grid" id="mainCalGrid"></div>
+                `;
+                renderMonthGrid(document.getElementById('mainCalGrid'));
+            } else {
+                container.innerHTML = `
+                    <div class="split-view-container">
+                        <div class="mini-cal-container" id="miniCalContainer"></div>
+                        <div id="subViewContainer" style="flex:1; min-width:0; display:flex; flex-direction:column;"></div>
+                    </div>
+                `;
+                renderMiniCalendar(document.getElementById('miniCalContainer'));
+
+                if (currentViewMode === 'week') {
+                    monthDisplay.innerText = `Week of ${monthNames[currentDisplayDate.getMonth()]} ${currentDisplayDate.getFullYear()}`;
+                    renderWeekView(document.getElementById('subViewContainer'));
+                } else if (currentViewMode === 'day') {
+                    monthDisplay.innerText = `${selectedDateStr.replace(/\./g, ' / ')}`;
+                    renderDayView(document.getElementById('subViewContainer'));
+                }
+            }
+        }
+
+        function renderMonthGrid(grid) {
+            const year = currentDisplayDate.getFullYear();
+            const month = currentDisplayDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(createCellHTML(year, month - 1, daysInPrevMonth - i, true));
+            for (let d = 1; d <= daysInMonth; d++) grid.appendChild(createCellHTML(year, month, d, false));
+            const remainingCells = 42 - (firstDay + daysInMonth);
+            for (let d = 1; d <= remainingCells; d++) grid.appendChild(createCellHTML(year, month + 1, d, true));
+        }
+
+        function createCellHTML(year, month, day, isOtherMonth) {
+            const dateObj = new Date(year, month, day);
+            const dateKey = getFixedDateKey(dateObj);
+            const isToday = (dateKey === getRealTodayString());
+            const isSelected = (dateKey === selectedDateStr);
+
+            const cell = document.createElement('div');
+            cell.className = `cal-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isOtherMonth ? 'other-month' : ''}`;
+            cell.onclick = () => selectDate(dateKey);
+
+            let previewHtml = '<div class="task-preview">';
+            let colorDotsHtml = '';
+            let taskCountHtml = '';
+
+            const dayData = appData.dailyPlanner[dateKey];
+            if (dayData) {
+                const schedules = dayData.schedules || [];
+                if (schedules.length > 0) {
+                    schedules.forEach((sch, idx) => {
+                        colorDotsHtml += `<div class="color-dot" style="background-color: ${sch.color || '#EF4444'};"></div>`;
+                        // 말줄임 텍스트 & 상세 팝업
+                        previewHtml += `<div class="mini-schedule truncate-text" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                    });
+                }
+                const tasks = dayData.tasks || [];
+                if (tasks.length > 0) {
+                    taskCountHtml = `<div class="task-count-badge">📝 ${tasks.length}</div>`;
+                    const displayLimit = 4;
+                    for (let i = 0; i < Math.min(tasks.length, displayLimit); i++) {
+                        previewHtml += `<div class="mini-task truncate-text ${tasks[i].done ? 'done' : ''}" onclick="showItemDetail('task', '${dateKey}', ${i}, event)">${tasks[i].content}</div>`;
+                    }
+                    if (tasks.length > displayLimit) previewHtml += `<div class="more-tasks">+${tasks.length - displayLimit} more</div>`;
+                }
+            }
+            previewHtml += '</div>';
+
+            cell.innerHTML = `
+                <div class="cell-top-bar">
+                    <div class="date-num">${day}</div>
+                    <div class="cell-badges">
+                        <div class="color-dots">${colorDotsHtml}</div>
+                        ${taskCountHtml}
+                    </div>
+                </div>
+                ${previewHtml}
+            `;
+            return cell;
+        }
+
+        function renderMiniCalendar(container) {
+            const year = miniDisplayDate.getFullYear();
+            const month = miniDisplayDate.getMonth();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            let html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <div class="mini-cal-month">${monthNames[month]} ${year}</div>
+                    <div style="display:flex; gap:4px;">
+                        <button class="btn-nav" style="width:26px; height:26px; font-size:0.9rem;" onclick="changeMiniMonth(-1)">&lt;</button>
+                        <button class="btn-nav" style="width:26px; height:26px; font-size:0.9rem;" onclick="changeMiniMonth(1)">&gt;</button>
+                    </div>
+                </div>
+                <div class="mini-cal-grid">
+            `;
+            const dayNames = ['S','M','T','W','T','F','S'];
+            dayNames.forEach(d => { html += `<div class="mini-cal-dayname">${d}</div>`; });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            let cellsHtml = '';
+            for (let i = firstDay - 1; i >= 0; i--) cellsHtml += createMiniCell(year, month - 1, daysInPrevMonth - i, true);
+            for (let d = 1; d <= daysInMonth; d++) cellsHtml += createMiniCell(year, month, d, false);
+            const remainingCells = 42 - (firstDay + daysInMonth);
+            for (let d = 1; d <= remainingCells; d++) cellsHtml += createMiniCell(year, month + 1, d, true);
+
+            html += cellsHtml + `</div>`;
+            container.innerHTML = html;
+        }
+
+        function createMiniCell(year, month, day, isOtherMonth) {
+            const dateObj = new Date(year, month, day);
+            const dateKey = getFixedDateKey(dateObj);
+            const isToday = (dateKey === getRealTodayString());
+            const isSelected = (dateKey === selectedDateStr);
+            const classNames = `mini-cal-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isOtherMonth ? 'other-month' : ''}`;
+            return `<div class="${classNames}" onclick="selectDate('${dateKey}')">${day}</div>`;
+        }
+
+        function renderWeekView(container) {
+            let d = new Date(selectedDateStr.replace(/\./g, '-'));
+            let day = d.getDay();
+            let startOfWeek = new Date(d);
+            startOfWeek.setDate(d.getDate() - day);
+
+            let headerHtml = `<div class="week-grid-header">`;
+            let bodyHtml = `<div class="week-grid-body">`;
+            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+            for (let i = 0; i < 7; i++) {
+                let currentDay = new Date(startOfWeek);
+                currentDay.setDate(startOfWeek.getDate() + i);
+                const dateKey = getFixedDateKey(currentDay);
+                const isToday = (dateKey === getRealTodayString());
+
+                headerHtml += `
+                    <div class="week-header-cell ${isToday ? 'today' : ''}" style="cursor:pointer;" onclick="selectDate('${dateKey}')">
+                        <div class="week-day-name">${dayNames[i]}</div>
+                        <div class="week-day-num">${currentDay.getDate()}</div>
+                    </div>`;
+
+                let colHtml = `<div class="week-col" onclick="selectDate('${dateKey}')">`;
+                const dayData = appData.dailyPlanner[dateKey];
+                if (dayData) {
+                    (dayData.schedules || []).forEach((sch, idx) => {
+                        // 텍스트 자름 클래스 포함 + 팝업
+                        colHtml += `<div class="mini-schedule truncate-text" style="background:rgba(239, 68, 68, 0.1); border-radius:4px; padding:6px 8px;" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                    });
+                    (dayData.tasks || []).forEach((task, idx) => {
+                        colHtml += `<div class="mini-task truncate-text ${task.done ? 'done' : ''}" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
+                    });
+                }
+                colHtml += `</div>`;
+                bodyHtml += colHtml;
+            }
+            headerHtml += `</div>`;
+            bodyHtml += `</div>`;
+
+            container.innerHTML = `<div class="week-view-container">${headerHtml}${bodyHtml}</div>`;
+        }
+
+        function renderDayView(container) {
+            const dateObj = new Date(selectedDateStr.replace(/\./g, '-'));
+            const dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+            const dayName = dayNames[dateObj.getDay()];
+            const dayNum = dateObj.getDate();
+
+            let html = `
+                <div class="day-view-container">
+                    <div class="day-hero-date">${dayNum}</div>
+                    <div class="day-hero-day">${dayName}</div>
+                    <div class="day-items-list">
+            `;
+
+            const dayData = appData.dailyPlanner[selectedDateStr];
+            if (!dayData || ((!dayData.schedules || dayData.schedules.length===0) && (!dayData.tasks || dayData.tasks.length===0))) {
+                html += `<div style="color:var(--text-sub); font-weight:600; margin-top:1rem;">등록된 일정이 없습니다. 우측 패널에서 추가해주세요.</div>`;
+            } else {
+                (dayData.schedules || []).forEach((sch, idx) => {
+                    html += `
+                        <div class="day-item-card" onclick="showItemDetail('schedule', '${selectedDateStr}', ${idx}, event)">
+                            <span style="width:14px; height:14px; border-radius:50%; background:${sch.color || '#EF4444'}; flex-shrink:0;"></span>
+                            <span class="truncate-text" style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${sch.content}</span>
+                        </div>
+                    `;
+                });
+                (dayData.tasks || []).forEach((task, idx) => {
+                    html += `
+                        <div class="day-item-card" style="${task.done ? 'opacity:0.5;' : ''}" onclick="showItemDetail('task', '${selectedDateStr}', ${idx}, event)">
+                            <div style="width:20px; height:20px; border-radius:6px; border:2px solid ${task.done ? 'var(--success)' : 'var(--text-sub)'}; background:${task.done ? 'var(--success)' : 'transparent'}; display:flex; justify-content:center; align-items:center; color:white; font-size:12px; font-weight:bold; flex-shrink:0;">${task.done ? '✓' : ''}</div>
+                            <span class="truncate-text" style="font-size:1.05rem; font-weight:700; color:var(--text-main); ${task.done ? 'text-decoration:line-through;' : ''}">${task.content}</span>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        // 푸터 프로그레스 바
+        function updateFooterProgress() {
+            const progressText = document.getElementById('footerProgressText');
+            const progressBar = document.getElementById('footerProgressBar');
+
+            const dayData = appData.dailyPlanner[selectedDateStr];
+            if (!dayData || !dayData.tasks || dayData.tasks.length === 0) {
+                progressText.innerText = "Today's Tasks: 0 / 0";
+                progressBar.style.width = "0%";
+                return;
+            }
+
+            const total = dayData.tasks.length;
+            const done = dayData.tasks.filter(t => t.done).length;
+            const percent = Math.round((done / total) * 100);
+
+            progressText.innerText = `Today's Tasks: ${done} / ${total} (${percent}%)`;
+            progressBar.style.width = `${percent}%`;
+        }
+
+        // 우측 패널 (Truncate 없음, 전체 내용 노출)
+        function renderDetailPanel() {
+            const dateObj = new Date(selectedDateStr.replace(/\./g, '-'));
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+            document.getElementById('selectedDayName').innerText = dayNames[dateObj.getDay()];
+            document.getElementById('selectedDateDisplay').innerText = selectedDateStr;
+
+            const scheduleList = document.getElementById('scheduleList');
+            const planList = document.getElementById('planList');
+            scheduleList.innerHTML = ''; planList.innerHTML = '';
+
+            const dayData = appData.dailyPlanner[selectedDateStr] || { tasks: [], schedules: [] };
+
+            const schedules = dayData.schedules || [];
+            if (schedules.length === 0) {
+                scheduleList.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:0.85rem; margin-top:1.5rem; font-weight:600;">등록된 일정이 없습니다.</div>`;
+            } else {
+                schedules.forEach((sch, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'list-card';
+                    div.innerHTML = `
+                        <div class="sch-content">
+                            <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:${sch.color || '#EF4444'}; flex-shrink:0;"></span>
+                            <span class="sch-text">${sch.content}</span>
+                        </div>
+                        <div class="btn-icon-group">
+                            <button class="btn-icon" onclick="openScheduleEditModal(${idx})" title="수정">${ICON_EDIT}</button>
+                            <button class="btn-icon delete" onclick="deleteSchedule(${idx})" title="삭제">${ICON_TRASH}</button>
+                        </div>
+                    `;
+                    scheduleList.appendChild(div);
+                });
+            }
+
+            const tasks = dayData.tasks || [];
+            if (tasks.length === 0) {
+                planList.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:0.85rem; margin-top:1.5rem; font-weight:600;">계획이 비어있습니다.</div>`;
+            } else {
+                tasks.forEach((task, idx) => {
+                    const div = document.createElement('div');
+                    div.className = `list-card ${task.done ? 'done' : ''}`;
+                    div.innerHTML = `
+                        <div class="custom-checkbox" onclick="togglePlanDone(${idx}, event)"></div>
+                        <div class="list-content">${task.content}</div>
+                        <div class="btn-icon-group">
+                            <button class="btn-icon" onclick="openPlanEditModal(${idx})" title="수정">${ICON_EDIT}</button>
+                            <button class="btn-icon delete" onclick="deletePlan(${idx})" title="삭제">${ICON_TRASH}</button>
+                        </div>
+                    `;
+                    planList.appendChild(div);
+                });
+            }
+            updateFooterProgress(); // 푸터 바도 같이 업데이트
+        }
+
+        window.openModal = (id) => {
+            document.getElementById(id).classList.add('show');
+            if(id === 'geminiModal') {
+                document.getElementById('geminiInput').focus();
+                if (typeof window.renderChatHistory === 'function') window.renderChatHistory();
+            }
+        };
+        window.closeModal = (id) => { document.getElementById(id).classList.remove('show'); };
+
+        async function syncToFirebase() {
+            try { await setDoc(doc(db, "users", USER_DOC_ID), { dailyPlanner: appData.dailyPlanner }, { merge: true }); }
+            catch (e) { console.error("Sync Error:", e); alert("저장 실패"); }
+        }
+
+        window.saveNewSchedule = async () => {
+            const content = document.getElementById('addSchInput').value.trim();
+            const color = document.getElementById('addSchColor').value;
+            if (!content) return;
+            if (!appData.dailyPlanner[selectedDateStr]) appData.dailyPlanner[selectedDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[selectedDateStr].schedules) appData.dailyPlanner[selectedDateStr].schedules = [];
+
+            appData.dailyPlanner[selectedDateStr].schedules.push({ id: Date.now(), content, color });
+            closeModal('scheduleAddModal'); document.getElementById('addSchInput').value = '';
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.openScheduleEditModal = (idx) => {
+            const sch = appData.dailyPlanner[selectedDateStr].schedules[idx];
+            editTarget = { type: 'schedule', oldDate: selectedDateStr, idx: idx };
+            document.getElementById('editSchInput').value = sch.content;
+            document.getElementById('editSchDate').value = selectedDateStr.replace(/\./g, '-');
+            document.getElementById('editSchColor').value = sch.color || '#EF4444';
+            openModal('scheduleEditModal');
+        };
+
+        window.saveEditedSchedule = async () => {
+            const newContent = document.getElementById('editSchInput').value.trim();
+            const newDateStr = document.getElementById('editSchDate').value.replace(/-/g, '.');
+            const newColor = document.getElementById('editSchColor').value;
+            if(!newContent || !newDateStr) return;
+
+            const targetItem = appData.dailyPlanner[editTarget.oldDate].schedules.splice(editTarget.idx, 1)[0];
+            targetItem.content = newContent; targetItem.color = newColor;
+
+            if (!appData.dailyPlanner[newDateStr]) appData.dailyPlanner[newDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[newDateStr].schedules) appData.dailyPlanner[newDateStr].schedules = [];
+            appData.dailyPlanner[newDateStr].schedules.push(targetItem);
+
+            closeModal('scheduleEditModal');
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.deleteSchedule = async (idx) => {
+            if (!confirm("삭제하시겠습니까?")) return;
+            appData.dailyPlanner[selectedDateStr].schedules.splice(idx, 1);
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.openPlanAddModal = () => {
+            openModal('planAddModal');
+            document.getElementById('addPlanType').value = 'normal';
+            window.toggleAddPlanType();
+        };
+
+        window.toggleAddPlanType = function() {
+            const isStudy = document.getElementById('addPlanType').value === 'study';
+            document.getElementById('addStudyGroup').style.display = isStudy ? 'block' : 'none';
+            document.getElementById('addNormalGroup').style.display = isStudy ? 'none' : 'block';
+            if(isStudy) {
+                const sel = document.getElementById('addPlanBook');
+                sel.innerHTML = '<option value="">문제집 선택...</option>';
+                appData.books.forEach(b => { sel.innerHTML += `<option value="${b.id}">${b.title}</option>`; });
+                document.getElementById('addPlanChapter').innerHTML = '<option value="">먼저 문제집을 선택하세요</option>';
+            }
+        };
+
+        window.updateAddChapterSelect = function() {
+            const bid = document.getElementById('addPlanBook').value;
+            const csel = document.getElementById('addPlanChapter');
+            csel.innerHTML = '<option value="">단원 선택...</option>';
+            const book = appData.books.find(x => x.id == bid);
+            if(book) { book.chapters.forEach((c, i) => { csel.innerHTML += `<option value="${i}">${c.name} ${c.done ? '(완료)' : ''}</option>`; }); }
+        };
+
+        window.saveNewPlan = async () => {
+            const type = document.getElementById('addPlanType').value;
+            let newTask = { id: Date.now(), type: type, done: false, content: '' };
+            if (type === 'study') {
+                const bid = document.getElementById('addPlanBook').value;
+                const cid = document.getElementById('addPlanChapter').value;
+                if (!bid || cid === "") return alert("문제집과 단원을 선택하세요!");
+                const b = appData.books.find(x => x.id == bid);
+                newTask.content = `[${b.title}] ${b.chapters[cid].name}`;
+                newTask.bookId = bid; newTask.chapterIdx = cid;
+            } else {
+                const content = document.getElementById('addPlanInput').value.trim();
+                if (!content) return;
+                newTask.content = content;
+            }
+
+            if (!appData.dailyPlanner[selectedDateStr]) appData.dailyPlanner[selectedDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[selectedDateStr].tasks) appData.dailyPlanner[selectedDateStr].tasks = [];
+            appData.dailyPlanner[selectedDateStr].tasks.push(newTask);
+
+            closeModal('planAddModal'); document.getElementById('addPlanInput').value = '';
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.openPlanEditModal = (idx) => {
+            const task = appData.dailyPlanner[selectedDateStr].tasks[idx];
+            editTarget = { type: 'task', oldDate: selectedDateStr, idx: idx };
+            document.getElementById('editPlanInput').value = task.content;
+            document.getElementById('editPlanDate').value = selectedDateStr.replace(/\./g, '-');
+            openModal('planEditModal');
+        };
+
+        window.saveEditedPlan = async () => {
+            const newContent = document.getElementById('editPlanInput').value.trim();
+            const newDateStr = document.getElementById('editPlanDate').value.replace(/-/g, '.');
+            if(!newContent || !newDateStr) return;
+
+            const targetItem = appData.dailyPlanner[editTarget.oldDate].tasks.splice(editTarget.idx, 1)[0];
+            targetItem.content = newContent;
+
+            if (!appData.dailyPlanner[newDateStr]) appData.dailyPlanner[newDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[newDateStr].tasks) appData.dailyPlanner[newDateStr].tasks = [];
+            appData.dailyPlanner[newDateStr].tasks.push(targetItem);
+
+            closeModal('planEditModal');
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        }
+
+        window.deletePlan = async (idx) => {
+            if (!confirm("삭제하시겠습니까?")) return;
+            appData.dailyPlanner[selectedDateStr].tasks.splice(idx, 1);
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.togglePlanDone = async (idx, e) => {
+            if(e) e.stopPropagation();
+            const task = appData.dailyPlanner[selectedDateStr].tasks[idx];
+            task.done = !task.done;
+
+            if (task.type === 'study' && task.bookId != null && task.chapterIdx != null) {
+                const bookIndex = appData.books.findIndex(x => x.id == task.bookId);
+                if (bookIndex > -1 && appData.books[bookIndex].chapters[task.chapterIdx]) {
+                    appData.books[bookIndex].chapters[task.chapterIdx].done = task.done;
+                    try { await setDoc(doc(db, "users", USER_DOC_ID), { books: appData.books }, { merge: true }); }
+                    catch (err) { console.error("Book Sync Error:", err); }
+                }
+            }
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        // ==========================================
+        // ✨ Gemini Chat API
+        // ==========================================
+        window.renderChatHistory = function() {
+            const chatArea = document.getElementById('chatArea');
+            if (!appData.chatHistory || appData.chatHistory.length === 0) {
+                chatArea.innerHTML = `<div class="chat-bubble chat-bot">안녕하세요! 학습 계획이나 고민이 있다면 편하게 말씀해주세요. 😊</div>`;
+                return;
+            }
+
+            let html = '';
+            appData.chatHistory.forEach(msg => {
+                const roleClass = msg.role === 'user' ? 'chat-user' : 'chat-bot';
+                html += `<div class="chat-bubble ${roleClass}">${msg.text.replace(/\n/g, '<br>')}</div>`;
+            });
+            chatArea.innerHTML = html;
+            chatArea.scrollTop = chatArea.scrollHeight;
+        };
+
+        window.sendChatMessage = async () => {
+            const inputEl = document.getElementById('geminiInput');
+            const chatArea = document.getElementById('chatArea');
+            const text = inputEl.value.trim();
+            if(!text) return;
+
+            if (!appData.chatHistory) appData.chatHistory = [];
+            appData.chatHistory.push({ role: 'user', text: text });
+            inputEl.value = '';
+            renderChatHistory();
+
+            try { await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true }); }
+            catch (e) { console.error("채팅 저장 에러:", e); }
+
+            const loadingId = "loading-" + Date.now();
+            chatArea.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="opacity: 0.5;">답변을 생성하는 중...</div>`;
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            const GEMINI_API_KEY = "AIzaSyCggfn7G_d37GejuI6oPV9zADoa_1HrK3I"; // 🚨 API 키 입력
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+            const historyContents = appData.chatHistory.map(msg => ({
+                role: msg.role === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.text }]
+            }));
+
+            try {
+                if (GEMINI_API_KEY === "YOUR_API_KEY_HERE") throw new Error("API 키를 입력해주세요!");
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: historyContents,
+                        systemInstruction: {
+                            parts: [{ text: "너는 서울대학교 컴퓨터공학부를 목표로 하는 고등학생 '송민찬'을 돕는 최고의 AI 멘토야. 친절하고, 분석적이며, 공부 계획과 컴퓨터 공학 지식에 대해 핵심만 짚어서 조언해줘." }]
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API 응답 에러: ${response.status} - ${errorData.error?.message || '알 수 없는 오류'}`);
+                }
+
+                const data = await response.json();
+                const botReply = data.candidates[0].content.parts[0].text;
+
+                appData.chatHistory.push({ role: 'bot', text: botReply });
+                renderChatHistory();
+                await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true });
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                document.getElementById(loadingId).innerHTML = `앗, 에러가 발생했어!<br><span style="font-size:0.8rem; color:var(--danger);">(${error.message})</span>`;
+            }
+        };
+
+        window.onclick = function(e) {
+            if(e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
