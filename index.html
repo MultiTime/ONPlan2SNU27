@@ -530,57 +530,60 @@
         function getRealTodayString() { return getFixedDateKey(new Date()); }
 
         // ==========================================
-        // ✨ 데이터 로드 및 초기 렌더링 (방어 코드 및 에러 핸들링 추가)
+        // ✨ 데이터 로드 및 무한 로딩 방지 (Fallback) 적용
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             const docRef = doc(db, "users", USER_DOC_ID);
+            
+            // 🚨 안전장치: 3초가 지나도 파이어베이스가 응답이 없으면 강제로 화면부터 엽니다.
+            const fallbackTimer = setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen && loadingScreen.style.display !== 'none') {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => { loadingScreen.style.display = 'none'; }, 400);
+                    console.warn("⚠️ 연결 지연: 오프라인 모드로 우선 진입합니다.");
+                    
+                    // 빈 데이터로라도 일단 화면을 그려서 먹통을 방지함
+                    renderCalendarBody();
+                    renderDetailPanel();
+                    renderMemoList();
+                }
+            }, 3000); // 3000ms = 3초
 
-            // onSnapshot에 에러 콜백 추가
+            // 파이어베이스 실시간 데이터 수신
             onSnapshot(docRef, (docSnap) => {
-                // 1. 데이터가 무사히 도착하면 로딩창 제거
+                // 정상적으로 데이터를 받았으므로 3초 강제종료 타이머 취소
+                clearTimeout(fallbackTimer); 
+
                 const loadingScreen = document.getElementById('loadingScreen');
                 if (loadingScreen && loadingScreen.style.display !== 'none') {
                     loadingScreen.style.opacity = '0';
                     setTimeout(() => { loadingScreen.style.display = 'none'; }, 400);
                 }
                 
-                // 2. 데이터 안전하게 덮어씌우기 (undefined 방지)
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     appData.dailyPlanner = data.dailyPlanner || {};
-                    appData.books = data.books || [];
-                    appData.chatHistory = data.chatHistory || [];
+                    appData.books = data.books || []; 
+                    appData.chatHistory = data.chatHistory || []; 
                     appData.memos = data.memos || [];
                 }
-
-                // 3. 화면 렌더링 시 하나가 에러나도 전체가 뻗지 않도록 try-catch 적용
+                
                 try {
                     renderCalendarBody();
                     renderDetailPanel();
+                    calculateStatistics && typeof calculateStatistics === 'function' ? calculateStatistics() : null;
                     renderMemoList();
-                    if (typeof window.renderChatHistory === 'function') {
-                        window.renderChatHistory(); 
-                    }
-                } catch (renderError) {
-                    console.error("화면을 그리는 중 오류 발생:", renderError);
+                    if (typeof window.renderChatHistory === 'function') window.renderChatHistory(); 
+                } catch (err) {
+                    console.error("렌더링 에러:", err);
                 }
-
             }, (error) => {
-                // 🚨 파이어베이스 통신 에러 발생 시 처리 (무한 로딩 방지)
-                console.error("Firebase 로드 에러:", error);
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.innerHTML = `
-                        <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
-                        <div style="font-size: 1.2rem; font-weight: 800; color: #111827; margin-bottom: 5px;">연결 지연됨</div>
-                        <div style="font-size: 0.9rem; color: #EF4444; text-align: center; max-width: 80%;">
-                            데이터를 불러오지 못했습니다.<br>새로고침 하거나 네트워크를 확인해주세요.
-                        </div>
-                        <button onclick="location.reload()" style="margin-top: 20px; padding: 8px 16px; border: none; background: #2563EB; color: white; border-radius: 8px; cursor: pointer; font-weight: bold;">새로고침</button>
-                    `;
-                }
+                console.error("파이어베이스 수신 에러:", error);
+                alert("데이터를 불러오는 중 오류가 발생했습니다. 네트워크를 확인해주세요.");
             });
         });
+
 
 
         // ==========================================
