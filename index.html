@@ -490,10 +490,10 @@
         </div>
     </div>
 
-            <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // ✅ getDoc 모듈 추가
-        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // 🚨 1. getFirestore 대신 initializeFirestore를 가져옵니다.
+        import { initializeFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDW4xa4Qn5EI1AGlOyAUHwlB6Dtl3NHxHE",
@@ -505,20 +505,27 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        
+        // 🚨 2. 태블릿 무한 로딩 해결을 위해 통신 방식을 강제로 우회(Long Polling) 시킵니다!
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
+        
         const USER_DOC_ID = "minchan_data";
 
-        let appData = { dailyPlanner: {}, chatHistory: [], memos: [] };
-        let currentViewMode = 'week'; 
+        let appData = { dailyPlanner: {}, books: [], chatHistory: [], memos: [] };
+        let currentViewMode = 'month';
         let currentDisplayDate = new Date();
         let miniDisplayDate = new Date();
         let selectedDateStr = getRealTodayString();
-        
-        let isEditMode = false;
-        let editTaskData = { oldDate: '', idx: -1 };
-        
+        let editTarget = { type: '', oldDate: '', idx: -1 };
+
+        // 메모 상태
         let currentMemoId = null;
         let isMemoUnsaved = false;
+
+        const ICON_EDIT = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+        const ICON_TRASH = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
 
         function getFixedDateKey(dateObj) {
             const y = dateObj.getFullYear();
@@ -527,94 +534,80 @@
             return `${y}.${m}.${d}`;
         }
         function getRealTodayString() { return getFixedDateKey(new Date()); }
-        function formatShortDate(dateObj) {
-            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const d = String(dateObj.getDate()).padStart(2, '0');
-            return `${m}-${d}`;
-        }
 
-        // 🔥 여기서부터 로딩 로직 전면 개편
-        document.addEventListener('DOMContentLoaded', async () => {
-            const loadingScreen = document.getElementById('loadingScreen');
+        // ==========================================
+        // ✨ 데이터 로드 및 무한 로딩 방지 (Fallback) 적용
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const docRef = doc(db, "users", USER_DOC_ID);
             
-            // 1. 강제 렌더링 안전장치 (1초 뒤 파이어베이스 응답 없으면 화면부터 염)
+            // 🚨 안전장치: 3초가 지나도 파이어베이스가 응답이 없으면 강제로 화면부터 엽니다.
             const fallbackTimer = setTimeout(() => {
-                if(loadingScreen) loadingScreen.style.display = 'none';
-                renderWorkspace();
-                console.warn("네트워크 지연: 빈 화면 우선 렌더링");
-            }, 1000);
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen && loadingScreen.style.display !== 'none') {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => { loadingScreen.style.display = 'none'; }, 400);
+                    console.warn("⚠️ 연결 지연: 오프라인 모드로 우선 진입합니다.");
+                    
+                    // 빈 데이터로라도 일단 화면을 그려서 먹통을 방지함
+                    renderCalendarBody();
+                    renderDetailPanel();
+                    renderMemoList();
+                }
+            }, 3000); // 3000ms = 3초
 
-            try {
-                const docRef = doc(db, "users", USER_DOC_ID);
-                
-                // 2. 소켓 연결 전, 1회성(HTTP)으로 빠르고 확실하게 데이터 수신
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.dailyPlanner) appData.dailyPlanner = data.dailyPlanner;
-                    if (data.chatHistory) appData.chatHistory = data.chatHistory; 
-                    if (data.memos) appData.memos = data.memos;
+            // 파이어베이스 실시간 데이터 수신
+            onSnapshot(docRef, (docSnap) => {
+                // 정상적으로 데이터를 받았으므로 3초 강제종료 타이머 취소
+                clearTimeout(fallbackTimer); 
+
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen && loadingScreen.style.display !== 'none') {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => { loadingScreen.style.display = 'none'; }, 400);
                 }
                 
-                // 정상 수신 시 타이머 끄고 화면 업데이트
-                clearTimeout(fallbackTimer);
-                if(loadingScreen) loadingScreen.style.display = 'none';
-                renderWorkspace();
-                if (typeof window.renderChatHistory === 'function') window.renderChatHistory(); 
-
-                // 3. 렌더링 완료 후 백그라운드에서 실시간 동기화 채널 오픈 (다른 탭/기기 연동용)
-                onSnapshot(docRef, (snap) => {
-                    if (snap.exists()) {
-                        const data = snap.data();
-                        if (data.dailyPlanner) appData.dailyPlanner = data.dailyPlanner;
-                        if (data.chatHistory) appData.chatHistory = data.chatHistory; 
-                        if (data.memos) appData.memos = data.memos;
-                        renderWorkspace(); 
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase 로드 에러:", error);
-                // 에러 발생 시에도 무조건 화면은 띄워줌
-                clearTimeout(fallbackTimer);
-                if(loadingScreen) loadingScreen.style.display = 'none';
-                renderWorkspace();
-            }
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    appData.dailyPlanner = data.dailyPlanner || {};
+                    appData.books = data.books || []; 
+                    appData.chatHistory = data.chatHistory || []; 
+                    appData.memos = data.memos || [];
+                }
+                
+                try {
+                    renderCalendarBody();
+                    renderDetailPanel();
+                    calculateStatistics && typeof calculateStatistics === 'function' ? calculateStatistics() : null;
+                    renderMemoList();
+                    if (typeof window.renderChatHistory === 'function') window.renderChatHistory(); 
+                } catch (err) {
+                    console.error("렌더링 에러:", err);
+                }
+            }, (error) => {
+                console.error("파이어베이스 수신 에러:", error);
+                alert("데이터를 불러오는 중 오류가 발생했습니다. 네트워크를 확인해주세요.");
+            });
         });
 
-        window.changeViewMode = function(mode) {
-            currentViewMode = mode;
-            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('btnView' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
-            renderWorkspace();
-        };
 
-        window.changeDateRange = function(offset) {
-            if (currentViewMode === 'week') {
-                currentDisplayDate.setDate(currentDisplayDate.getDate() + (offset * 7));
-            } else if (currentViewMode === 'day') {
-                currentDisplayDate.setDate(currentDisplayDate.getDate() + offset);
-            } else {
-                currentDisplayDate.setMonth(currentDisplayDate.getMonth() + offset);
-            }
-            selectedDateStr = getFixedDateKey(currentDisplayDate);
-            renderWorkspace();
-        };
 
-        window.goToToday = function() {
-            currentDisplayDate = new Date();
-            selectedDateStr = getRealTodayString();
-            renderWorkspace();
-        }
-
+        // ==========================================
+        // ✨ 탭 메뉴 전환 라우팅 로직
+        // ==========================================
         window.switchPage = function(pageId) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav-' + pageId).classList.add('active');
+
             document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
             document.getElementById('page-' + pageId).classList.add('active');
+
             if(pageId === 'memo') renderMemoList();
         }
 
+        // ==========================================
+        // ✨ 메모 (Memo) 로직
+        // ==========================================
         window.formatDoc = function(cmd, value=null) {
             document.execCommand(cmd, false, value);
             document.getElementById('memoContentEditor').focus();
@@ -623,41 +616,51 @@
         window.renderMemoList = function() {
             const container = document.getElementById('memoListContainer');
             container.innerHTML = '';
-            
+
             if (!appData.memos || appData.memos.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding: 2rem 0; color:var(--text-muted); font-size:0.85rem;">메모가 없습니다.</div>`;
                 return;
             }
 
             const sortedMemos = [...appData.memos].sort((a, b) => b.id - a.id);
+
             sortedMemos.forEach(memo => {
                 const div = document.createElement('div');
                 div.className = `memo-item ${currentMemoId === memo.id ? 'active' : ''}`;
                 div.onclick = () => loadMemo(memo.id);
-                
+
                 const dateObj = new Date(memo.id);
                 const dateStr = `${dateObj.getMonth()+1}/${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
 
-                div.innerHTML = `<div class="memo-item-title">${memo.title || '제목 없는 메모'}</div><div class="memo-item-date">${dateStr}</div>`;
+                div.innerHTML = `
+                    <div class="memo-item-title">${memo.title || '제목 없는 메모'}</div>
+                    <div class="memo-item-date">${dateStr}</div>
+                `;
                 container.appendChild(div);
             });
         };
 
         window.createNewMemo = function() {
-            if (isMemoUnsaved) { if(!confirm("저장하지 않은 내용이 있습니다. 새 메모를 만드시겠습니까?")) return; }
+            if (isMemoUnsaved) {
+                if(!confirm("저장하지 않은 내용이 있습니다. 새 메모를 만드시겠습니까?")) return;
+            }
             document.getElementById('memoTitleInput').value = '';
             document.getElementById('memoContentEditor').innerHTML = '';
             currentMemoId = Date.now();
             isMemoUnsaved = true;
+
             appData.memos.push({ id: currentMemoId, title: '', content: '' });
             renderMemoList();
             document.getElementById('memoTitleInput').focus();
         };
 
         window.loadMemo = function(id) {
-            if (isMemoUnsaved && currentMemoId !== id) { if(!confirm("저장하지 않은 내용이 있습니다. 이동하시겠습니까?")) return; }
+            if (isMemoUnsaved && currentMemoId !== id) {
+                if(!confirm("저장하지 않은 내용이 있습니다. 이동하시겠습니까?")) return;
+            }
             const memo = appData.memos.find(m => m.id === id);
             if(!memo) return;
+
             currentMemoId = id;
             document.getElementById('memoTitleInput').value = memo.title;
             document.getElementById('memoContentEditor').innerHTML = memo.content;
@@ -669,11 +672,18 @@
 
         window.saveCurrentMemo = async function() {
             if (!currentMemoId) return alert("선택된 메모가 없습니다.");
+
             const title = document.getElementById('memoTitleInput').value.trim();
             const content = document.getElementById('memoContentEditor').innerHTML;
+
             const idx = appData.memos.findIndex(m => m.id === currentMemoId);
-            if (idx > -1) { appData.memos[idx].title = title; appData.memos[idx].content = content; } 
-            else { appData.memos.push({ id: currentMemoId, title, content }); }
+            if (idx > -1) {
+                appData.memos[idx].title = title;
+                appData.memos[idx].content = content;
+            } else {
+                appData.memos.push({ id: currentMemoId, title, content });
+            }
+
             isMemoUnsaved = false;
             renderMemoList();
             try { await setDoc(doc(db, "users", USER_DOC_ID), { memos: appData.memos }, { merge: true }); alert("메모가 저장되었습니다.");}
@@ -683,69 +693,138 @@
         window.deleteCurrentMemo = async function() {
             if (!currentMemoId) return;
             if (!confirm("이 메모를 삭제하시겠습니까?")) return;
+
             appData.memos = appData.memos.filter(m => m.id !== currentMemoId);
             currentMemoId = null;
             document.getElementById('memoTitleInput').value = '';
             document.getElementById('memoContentEditor').innerHTML = '';
             isMemoUnsaved = false;
+
             renderMemoList();
             try { await setDoc(doc(db, "users", USER_DOC_ID), { memos: appData.memos }, { merge: true }); }
             catch (e) { console.error("Memo Sync Error:", e); }
         };
 
-        function renderWorkspace() {
-            const navLabel = document.getElementById('currentDateRange');
-            const ws = document.getElementById('mainWorkspace');
+        // ==========================================
+        // ✨ 기존 캘린더 구동 로직
+        // ==========================================
+        window.changeViewMode = function(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btnView' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+
+            miniDisplayDate = new Date(currentDisplayDate);
+
+            const body = document.getElementById('calendarBody');
+            body.style.opacity = '0';
+            setTimeout(() => {
+                renderCalendarBody();
+                body.style.opacity = '1';
+            }, 200);
+        };
+
+        window.changeDateRange = function(offset) {
+            const body = document.getElementById('calendarBody');
+            body.style.opacity = '0';
+            setTimeout(() => {
+                if (currentViewMode === 'month') {
+                    currentDisplayDate.setMonth(currentDisplayDate.getMonth() + offset);
+                } else if (currentViewMode === 'week') {
+                    let d = new Date(selectedDateStr.replace(/\./g, '-'));
+                    d.setDate(d.getDate() + (offset * 7));
+                    selectedDateStr = getFixedDateKey(d);
+                    currentDisplayDate = new Date(d);
+                } else if (currentViewMode === 'day') {
+                    let d = new Date(selectedDateStr.replace(/\./g, '-'));
+                    d.setDate(d.getDate() + offset);
+                    selectedDateStr = getFixedDateKey(d);
+                    currentDisplayDate = new Date(d);
+                }
+                miniDisplayDate = new Date(currentDisplayDate);
+                renderCalendarBody();
+                renderDetailPanel();
+                body.style.opacity = '1';
+            }, 200);
+        };
+
+        window.changeMiniMonth = function(offset) {
+            miniDisplayDate.setMonth(miniDisplayDate.getMonth() + offset);
+            renderMiniCalendar(document.getElementById('miniCalContainer'));
+        };
+
+        window.goToToday = function() {
+            currentDisplayDate = new Date();
+            miniDisplayDate = new Date();
+            selectedDateStr = getRealTodayString();
+
+            const body = document.getElementById('calendarBody');
+            body.style.opacity = '0';
+            setTimeout(() => {
+                renderCalendarBody();
+                renderDetailPanel();
+                body.style.opacity = '1';
+            }, 200);
+        }
+
+        window.selectDate = function(dateKey) {
+            selectedDateStr = dateKey;
+            currentDisplayDate = new Date(dateKey.replace(/\./g, '-'));
+            renderCalendarBody();
+            renderDetailPanel();
+        }
+
+        window.showItemDetail = function(type, dateKey, idx, event) {
+            event.stopPropagation();
+            const data = appData.dailyPlanner[dateKey];
+            if(!data) return;
+
+            const badge = document.getElementById('detailViewBadge');
+            const textEl = document.getElementById('detailViewText');
+
+            if (type === 'schedule') {
+                const sch = data.schedules[idx];
+                badge.innerText = "Schedule";
+                badge.style.backgroundColor = sch.color || '#EF4444';
+                textEl.innerText = sch.content;
+            } else if (type === 'task') {
+                const task = data.tasks[idx];
+                badge.innerText = "Plan & Task";
+                badge.style.backgroundColor = 'var(--accent)';
+                textEl.innerText = task.content;
+            }
+            openModal('detailViewModal');
+        };
+
+        function renderCalendarBody() {
+            const container = document.getElementById('calendarBody');
+            const monthDisplay = document.getElementById('monthDisplay');
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
             if (currentViewMode === 'month') {
-                navLabel.innerText = `${currentDisplayDate.getFullYear()}년 ${currentDisplayDate.getMonth()+1}월`;
-                ws.innerHTML = `
-                    <div class="month-view-wrapper">
-                        <div class="cal-grid-header">
-                            <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
-                        </div>
-                        <div class="cal-grid" id="mainCalGrid"></div>
+                monthDisplay.innerText = `${monthNames[currentDisplayDate.getMonth()]} ${currentDisplayDate.getFullYear()}`;
+                container.innerHTML = `
+                    <div class="cal-grid-header">
+                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                     </div>
+                    <div class="cal-grid" id="mainCalGrid"></div>
                 `;
                 renderMonthGrid(document.getElementById('mainCalGrid'));
             } else {
-                if (currentViewMode === 'week') {
-                    let d = new Date(currentDisplayDate);
-                    let day = d.getDay();
-                    let startOfWeek = new Date(d); startOfWeek.setDate(d.getDate() - day);
-                    let endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6);
-                    navLabel.innerText = `${startOfWeek.getMonth()+1}월 ${startOfWeek.getDate()}일 - ${endOfWeek.getMonth()+1}월 ${endOfWeek.getDate()}일`;
-                } else if (currentViewMode === 'day') {
-                    navLabel.innerText = `${currentDisplayDate.getMonth()+1}월 ${currentDisplayDate.getDate()}일`;
-                }
-
-                ws.innerHTML = `
-                    <aside class="task-sidebar">
-                        <div class="task-list-container" id="taskSidebarContainer"></div>
-                    </aside>
-                    <main class="calendar-workspace">
-                        <div class="grid-view-wrapper">
-                            <div class="grid-header" id="gridHeader">
-                                <div class="grid-time-label-spacer"></div>
-                            </div>
-                            <div class="grid-scroll-area">
-                                <div class="time-y-axis" id="timeYAxis"></div>
-                                <div class="grid-content" id="gridContent"></div>
-                            </div>
-                        </div>
-                    </main>
+                container.innerHTML = `
+                    <div class="split-view-container">
+                        <div class="mini-cal-container" id="miniCalContainer"></div>
+                        <div id="subViewContainer" style="flex:1; min-width:0; display:flex; flex-direction:column;"></div>
+                    </div>
                 `;
-                
-                const yAxis = document.getElementById('timeYAxis');
-                let timeHtml = '';
-                for(let i=5; i<=28; i++) { 
-                    let dispHour = i % 24;
-                    timeHtml += `<div class="time-slot-label">${dispHour}</div>`; 
-                }
-                yAxis.innerHTML = timeHtml;
+                renderMiniCalendar(document.getElementById('miniCalContainer'));
 
-                renderTaskSidebar();
-                renderGrid();
+                if (currentViewMode === 'week') {
+                    monthDisplay.innerText = `Week of ${monthNames[currentDisplayDate.getMonth()]} ${currentDisplayDate.getFullYear()}`;
+                    renderWeekView(document.getElementById('subViewContainer'));
+                } else if (currentViewMode === 'day') {
+                    monthDisplay.innerText = `${selectedDateStr.replace(/\./g, ' / ')}`;
+                    renderDayView(document.getElementById('subViewContainer'));
+                }
             }
         }
 
@@ -756,305 +835,390 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-            for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(createCalCell(year, month - 1, daysInPrevMonth - i, true));
-            for (let d = 1; d <= daysInMonth; d++) grid.appendChild(createCalCell(year, month, d, false));
+            for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(createCellHTML(year, month - 1, daysInPrevMonth - i, true));
+            for (let d = 1; d <= daysInMonth; d++) grid.appendChild(createCellHTML(year, month, d, false));
             const remainingCells = 42 - (firstDay + daysInMonth);
-            for (let d = 1; d <= remainingCells; d++) grid.appendChild(createCalCell(year, month + 1, d, true));
+            for (let d = 1; d <= remainingCells; d++) grid.appendChild(createCellHTML(year, month + 1, d, true));
         }
 
-        function createCalCell(year, month, day, isOtherMonth) {
+        function createCellHTML(year, month, day, isOtherMonth) {
             const dateObj = new Date(year, month, day);
             const dateKey = getFixedDateKey(dateObj);
-            const isToday = dateKey === getRealTodayString();
+            const todayStr = getRealTodayString();
+
+            const isToday = (dateKey === todayStr);
+            const isSelected = (dateKey === selectedDateStr);
 
             const cell = document.createElement('div');
-            cell.className = `cal-cell ${isToday ? 'today' : ''} ${isOtherMonth ? 'other-month' : ''}`;
-            cell.onclick = () => { selectDate(dateKey); changeViewMode('day'); };
+            cell.className = `cal-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isOtherMonth ? 'other-month' : ''}`;
+            cell.onclick = () => selectDate(dateKey);
 
-            let taskHtml = '<div class="cal-task-list">';
-            const dayData = appData.dailyPlanner[dateKey] || { tasks: [] };
-            const tasks = dayData.tasks || [];
-            
-            const limit = 2;
-            tasks.slice(0, limit).forEach((task, idx) => {
-                taskHtml += `<div class="mini-cal-task truncate-text ${task.done ? 'done' : ''}" style="border-left-color: ${task.catColor || '#3B82F6'};" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
-            });
-            
-            if (tasks.length > limit) {
-                taskHtml += `<div class="more-tasks" style="font-size:0.7rem; color:var(--text-sub); text-align:center; font-weight:600; margin-top:2px;">+${tasks.length - limit} more</div>`;
+            let previewHtml = '<div class="task-preview">';
+            let colorDotsHtml = '';
+            let taskCountHtml = '';
+
+            const dayData = appData.dailyPlanner[dateKey];
+            if (dayData) {
+                const schedules = dayData.schedules || [];
+                if (schedules.length > 0) {
+                    schedules.forEach((sch, idx) => {
+                        colorDotsHtml += `<div class="color-dot" style="background-color: ${sch.color || '#EF4444'};"></div>`;
+                        previewHtml += `<div class="mini-schedule truncate-text" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                    });
+                }
+                const tasks = dayData.tasks || [];
+                if (tasks.length > 0) {
+                    taskCountHtml = `<div class="task-count-badge">📝 ${tasks.length}</div>`;
+                    const displayLimit = 4;
+                    for (let i = 0; i < Math.min(tasks.length, displayLimit); i++) {
+                        previewHtml += `<div class="mini-task truncate-text ${tasks[i].done ? 'done' : ''}" onclick="showItemDetail('task', '${dateKey}', ${i}, event)">${tasks[i].content}</div>`;
+                    }
+                    if (tasks.length > displayLimit) previewHtml += `<div class="more-tasks">+${tasks.length - displayLimit} more</div>`;
+                }
             }
-            taskHtml += '</div>';
-            cell.innerHTML = `<div class="cal-cell-top">${day}</div>${taskHtml}`;
+            previewHtml += '</div>';
+
+            cell.innerHTML = `
+                <div class="cell-top-bar">
+                    <div class="date-num">${day}</div>
+                    <div class="cell-badges">
+                        <div class="color-dots">${colorDotsHtml}</div>
+                        ${taskCountHtml}
+                    </div>
+                </div>
+                ${previewHtml}
+            `;
             return cell;
         }
 
-        function renderTaskSidebar() {
-            const container = document.getElementById('taskSidebarContainer');
-            container.innerHTML = '';
-            
-            let daysToRender = [];
-            const dayNamesKr = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+        function renderMiniCalendar(container) {
+            const year = miniDisplayDate.getFullYear();
+            const month = miniDisplayDate.getMonth();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-            if (currentViewMode === 'week') {
-                let d = new Date(currentDisplayDate);
-                let day = d.getDay();
-                let startOfWeek = new Date(d); startOfWeek.setDate(d.getDate() - day);
-                for(let i=0; i<7; i++) {
-                    let cur = new Date(startOfWeek); cur.setDate(startOfWeek.getDate() + i);
-                    daysToRender.push(cur);
-                }
-            } else if (currentViewMode === 'day') {
-                daysToRender.push(new Date(currentDisplayDate));
-            }
+            let html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <div class="mini-cal-month">${monthNames[month]} ${year}</div>
+                    <div style="display:flex; gap:4px;">
+                        <button class="btn-nav" style="width:26px; height:26px; font-size:0.9rem;" onclick="changeMiniMonth(-1)">&lt;</button>
+                        <button class="btn-nav" style="width:26px; height:26px; font-size:0.9rem;" onclick="changeMiniMonth(1)">&gt;</button>
+                    </div>
+                </div>
+                <div class="mini-cal-grid">
+            `;
+            const dayNames = ['S','M','T','W','T','F','S'];
+            dayNames.forEach(d => { html += `<div class="mini-cal-dayname">${d}</div>`; });
 
-            daysToRender.forEach((dateObj) => {
-                const dateKey = getFixedDateKey(dateObj);
-                const dayData = appData.dailyPlanner[dateKey] || { tasks: [] };
-                const tasks = dayData.tasks || [];
-                const total = tasks.length;
-                const done = tasks.filter(t => t.done).length;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-                const accDiv = document.createElement('div');
-                accDiv.className = 'day-accordion';
-                
-                const isDayView = currentViewMode === 'day';
-                const isOpen = isDayView || dateKey === getRealTodayString();
+            let cellsHtml = '';
+            for (let i = firstDay - 1; i >= 0; i--) cellsHtml += createMiniCell(year, month - 1, daysInPrevMonth - i, true);
+            for (let d = 1; d <= daysInMonth; d++) cellsHtml += createMiniCell(year, month, d, false);
+            const remainingCells = 42 - (firstDay + daysInMonth);
+            for (let d = 1; d <= remainingCells; d++) cellsHtml += createMiniCell(year, month + 1, d, true);
 
-                let headerHtml = '';
-                if (isDayView) {
-                    headerHtml = `
-                        <div class="day-header" style="cursor:default; background:transparent;">
-                            <div class="day-title-wrap">
-                                <span class="day-title" style="font-size:1.1rem;">${dayNamesKr[dateObj.getDay()]}</span>
-                            </div>
-                            <span class="day-count">${done}/${total}</span>
-                        </div>
-                    `;
-                } else {
-                    headerHtml = `
-                        <div class="day-header ${isOpen ? 'active' : ''}" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('open');">
-                            <div class="day-title-wrap">
-                                <span class="acc-icon">▶</span>
-                                <span class="day-title">${dayNamesKr[dateObj.getDay()]} <span style="font-weight:400; font-size:0.8rem; color:var(--text-muted);">${formatShortDate(dateObj)}</span></span>
-                            </div>
-                            <span class="day-count">${done}/${total}</span>
-                        </div>
-                    `;
-                }
+            html += cellsHtml + `</div>`;
+            container.innerHTML = html;
+        }
 
-                let contentHtml = `<div class="day-content ${isOpen ? 'open' : ''}" style="${isDayView ? 'background:#fff; border:none;' : ''}">`;
-                if(tasks.length === 0) {
-                    contentHtml += `<div style="text-align:center; padding:10px; font-size:0.85rem; color:var(--text-muted);">할 일이 없습니다.</div>`;
-                } else {
-                    tasks.forEach((task, idx) => {
-                        let durationTxt = '';
-                        if(task.startTime && task.endTime) {
-                            const sArr = task.startTime.split(':'); const eArr = task.endTime.split(':');
-                            const sMin = parseInt(sArr[0])*60 + parseInt(sArr[1]);
-                            const eMin = parseInt(eArr[0])*60 + parseInt(eArr[1]);
-                            let diffMins = eMin - sMin;
-                            if(diffMins < 0) diffMins += 24*60;
-                            durationTxt = `(${diffMins}분)`;
-                        }
+        function createMiniCell(year, month, day, isOtherMonth) {
+            const dateObj = new Date(year, month, day);
+            const dateKey = getFixedDateKey(dateObj);
+            const isToday = (dateKey === getRealTodayString());
+            const isSelected = (dateKey === selectedDateStr);
+            const classNames = `mini-cal-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isOtherMonth ? 'other-month' : ''}`;
+            return `<div class="${classNames}" onclick="selectDate('${dateKey}')">${day}</div>`;
+        }
 
-                        contentHtml += `
-                            <div class="task-card ${task.done ? 'done' : ''}">
-                                <div class="task-checkbox" onclick="toggleTaskDone('${dateKey}', ${idx}, event)"></div>
-                                <div class="task-info" onclick="openEditTaskModal('${dateKey}', ${idx})">
-                                    <div class="task-meta">
-                                        <span class="priority-badge pri-${task.priority?.toLowerCase() || 'c'}">${task.priority || 'C'}</span>
-                                        <span class="category-name truncate-text" style="color: ${task.catColor || '#9CA3AF'}">${task.category || '미분류'}</span>
-                                    </div>
-                                    <div class="task-title">${task.content}</div>
-                                    ${task.startTime ? `<div class="task-time-wrap">
-                                        <span class="task-time">🕒 ${task.startTime} ~ ${task.endTime} ${durationTxt}</span>
-                                        ${task.done ? `<span style="font-size:0.7rem; color:var(--success);">■ 완료</span>` : ''}
-                                    </div>` : ''}
-                                </div>
-                                <div class="task-options" onclick="deleteTask('${dateKey}', ${idx}, event)">⋮</div>
-                            </div>
-                        `;
+        function renderWeekView(container) {
+            let d = new Date(selectedDateStr.replace(/\./g, '-'));
+            let day = d.getDay();
+            let startOfWeek = new Date(d);
+            startOfWeek.setDate(d.getDate() - day);
+
+            let headerHtml = `<div class="week-grid-header">`;
+            let bodyHtml = `<div class="week-grid-body">`;
+            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+            for (let i = 0; i < 7; i++) {
+                let currentDay = new Date(startOfWeek);
+                currentDay.setDate(startOfWeek.getDate() + i);
+                const dateKey = getFixedDateKey(currentDay);
+                const isToday = (dateKey === getRealTodayString());
+
+                headerHtml += `
+                    <div class="week-header-cell ${isToday ? 'today' : ''}" style="cursor:pointer;" onclick="selectDate('${dateKey}')">
+                        <div class="week-day-name">${dayNames[i]}</div>
+                        <div class="week-day-num">${currentDay.getDate()}</div>
+                    </div>`;
+
+                let colHtml = `<div class="week-col" onclick="selectDate('${dateKey}')">`;
+                const dayData = appData.dailyPlanner[dateKey];
+                if (dayData) {
+                    (dayData.schedules || []).forEach((sch, idx) => {
+                        colHtml += `<div class="mini-schedule truncate-text" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                    });
+                    (dayData.tasks || []).forEach((task, idx) => {
+                        colHtml += `<div class="mini-task truncate-text ${task.done ? 'done' : ''}" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
                     });
                 }
-                contentHtml += `</div>`;
+                colHtml += `</div>`;
+                bodyHtml += colHtml;
+            }
+            headerHtml += `</div>`;
+            bodyHtml += `</div>`;
 
-                accDiv.innerHTML = headerHtml + contentHtml;
-                container.appendChild(accDiv);
-            });
+            container.innerHTML = `<div class="week-view-container">${headerHtml}${bodyHtml}</div>`;
         }
 
-        function renderGrid() {
-            const header = document.getElementById('gridHeader');
-            const content = document.getElementById('gridContent');
-            
-            header.innerHTML = '<div class="grid-time-label-spacer"></div>';
-            content.innerHTML = '';
+        function renderDayView(container) {
+            const dateObj = new Date(selectedDateStr.replace(/\./g, '-'));
+            const dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+            const dayName = dayNames[dateObj.getDay()];
+            const dayNum = dateObj.getDate();
 
-            const dayNamesKr = ["일", "월", "화", "수", "목", "금", "토"];
-            let daysToRender = [];
+            let html = `
+                <div class="day-view-container">
+                    <div class="day-hero-date">${dayNum}</div>
+                    <div class="day-hero-day">${dayName}</div>
+                    <div class="day-items-list">
+            `;
 
-            if (currentViewMode === 'week') {
-                let d = new Date(currentDisplayDate);
-                let day = d.getDay();
-                let startOfWeek = new Date(d); startOfWeek.setDate(d.getDate() - day);
-                for(let i=0; i<7; i++) {
-                    let cur = new Date(startOfWeek); cur.setDate(startOfWeek.getDate() + i);
-                    daysToRender.push(cur);
-                }
+            const dayData = appData.dailyPlanner[selectedDateStr];
+            if (!dayData || ((!dayData.schedules || dayData.schedules.length===0) && (!dayData.tasks || dayData.tasks.length===0))) {
+                html += `<div style="color:var(--text-sub); font-weight:600; margin-top:1rem;">등록된 일정이 없습니다. 우측 패널에서 추가해주세요.</div>`;
             } else {
-                daysToRender.push(new Date(currentDisplayDate));
-            }
-
-            daysToRender.forEach(dateObj => {
-                const dateKey = getFixedDateKey(dateObj);
-                const isToday = dateKey === getRealTodayString();
-                
-                header.innerHTML += `
-                    <div class="grid-day-header ${isToday ? 'today' : ''}">
-                        ${dayNamesKr[dateObj.getDay()]} <span class="date-num">${formatShortDate(dateObj)}</span>
-                    </div>
-                `;
-
-                const col = document.createElement('div');
-                col.className = `day-column ${isToday ? 'today' : ''}`;
-                
-                const dayData = appData.dailyPlanner[dateKey] || { tasks: [] };
-                (dayData.tasks || []).forEach((task, idx) => {
-                    if (task.startTime && task.endTime) {
-                        const sParts = task.startTime.split(':');
-                        const eParts = task.endTime.split(':');
-                        const startHour = parseInt(sParts[0], 10);
-                        const startMin = parseInt(sParts[1], 10);
-                        const endHour = parseInt(eParts[0], 10);
-                        const endMin = parseInt(eParts[1], 10);
-                        
-                        let adjStartHour = startHour < 5 ? startHour + 24 : startHour;
-                        let adjEndHour = endHour < 5 ? endHour + 24 : endHour;
-                        if (adjEndHour <= adjStartHour) adjEndHour += 24; 
-
-                        const topPx = ((adjStartHour - 5) * 25) + (startMin / 60 * 25);
-                        const durationMins = ((adjEndHour * 60) + endMin) - ((adjStartHour * 60) + startMin);
-                        let heightPx = (durationMins / 60 * 25);
-                        if (heightPx < 18) heightPx = 18; 
-
-                        const blockHTML = `
-                            <div class="grid-task-block ${task.done ? 'done' : ''}" 
-                                 onclick="openEditTaskModal('${dateKey}', ${idx})"
-                                 style="top: ${topPx}px; height: ${heightPx}px; border-left-color: ${task.catColor || 'var(--accent)'}; background-color: ${task.catColor ? task.catColor + '20' : '#EFF6FF'};">
-                                <span class="truncate-text" style="font-size:0.65rem; color:var(--text-sub);">${task.category || '미분류'}</span>
-                                <span class="grid-task-title" style="${task.done ? 'text-decoration:line-through;' : ''}">${task.content}</span>
-                            </div>
-                        `;
-                        col.innerHTML += blockHTML;
-                    }
+                (dayData.schedules || []).forEach((sch, idx) => {
+                    html += `
+                        <div class="day-item-card" onclick="showItemDetail('schedule', '${selectedDateStr}', ${idx}, event)">
+                            <span style="width:14px; height:14px; border-radius:50%; background:${sch.color || '#EF4444'}; flex-shrink:0;"></span>
+                            <span class="truncate-text" style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${sch.content}</span>
+                        </div>
+                    `;
                 });
-                content.appendChild(col);
-            });
+                (dayData.tasks || []).forEach((task, idx) => {
+                    html += `
+                        <div class="day-item-card" style="${task.done ? 'opacity:0.5;' : ''}" onclick="showItemDetail('task', '${selectedDateStr}', ${idx}, event)">
+                            <div style="width:20px; height:20px; border-radius:6px; border:2px solid ${task.done ? 'var(--success)' : 'var(--border-outer)'}; background:${task.done ? 'var(--success)' : 'transparent'}; display:flex; justify-content:center; align-items:center; color:white; font-size:12px; font-weight:bold; flex-shrink:0;">${task.done ? '✓' : ''}</div>
+                            <span class="truncate-text" style="font-size:1.05rem; font-weight:700; color:var(--text-main); ${task.done ? 'text-decoration:line-through;' : ''}">${task.content}</span>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div></div>`;
+            container.innerHTML = html;
         }
 
-        window.selectDate = function(dateKey) {
-            selectedDateStr = dateKey;
-            currentDisplayDate = new Date(dateKey.replace(/\./g, '-'));
-            renderWorkspace();
-        }
+        function renderDetailPanel() {
+            const dateObj = new Date(selectedDateStr.replace(/\./g, '-'));
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-        window.showItemDetail = function(type, dateKey, idx, event) {
-            event.stopPropagation();
-            const data = appData.dailyPlanner[dateKey];
-            if(!data) return;
+            document.getElementById('selectedDayName').innerText = dayNames[dateObj.getDay()];
+            document.getElementById('selectedDateDisplay').innerText = selectedDateStr;
 
-            const badge = document.getElementById('detailViewBadge');
-            const textEl = document.getElementById('detailViewText');
-            const task = data.tasks[idx];
-            
-            badge.innerText = task.category || "Plan & Task";
-            badge.style.backgroundColor = task.catColor || 'var(--accent)';
-            textEl.innerText = task.content;
-            openModal('detailViewModal');
-        };
+            const scheduleList = document.getElementById('scheduleList');
+            const planList = document.getElementById('planList');
+            scheduleList.innerHTML = ''; planList.innerHTML = '';
 
-        window.openModal = (id) => { document.getElementById(id).classList.add('show'); };
-        window.closeModal = (id) => { document.getElementById(id).classList.remove('show'); };
+            const dayData = appData.dailyPlanner[selectedDateStr] || { tasks: [], schedules: [] };
 
-        window.openTaskModal = () => {
-            isEditMode = false;
-            document.getElementById('taskModalTitle').innerText = '할 일 추가';
-            document.getElementById('taskInputContent').value = '';
-            document.getElementById('taskInputCategory').value = '';
-            document.getElementById('taskInputColor').value = '#BFDBFE';
-            document.getElementById('taskInputDate').value = selectedDateStr.replace(/\./g, '-');
-            document.getElementById('taskInputPriority').value = 'C';
-            document.getElementById('taskInputStart').value = '';
-            document.getElementById('taskInputEnd').value = '';
-            openModal('taskModal');
-        };
-
-        window.openEditTaskModal = (dateKey, idx) => {
-            isEditMode = true;
-            editTaskData = { oldDate: dateKey, idx: idx };
-            const task = appData.dailyPlanner[dateKey].tasks[idx];
-
-            document.getElementById('taskModalTitle').innerText = '할 일 수정';
-            document.getElementById('taskInputContent').value = task.content;
-            document.getElementById('taskInputCategory').value = task.category || '';
-            document.getElementById('taskInputColor').value = task.catColor || '#BFDBFE';
-            document.getElementById('taskInputDate').value = dateKey.replace(/\./g, '-');
-            document.getElementById('taskInputPriority').value = task.priority || 'C';
-            document.getElementById('taskInputStart').value = task.startTime || '';
-            document.getElementById('taskInputEnd').value = task.endTime || '';
-            openModal('taskModal');
-        };
-
-        window.saveTask = async () => {
-            const content = document.getElementById('taskInputContent').value.trim();
-            const dateStr = document.getElementById('taskInputDate').value.replace(/-/g, '.');
-            if(!content || !dateStr) return alert("업무 내용과 날짜를 입력하세요.");
-
-            const newTask = {
-                id: Date.now(),
-                content: content,
-                category: document.getElementById('taskInputCategory').value.trim(),
-                catColor: document.getElementById('taskInputColor').value,
-                priority: document.getElementById('taskInputPriority').value,
-                startTime: document.getElementById('taskInputStart').value,
-                endTime: document.getElementById('taskInputEnd').value,
-                done: false
-            };
-
-            if (isEditMode) {
-                const targetTask = appData.dailyPlanner[editTaskData.oldDate].tasks.splice(editTaskData.idx, 1)[0];
-                newTask.done = targetTask.done;
+            const schedules = dayData.schedules || [];
+            if (schedules.length === 0) {
+                scheduleList.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:0.85rem; margin-top:1.5rem; font-weight:600;">등록된 일정이 없습니다.</div>`;
+            } else {
+                schedules.forEach((sch, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'list-card';
+                    div.innerHTML = `
+                        <div class="sch-content">
+                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:${sch.color || '#EF4444'}; flex-shrink:0; margin-top:4px;"></span>
+                            <span class="sch-text">${sch.content}</span>
+                        </div>
+                        <div class="btn-icon-group">
+                            <button class="btn-icon" onclick="openScheduleEditModal(${idx})" title="수정">${ICON_EDIT}</button>
+                            <button class="btn-icon delete" onclick="deleteSchedule(${idx})" title="삭제">${ICON_TRASH}</button>
+                        </div>
+                    `;
+                    scheduleList.appendChild(div);
+                });
             }
 
-            if (!appData.dailyPlanner[dateStr]) appData.dailyPlanner[dateStr] = { tasks: [] };
-            if (!appData.dailyPlanner[dateStr].tasks) appData.dailyPlanner[dateStr].tasks = [];
-            appData.dailyPlanner[dateStr].tasks.push(newTask);
+            const tasks = dayData.tasks || [];
+            if (tasks.length === 0) {
+                planList.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:0.85rem; margin-top:1.5rem; font-weight:600;">계획이 비어있습니다.</div>`;
+            } else {
+                tasks.forEach((task, idx) => {
+                    const div = document.createElement('div');
+                    div.className = `list-card ${task.done ? 'done' : ''}`;
+                    div.innerHTML = `
+                        <div class="custom-checkbox" onclick="togglePlanDone('${selectedDateStr}', ${idx}, event)"></div>
+                        <div class="list-content">${task.content}</div>
+                        <div class="btn-icon-group">
+                            <button class="btn-icon" onclick="openPlanEditModal(${idx})" title="수정">${ICON_EDIT}</button>
+                            <button class="btn-icon delete" onclick="deletePlan('${selectedDateStr}', ${idx}, event)" title="삭제">${ICON_TRASH}</button>
+                        </div>
+                    `;
+                    planList.appendChild(div);
+                });
+            }
+        }
 
-            closeModal('taskModal');
-            renderWorkspace();
-            await syncToFirebase();
+        window.openModal = (id) => {
+            document.getElementById(id).classList.add('show');
+            if(id === 'geminiModal') {
+                document.getElementById('geminiInput').focus();
+                if (typeof window.renderChatHistory === 'function') window.renderChatHistory();
+            }
         };
-
-        window.deleteTask = async (dateKey, idx, e) => {
-            if(e) e.stopPropagation();
-            if (!confirm("삭제하시겠습니까?")) return;
-            appData.dailyPlanner[dateKey].tasks.splice(idx, 1);
-            renderWorkspace();
-            await syncToFirebase();
-        };
-
-        window.toggleTaskDone = async (dateKey, idx, e) => {
-            if(e) e.stopPropagation();
-            const task = appData.dailyPlanner[dateKey].tasks[idx];
-            task.done = !task.done;
-            renderWorkspace();
-            await syncToFirebase();
-        };
+        window.closeModal = (id) => { document.getElementById(id).classList.remove('show'); };
 
         async function syncToFirebase() {
             try { await setDoc(doc(db, "users", USER_DOC_ID), { dailyPlanner: appData.dailyPlanner }, { merge: true }); }
-            catch (e) { console.error("Sync Error:", e); }
+            catch (e) { console.error("Sync Error:", e); alert("저장 실패"); }
         }
+
+        window.saveNewSchedule = async () => {
+            const content = document.getElementById('addSchInput').value.trim();
+            const color = document.getElementById('addSchColor').value;
+            if (!content) return;
+            if (!appData.dailyPlanner[selectedDateStr]) appData.dailyPlanner[selectedDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[selectedDateStr].schedules) appData.dailyPlanner[selectedDateStr].schedules = [];
+
+            appData.dailyPlanner[selectedDateStr].schedules.push({ id: Date.now(), content, color });
+            closeModal('scheduleAddModal'); document.getElementById('addSchInput').value = '';
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.openScheduleEditModal = (idx) => {
+            const sch = appData.dailyPlanner[selectedDateStr].schedules[idx];
+            editTarget = { type: 'schedule', oldDate: selectedDateStr, idx: idx };
+            document.getElementById('editSchInput').value = sch.content;
+            document.getElementById('editSchDate').value = selectedDateStr.replace(/\./g, '-');
+            document.getElementById('editSchColor').value = sch.color || '#EF4444';
+            openModal('scheduleEditModal');
+        };
+
+        window.saveEditedSchedule = async () => {
+            const newContent = document.getElementById('editSchInput').value.trim();
+            const newDateStr = document.getElementById('editSchDate').value.replace(/-/g, '.');
+            const newColor = document.getElementById('editSchColor').value;
+            if(!newContent || !newDateStr) return;
+
+            const targetItem = appData.dailyPlanner[editTarget.oldDate].schedules.splice(editTarget.idx, 1)[0];
+            targetItem.content = newContent; targetItem.color = newColor;
+
+            if (!appData.dailyPlanner[newDateStr]) appData.dailyPlanner[newDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[newDateStr].schedules) appData.dailyPlanner[newDateStr].schedules = [];
+            appData.dailyPlanner[newDateStr].schedules.push(targetItem);
+
+            closeModal('scheduleEditModal');
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.deleteSchedule = async (idx) => {
+            if (!confirm("삭제하시겠습니까?")) return;
+            appData.dailyPlanner[selectedDateStr].schedules.splice(idx, 1);
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.openPlanAddModal = () => {
+            openModal('planAddModal');
+            document.getElementById('addPlanType').value = 'normal';
+            window.toggleAddPlanType();
+        };
+
+        window.toggleAddPlanType = function() {
+            const isStudy = document.getElementById('addPlanType').value === 'study';
+            document.getElementById('addStudyGroup').style.display = isStudy ? 'block' : 'none';
+            document.getElementById('addNormalGroup').style.display = isStudy ? 'none' : 'block';
+            if(isStudy) {
+                const sel = document.getElementById('addPlanBook');
+                sel.innerHTML = '<option value="">문제집 선택...</option>';
+                appData.books.forEach(b => { sel.innerHTML += `<option value="${b.id}">${b.title}</option>`; });
+                document.getElementById('addPlanChapter').innerHTML = '<option value="">먼저 문제집 선택하세요</option>';
+            }
+        };
+
+        window.updateAddChapterSelect = function() {
+            const bid = document.getElementById('addPlanBook').value;
+            const csel = document.getElementById('addPlanChapter');
+            csel.innerHTML = '<option value="">단원 선택...</option>';
+            const book = appData.books.find(x => x.id == bid);
+            if(book) { book.chapters.forEach((c, i) => { csel.innerHTML += `<option value="${i}">${c.name} ${c.done ? '(완료)' : ''}</option>`; }); }
+        };
+
+        window.saveNewPlan = async () => {
+            const type = document.getElementById('addPlanType').value;
+            let newTask = { id: Date.now(), type: type, done: false, content: '' };
+            if (type === 'study') {
+                const bid = document.getElementById('addPlanBook').value;
+                const cid = document.getElementById('addPlanChapter').value;
+                if (!bid || cid === "") return alert("문제집과 단원을 선택하세요!");
+                const b = appData.books.find(x => x.id == bid);
+                newTask.content = `[${b.title}] ${b.chapters[cid].name}`;
+                newTask.bookId = bid; newTask.chapterIdx = cid;
+            } else {
+                const content = document.getElementById('addPlanInput').value.trim();
+                if (!content) return;
+                newTask.content = content;
+            }
+
+            if (!appData.dailyPlanner[selectedDateStr]) appData.dailyPlanner[selectedDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[selectedDateStr].tasks) appData.dailyPlanner[selectedDateStr].tasks = [];
+            appData.dailyPlanner[selectedDateStr].tasks.push(newTask);
+
+            closeModal('planAddModal'); document.getElementById('addPlanInput').value = '';
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.openPlanEditModal = (idx) => {
+            const task = appData.dailyPlanner[selectedDateStr].tasks[idx];
+            editTarget = { type: 'task', oldDate: selectedDateStr, idx: idx };
+            document.getElementById('editPlanInput').value = task.content;
+            document.getElementById('editPlanDate').value = selectedDateStr.replace(/\./g, '-');
+            openModal('planEditModal');
+        };
+
+        window.saveEditedPlan = async () => {
+            const newContent = document.getElementById('editPlanInput').value.trim();
+            const newDateStr = document.getElementById('editPlanDate').value.replace(/-/g, '.');
+            if(!newContent || !newDateStr) return;
+
+            const targetItem = appData.dailyPlanner[editTarget.oldDate].tasks.splice(editTarget.idx, 1)[0];
+            targetItem.content = newContent;
+
+            if (!appData.dailyPlanner[newDateStr]) appData.dailyPlanner[newDateStr] = { tasks: [], schedules: [] };
+            if (!appData.dailyPlanner[newDateStr].tasks) appData.dailyPlanner[newDateStr].tasks = [];
+            appData.dailyPlanner[newDateStr].tasks.push(targetItem);
+
+            closeModal('planEditModal');
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        }
+
+        window.deletePlan = async (dateKey, idx, e) => {
+            if(e) e.stopPropagation();
+            if (!confirm("삭제하시겠습니까?")) return;
+            appData.dailyPlanner[dateKey].tasks.splice(idx, 1);
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
+
+        window.togglePlanDone = async (dateKey, idx, e) => {
+            if(e) e.stopPropagation();
+            const task = appData.dailyPlanner[dateKey].tasks[idx];
+            task.done = !task.done;
+
+            if (task.type === 'study' && task.bookId != null && task.chapterIdx != null) {
+                const bookIndex = appData.books.findIndex(x => x.id == task.bookId);
+                if (bookIndex > -1 && appData.books[bookIndex].chapters[task.chapterIdx]) {
+                    appData.books[bookIndex].chapters[task.chapterIdx].done = task.done;
+                    try { await setDoc(doc(db, "users", USER_DOC_ID), { books: appData.books }, { merge: true }); }
+                    catch (err) { console.error("Book Sync Error:", err); }
+                }
+            }
+            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+        };
 
         window.sendChatMessage = async () => {
             const inputEl = document.getElementById('geminiInput');
@@ -1067,7 +1231,7 @@
             inputEl.value = '';
             renderChatHistory();
 
-            try { await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true }); } 
+            try { await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true }); }
             catch (e) { console.error("채팅 저장 에러:", e); }
 
             const loadingId = "loading-" + Date.now();
@@ -1083,20 +1247,28 @@
                 const response = await fetch('https://onplan2snu27-backend.onrender.com/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ historyContents: historyContents })
+                    body: JSON.stringify({
+                        historyContents: historyContents
+                    })
                 });
 
-                if (!response.ok) throw new Error('백엔드 서버 통신 에러');
+                if (!response.ok) {
+                    throw new Error('백엔드 서버 통신 에러');
+                }
+
                 const data = await response.json();
+
                 if (data.error) throw new Error(data.error);
 
-                appData.chatHistory.push({ role: 'bot', text: data.reply });
+                const botReply = data.reply;
+
+                appData.chatHistory.push({ role: 'bot', text: botReply });
                 renderChatHistory();
                 await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true });
 
             } catch (error) {
                 console.error("Chat Error:", error);
-                document.getElementById(loadingId).innerHTML = `앗, 에러가 발생했어!<br><span style="font-size:0.8rem; color:var(--danger);">(${error.message})</span>`;
+                document.getElementById(loadingId).innerHTML = `앗, 에러가 발생했어!<br><span style="font-size:0.8rem; color:var(--danger);">(${error.message})</span><br><br><span style="font-size:0.8rem; color:var(--text-sub);">💡 백엔드 서버(node server.js)가 실행 중인지 확인해줘!</span>`;
             }
         };
 
