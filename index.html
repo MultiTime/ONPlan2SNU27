@@ -8,27 +8,27 @@
 
     <style>
         :root {
-            /* 본문에 쓰일 밝고 모던한 색상 팔레트 */
+            /* ✅ 본문에 쓰일 밝고 모던한 색상 팔레트 */
             --primary: #4B5563;
             --primary-dark: #1F2937;
             --text-main: #111827;
             --text-sub: #6B7280;
             --text-muted: #9CA3AF;
 
-            --border-outer: #E5E7EB; /* 밝은 본문용 테두리 */
-            --border-inner: #F3F4F6;
+            --border-outer: #E2E8F0; /* 깔끔한 경계선 */
+            --border-inner: #F1F5F9;
 
             --success: #10B981;
             --danger: #EF4444;
             --accent: #2563EB;
             --gemini: #A855F7;
 
-            --bg-app: #F4F6F8; /* 메인 본문 배경 (라이트 그레이) */
-            --bg-panel: #FFFFFF; /* 카드/패널 배경 (완전 흰색) */
-            --bg-offwhite: #F9FAFB;
+            --bg-app: #FFFFFF; /* 메인 본문 배경 완전 흰색 */
+            --bg-panel: #FFFFFF; /* 카드/패널 배경 */
+            --bg-offwhite: #F8FAFC; /* 섹션 구분용 아주 밝은 회색 */
 
-            --radius-box: 16px;
-            --radius-item: 8px;
+            --radius-box: 12px;
+            --radius-item: 6px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: "Pretendard Variable", -apple-system, sans-serif !important; }
@@ -51,7 +51,7 @@
             width: 80px;
             background: rgba(17, 24, 39, 0.4);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1); /* 어두운 배경에 맞춘 테두리 */
+            border-right: 1px solid rgba(255, 255, 255, 0.1); 
             display: flex; flex-direction: column; align-items: center;
             padding: 1.5rem 0; z-index: 20; flex-shrink: 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.05);
@@ -72,7 +72,7 @@
         /* ✅ 메인 콘텐츠 영역 (완전 밝은 테마로 변경) */
         .main-content {
             flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden;
-            background: var(--bg-app); /* 밝은 라이트 그레이 배경 적용 */
+            background: var(--bg-app); 
         }
 
         .app-page { display: none; width: 100%; height: 100%; flex-direction: column; }
@@ -82,146 +82,155 @@
         /* ------------------------------------------------------------------ */
         /* ✨ 1. 캘린더 (Calendar) 페이지                                    */
         /* ------------------------------------------------------------------ */
-        header { padding: 1.2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel); z-index: 10; flex-shrink: 0; border-bottom: 1px solid var(--border-outer);}
+        header { padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel); z-index: 10; flex-shrink: 0; border-bottom: 1px solid var(--border-outer);}
 
         .view-toggles { display: flex; background: var(--bg-offwhite); padding: 4px; border-radius: 8px; border: 1px solid var(--border-outer); }
         .view-btn { border: none; background: transparent; padding: 6px 16px; font-size: 0.85rem; font-weight: 700; color: var(--text-sub); border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
         .view-btn.active { background: var(--bg-panel); color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        .header-actions { display: flex; align-items: center; gap: 0.8rem; }
-        .btn-action { font-size: 0.85rem; color: var(--text-main); background: var(--bg-panel); border: 1px solid var(--border-outer); padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; }
+        .header-actions { display: flex; align-items: center; gap: 0.6rem; }
+        .btn-action { font-size: 0.85rem; color: var(--text-main); background: var(--bg-panel); border: 1px solid var(--border-outer); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; display: flex; align-items: center; justify-content: center;}
         .btn-action:hover { background: var(--bg-offwhite); transform: translateY(-1px);}
 
-        .btn-gemini { background: #FAF5FF; color: var(--gemini); border: 1px solid #E9D5FF; padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .btn-gemini { background: #FAF5FF; color: var(--gemini); border: 1px solid #E9D5FF; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
         .btn-gemini span { font-size: 1.2rem; }
         .btn-gemini:hover { background: #F3E8FF; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2); }
 
-        .main-grid { display: flex; gap: 1.5rem; padding: 1.5rem; height: 100%; min-height: 0; overflow: hidden; }
+        /* ✅ Padding 대폭 축소하여 캘린더 영역 확장 */
+        .main-grid { display: flex; gap: 1rem; padding: 1rem 1.5rem; height: 100%; min-height: 0; overflow: hidden; }
 
-        .calendar-panel { flex: 1; padding: 1.5rem 2rem 2rem 2rem; display: flex; flex-direction: column; background: var(--bg-panel); border-radius: var(--radius-box); min-height: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-outer);}
+        .calendar-panel { flex: 1; padding: 1rem 1.5rem; display: flex; flex-direction: column; background: var(--bg-panel); border-radius: var(--radius-box); min-height: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid var(--border-outer);}
 
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
-        .month-title { font-size: 1.8rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; transition: 0.3s ease; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-shrink: 0; }
+        .month-title { font-size: 1.6rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; transition: 0.3s ease; }
         .cal-nav { display: flex; gap: 0.4rem; }
-        .btn-nav { width: 34px; height: 34px; border-radius: 6px; background: transparent; border: 1px solid var(--border-outer); font-size: 1.1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; color: var(--text-main); }
+        .btn-nav { width: 30px; height: 30px; border-radius: 6px; background: transparent; border: 1px solid var(--border-outer); font-size: 1.1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; color: var(--text-main); }
         .btn-nav:hover { background: var(--bg-offwhite); }
 
         #calendarBody { flex: 1; display: flex; flex-direction: column; min-height: 0; transition: opacity 0.25s ease; opacity: 1; }
 
         /* Month View Styles */
-        .cal-grid-header { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-weight: 700; color: var(--text-sub); margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; border-bottom: 2px solid var(--border-inner); padding-bottom: 0.5rem;}
-        .cal-grid { flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(80px, 1fr)); gap: 1px; min-height: 0; background: var(--border-outer); border: 1px solid var(--border-outer); border-radius: 8px; overflow-y: auto;}
+        .cal-grid-header { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-weight: 700; color: var(--text-sub); margin-bottom: 0.4rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; border-bottom: 2px solid var(--border-inner); padding-bottom: 0.4rem;}
+        .cal-grid { flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(60px, 1fr)); gap: 1px; min-height: 0; background: var(--border-outer); border: 1px solid var(--border-outer); border-radius: 8px; overflow-y: auto;}
         .cal-grid::-webkit-scrollbar { width: 6px; }
         .cal-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 
-        .cal-cell { background: var(--bg-panel); padding: 8px 10px; display: flex; flex-direction: column; cursor: pointer; transition: 0.15s ease; position: relative; overflow: hidden; min-height: 0; min-width: 0; }
+        /* ✅ 셀 패딩 축소 */
+        .cal-cell { background: var(--bg-panel); padding: 4px 6px; display: flex; flex-direction: column; cursor: pointer; transition: 0.15s ease; position: relative; overflow: hidden; min-height: 0; min-width: 0; }
         .cal-cell:hover { background: var(--bg-offwhite); z-index: 2; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
         .cal-cell.today { background: var(--bg-panel); box-shadow: inset 0 0 0 2px var(--accent); z-index: 3;}
         .cal-cell.selected { background: #EFF6FF; box-shadow: inset 0 0 0 2px var(--accent); z-index: 2; }
         .cal-cell.other-month { background: #FAFAFA; }
         .cal-cell.other-month .date-num { color: var(--text-muted); }
 
-        .cell-top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; flex-shrink: 0; }
-        .date-num { font-size: 1.05rem; font-weight: 600; color: var(--text-main); transition: 0.2s;}
+        /* ✅ 점과 배지 가로 병치 완벽 적용 */
+        .cell-top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 4px; flex-shrink: 0; }
+        .date-num { font-size: 0.95rem; font-weight: 600; color: var(--text-main); transition: 0.2s;}
         .cal-cell.today .date-num { color: var(--accent); font-weight: 800; background: #DBEAFE; padding: 0 6px; border-radius: 12px; }
 
-        /* ✅ 점과 배지 가로 병치 유지 */
-        .cell-badges { display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 5px; }
-        .color-dots { display: flex; gap: 3px; }
+        .cell-badges { display: flex; align-items: center; gap: 4px; }
+        .color-dots { display: flex; flex-direction: row; gap: 3px; align-items: center; }
         .color-dot { width: 6px; height: 6px; border-radius: 50%; opacity: 0.9; }
-        .task-count-badge { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); background: var(--bg-offwhite); border: 1px solid var(--border-outer); padding: 1px 5px; border-radius: 4px; }
+        .task-count-badge { font-size: 0.65rem; font-weight: 800; color: var(--text-sub); background: var(--bg-offwhite); border: 1px solid var(--border-outer); padding: 1px 4px; border-radius: 4px; display: inline-block;}
 
-        .task-preview { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding-right: 4px;}
+        /* ✅ 글자 겹침 방지를 위해 flex-shrink: 0 설정 및 텍스트 짤림(ellipsis) 적용 */
+        .task-preview { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding-right: 2px;}
         .task-preview::-webkit-scrollbar { width: 0px; }
-
+        
         .truncate-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
 
-        .mini-schedule { flex-shrink: 0; font-size: 0.8rem; color: var(--danger); font-weight: 700; padding: 2px; cursor: pointer; transition: 0.2s;}
-        .mini-schedule:hover { opacity: 0.7; }
-        .mini-task { flex-shrink: 0; font-size: 0.8rem; background: var(--bg-offwhite); padding: 4px 6px; border-radius: 4px; font-weight: 600; color: var(--text-main); border-left: 3px solid var(--primary-dark); cursor: pointer; transition: 0.2s;}
+        .mini-schedule { flex-shrink: 0; font-size: 0.75rem; color: var(--danger); font-weight: 700; padding: 3px 6px; cursor: pointer; transition: 0.2s; border-radius: 4px; background: #FEF2F2; border: 1px solid #FCA5A5;}
+        .mini-schedule:hover { opacity: 0.8; }
+        
+        .mini-task { flex-shrink: 0; font-size: 0.75rem; background: var(--bg-offwhite); padding: 3px 6px; border-radius: 4px; font-weight: 600; color: var(--text-main); border: 1px solid var(--border-outer); border-left: 3px solid var(--primary-dark); cursor: pointer; transition: 0.2s;}
         .mini-task:hover { background: #E2E8F0; }
-        .mini-task.done { opacity: 0.4; text-decoration: line-through; border-left-color: var(--success); }
-        .more-tasks { flex-shrink: 0; font-size: 0.7rem; color: var(--text-sub); font-weight: 600; text-align: center; margin-top: 2px; }
+        .mini-task.done { opacity: 0.5; text-decoration: line-through; border-left-color: var(--success); }
+        
+        .more-tasks { flex-shrink: 0; font-size: 0.65rem; color: var(--text-sub); font-weight: 700; text-align: center; margin-top: 2px; }
 
         /* Week & Day View 공통 (미니 캘린더) */
-        .split-view-container { display: flex; height: 100%; min-height: 0; gap: 1.5rem; }
+        .split-view-container { display: flex; height: 100%; min-height: 0; gap: 1.2rem; }
 
-        .mini-cal-container { width: 250px; flex-shrink: 0; border-right: 1px solid var(--border-outer); padding-right: 1.5rem; display: flex; flex-direction: column; }
-        .mini-cal-month { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; }
+        .mini-cal-container { width: 220px; flex-shrink: 0; border-right: 1px solid var(--border-outer); padding-right: 1.2rem; display: flex; flex-direction: column; }
+        .mini-cal-month { font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.8rem; }
         .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-        .mini-cal-dayname { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); text-align: center; margin-bottom: 6px;}
-        .mini-cal-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; font-weight: 600; border-radius: 50%; cursor: pointer; transition: 0.2s; color: var(--text-main);}
+        .mini-cal-dayname { font-size: 0.65rem; font-weight: 700; color: var(--text-sub); text-align: center; margin-bottom: 4px;}
+        .mini-cal-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 600; border-radius: 50%; cursor: pointer; transition: 0.2s; color: var(--text-main);}
         .mini-cal-cell:hover { background: var(--bg-offwhite); }
         .mini-cal-cell.today { background: var(--accent); color: white; }
         .mini-cal-cell.selected { border: 1.5px solid var(--accent); background: #EFF6FF;}
         .mini-cal-cell.other-month { color: var(--text-muted); opacity: 0.5;}
 
-        /* ✅ Week View (하얀 배경 적용, CSS 원상복구) */
-        .week-view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg-panel); border: 1px solid var(--border-outer); border-radius: 8px; overflow: hidden;}
+        /* ✅ Week View (주간 뷰 CSS 완벽 복원 및 테마 적용) */
+        .week-view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg-panel); border: 1px solid var(--border-outer); border-radius: var(--radius-item); overflow: hidden;}
         .week-grid-header { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border-outer); border-bottom: 1px solid var(--border-outer); flex-shrink: 0;}
-        .week-header-cell { background: #fff; padding: 10px; text-align: center; }
-        .week-day-name { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
-        .week-day-num { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-top: 4px; }
+        .week-header-cell { background: #fff; padding: 8px; text-align: center; }
+        .week-day-name { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+        .week-day-num { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-top: 2px; }
         .week-header-cell.today .week-day-num { color: var(--accent); }
 
         .week-grid-body { flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border-outer); overflow-y: auto; min-height: 0; align-items: start; }
         .week-grid-body::-webkit-scrollbar { width: 6px; }
         .week-grid-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 
-        .week-col { background: #fff; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 100%; cursor: pointer; min-width: 0; }
-        .week-col .mini-schedule, .week-col .mini-task { font-size: 0.9rem; padding: 6px 8px; }
+        .week-col { background: #fff; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 100%; cursor: pointer; min-width: 0; }
+        
+        /* ✅ 주간/일간 뷰 안의 미니 블록들도 겹침 방지 */
+        .week-col .mini-schedule, .week-col .mini-task { flex-shrink: 0; font-size: 0.8rem; padding: 4px 6px; border-radius: 4px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ✅ Day View */
-        .day-view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; padding-left: 1.5rem;}
-        .day-hero-date { font-size: 4rem; font-weight: 900; color: var(--text-main); letter-spacing: -0.04em; margin-bottom: 0.2rem; flex-shrink: 0;}
-        .day-hero-day { font-size: 1.2rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem; flex-shrink: 0;}
+        /* ✅ Day View (일간 뷰 CSS 완벽 복원 및 테마 적용) */
+        .day-view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg-panel); border: 1px solid var(--border-outer); border-radius: var(--radius-item); padding: 1.5rem;}
+        .day-hero-date { font-size: 3.5rem; font-weight: 900; color: var(--text-main); letter-spacing: -0.04em; margin-bottom: 0; flex-shrink: 0;}
+        .day-hero-day { font-size: 1rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem; flex-shrink: 0;}
 
-        .day-items-list { flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 10px; min-height: 0;}
+        .day-items-list { flex: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 10px; min-height: 0;}
         .day-items-list::-webkit-scrollbar { width: 6px; }
         .day-items-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 
-        .day-item-card { background: #fff; border: 1px solid var(--border-outer); padding: 1.2rem; border-radius: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 4px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; flex-shrink: 0; min-width: 0;}
-        .day-item-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #CBD5E1;}
+        .day-item-card { background: #fff; border: 1px solid var(--border-outer); padding: 1rem; border-radius: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; flex-shrink: 0; min-width: 0;}
+        .day-item-card:hover { transform: translateX(2px); border-color: #CBD5E1;}
 
-        /* 우측 패널 (밝은 테마로 완벽 변경) */
-        .detail-panel { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; background: var(--bg-panel); border-radius: 20px; min-height: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; border: 1px solid var(--border-outer);}
-        .detail-header { padding: 1.5rem 2rem; text-align: left; border-bottom: 1px solid var(--border-outer); flex-shrink: 0; background: var(--bg-offwhite);}
-        .selected-day-display { font-size: 0.85rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
-        .selected-date-display { font-size: 2rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.03em; margin-top: 4px; }
+        /* 우측 패널 */
+        .detail-panel { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; background: var(--bg-panel); border-radius: var(--radius-box); border: 1px solid var(--border-outer); min-height: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden;}
+        .detail-header { padding: 1rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border-outer); flex-shrink: 0; background: var(--bg-offwhite);}
+        .selected-day-display { font-size: 0.8rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+        .selected-date-display { font-size: 1.6rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.03em; margin-top: 2px; }
 
-        .split-sections { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 1.5rem; gap: 1.5rem; }
+        /* ✅ 수정 4: Schedules 세로 길이 대폭 연장 */
+        .split-sections { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 1rem; gap: 1rem; }
         .section-wrapper { display: flex; flex-direction: column; min-height: 0; }
-        .section-schedules { flex: 0.6; }
-        .section-plans { flex: 1.4; }
+        
+        .section-schedules { flex: 1; } /* 기존 0.6에서 1로 비율 확대 */
+        .section-plans { flex: 1; }   /* 기존 1.4에서 1로 조절하여 50:50 분배 */
 
-        .section-title { font-size: 0.85rem; font-weight: 800; color: var(--text-sub); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+        .section-title { font-size: 0.8rem; font-weight: 800; color: var(--text-sub); margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        .btn-add-sm { background: var(--accent); color: white; border: none; padding: 0.35rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);}
-        .btn-add-sm:hover { background: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);}
+        .btn-add-sm { background: var(--accent); color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);}
+        .btn-add-sm:hover { background: #1D4ED8; }
         .btn-add-sch { background: #FFFFFF; color: var(--text-main); border: 1px solid var(--border-outer); box-shadow: 0 1px 2px rgba(0,0,0,0.02);}
-        .btn-add-sch:hover { background: var(--bg-offwhite); border-color: #CBD5E1; color: var(--primary-dark);}
+        .btn-add-sch:hover { background: var(--bg-offwhite); color: var(--primary);}
 
-        .item-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; padding-right: 4px;}
-        .item-list::-webkit-scrollbar { width: 5px; }
-        .item-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+        .item-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; min-height: 0; padding-right: 4px;}
+        .item-list::-webkit-scrollbar { width: 4px; }
+        .item-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
 
-        .list-card { background: #FFFFFF; border: 1px solid var(--border-outer); padding: 0.8rem 1rem; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.01); flex-shrink: 0; gap: 12px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .list-card:hover { border-color: #CBD5E1; box-shadow: 0 4px 10px rgba(0,0,0,0.04); transform: translateX(2px);}
+        .list-card { background: #FFFFFF; border: 1px solid var(--border-outer); padding: 0.6rem 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 10px; transition: 0.2s; }
+        .list-card:hover { border-color: #CBD5E1; transform: translateX(2px);}
 
-        .custom-checkbox { width: 20px; height: 20px; border: 2px solid #CBD5E1; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; background: transparent; transition: 0.2s; position: relative; z-index: 5;}
-        .custom-checkbox:hover { border-color: var(--accent); transform: scale(1.1);}
+        .custom-checkbox { width: 18px; height: 18px; border: 2px solid #CBD5E1; border-radius: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; background: transparent; transition: 0.2s;}
+        .custom-checkbox:hover { border-color: var(--accent); }
         .list-card.done .custom-checkbox { background: var(--success); border-color: var(--success); }
-        .list-card.done .custom-checkbox::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+        .list-card.done .custom-checkbox::after { content: '✓'; color: white; font-size: 11px; font-weight: bold; }
 
-        .list-content { flex: 1; font-weight: 600; color: var(--text-main); font-size: 0.95rem; line-height: 1.4; word-break: break-word; transition: 0.2s;}
+        .list-content { flex: 1; font-weight: 600; color: var(--text-main); font-size: 0.9rem; line-height: 1.3; word-break: break-word;}
         .list-card.done .list-content { text-decoration: line-through; color: var(--text-muted); }
 
-        .sch-content { flex: 1; display: flex; align-items: flex-start; gap: 10px; }
-        .sch-text { font-weight: 700; color: var(--text-main); font-size: 0.95rem; line-height: 1.4; flex: 1; word-break: break-word; }
+        .sch-content { flex: 1; display: flex; align-items: flex-start; gap: 8px; }
+        .sch-text { font-weight: 700; color: var(--text-main); font-size: 0.9rem; line-height: 1.3; flex: 1; word-break: break-word; }
 
-        .btn-icon-group { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: 0.2s; }
+        .btn-icon-group { display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: 0.2s; }
         .list-card:hover .btn-icon-group { opacity: 1; }
-        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; padding: 4px; display: flex; justify-content: center; align-items: center; border-radius: 4px;}
+        .btn-icon { background: transparent; border: none; color: var(--text-sub); cursor: pointer; transition: 0.2s; padding: 4px; border-radius: 4px;}
         .btn-icon:hover { background: #F1F5F9; color: var(--accent); }
         .btn-icon.delete:hover { color: var(--danger); }
 
@@ -247,7 +256,7 @@
         /* 오른쪽 메모 에디터 */
         .memo-editor { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; background: #FFFFFF;}
 
-        /* ✅ H3/본문 추가 및 둥근 캡슐형 중앙 툴바 */
+        /* 중앙에 떠 있는 캡슐형 툴바 */
         .memo-editor-toolbar-container {
             display: flex; justify-content: center; padding: 15px 0; position: absolute; top: 0; width: 100%; z-index: 10; pointer-events: none;
         }
@@ -265,14 +274,14 @@
         .memo-content-editable[placeholder]:empty:before { content: attr(placeholder); color: var(--text-muted); pointer-events: none; display: block; }
 
         /* ------------------------------------------------------------------ */
-        /* ✨ 모달 및 팝업 창 디자인 (밝은 테마 예쁘게 적용)                 */
+        /* ✨ 모달 및 팝업 창 디자인                                         */
         /* ------------------------------------------------------------------ */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.4); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
         .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal-content { background: #FFFFFF; padding: 2.5rem; width: 420px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); transform: scale(0.95) translateY(10px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid var(--border-outer); }
         .modal-overlay.show .modal-content { transform: scale(1) translateY(0); }
 
-        /* ✅ 디테일 팝업 디자인 변경 */
+        /* 디테일 팝업 디자인 변경 */
         #detailViewModal .modal-content { width: 380px; padding: 2.5rem 2rem; text-align: center; }
         .detail-view-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 1.5rem; color: white; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 2px 8px rgba(0,0,0,0.15);}
         .detail-view-text { font-size: 1.25rem; font-weight: 800; color: var(--text-main); line-height: 1.5; word-break: break-word; margin-bottom: 2.5rem; }
@@ -297,7 +306,7 @@
         .btn-save:hover { background: #111827; transform: translateY(-1px);}
 
         /* Gemini 팝업 */
-        #geminiModal .modal-content { width: 50vw; min-width: 600px; max-width: 900px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; }
+        #geminiModal .modal-content { width: 50vw; min-width: 600px; max-width: 900px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; }
         .gemini-header { padding: 1.5rem 2rem; background: #FAF5FF; border-bottom: 1px solid #E9D5FF; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; justify-content: space-between; color: var(--gemini); }
         .gemini-chat-area { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF; }
         .gemini-input-area { padding: 1.2rem 2rem; border-top: 1px solid var(--border-light); display: flex; gap: 10px; background: #FFFFFF; }
@@ -325,7 +334,7 @@
     </div>
 
     <div class="app-wrapper">
-
+        
         <nav class="side-nav">
             <div class="nav-brand">O.</div>
             <div class="nav-menu">
@@ -341,7 +350,7 @@
         </nav>
 
         <div class="main-content">
-
+            
             <div id="page-calendar" class="app-page active">
                 <header>
                     <div style="font-weight: 800; font-size: 1.2rem; color: var(--text-main);">Planner</div>
@@ -351,6 +360,7 @@
                         <button class="view-btn" id="btnViewDay" onclick="changeViewMode('day')">Day</button>
                     </div>
                     <div class="header-actions">
+                        <button class="btn-action" onclick="location.reload()" title="데이터 새로고침">🔄 새로고침</button>
                         <button class="btn-action" onclick="window.goToToday()">Today</button>
                         <button class="btn-gemini" onclick="openModal('geminiModal')" title="AI 멘토 열기"><span>✨</span> Ask AI</button>
                     </div>
@@ -404,7 +414,7 @@
                         </div>
                         <div class="memo-list" id="memoListContainer"></div>
                     </div>
-
+                    
                     <div class="memo-editor">
                         <div class="memo-editor-toolbar-container">
                             <div class="apple-toolbar">
@@ -490,7 +500,7 @@
         </div>
     </div>
 
-        <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         // 🚨 1. getFirestore 대신 initializeFirestore를 가져옵니다.
         import { initializeFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -578,7 +588,6 @@
                 try {
                     renderCalendarBody();
                     renderDetailPanel();
-                    calculateStatistics && typeof calculateStatistics === 'function' ? calculateStatistics() : null;
                     renderMemoList();
                     if (typeof window.renderChatHistory === 'function') window.renderChatHistory(); 
                 } catch (err) {
@@ -589,8 +598,6 @@
                 alert("데이터를 불러오는 중 오류가 발생했습니다. 네트워크를 확인해주세요.");
             });
         });
-
-
 
         // ==========================================
         // ✨ 탭 메뉴 전환 라우팅 로직
@@ -879,12 +886,12 @@
             previewHtml += '</div>';
 
             cell.innerHTML = `
-                <div class="cell-top-bar">
-                    <div class="date-num">${day}</div>
-                    <div class="cell-badges">
+                <div class="cell-top-bar" style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:4px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <div class="date-num">${day}</div>
                         <div class="color-dots">${colorDotsHtml}</div>
-                        ${taskCountHtml}
                     </div>
+                    <div class="cell-badges">${taskCountHtml}</div>
                 </div>
                 ${previewHtml}
             `;
@@ -1033,7 +1040,7 @@
                     div.className = 'list-card';
                     div.innerHTML = `
                         <div class="sch-content">
-                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:${sch.color || '#EF4444'}; flex-shrink:0; margin-top:4px;"></span>
+                            <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:${sch.color || '#EF4444'}; flex-shrink:0; margin-top:4px;"></span>
                             <span class="sch-text">${sch.content}</span>
                         </div>
                         <div class="btn-icon-group">
@@ -1137,7 +1144,7 @@
                 const sel = document.getElementById('addPlanBook');
                 sel.innerHTML = '<option value="">문제집 선택...</option>';
                 appData.books.forEach(b => { sel.innerHTML += `<option value="${b.id}">${b.title}</option>`; });
-                document.getElementById('addPlanChapter').innerHTML = '<option value="">먼저 문제집 선택하세요</option>';
+                document.getElementById('addPlanChapter').innerHTML = '<option value="">먼저 문제집을 선택하세요</option>';
             }
         };
 
@@ -1231,7 +1238,7 @@
             inputEl.value = '';
             renderChatHistory();
 
-            try { await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true }); }
+            try { await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true }); } 
             catch (e) { console.error("채팅 저장 에러:", e); }
 
             const loadingId = "loading-" + Date.now();
@@ -1257,7 +1264,7 @@
                 }
 
                 const data = await response.json();
-
+                
                 if (data.error) throw new Error(data.error);
 
                 const botReply = data.reply;
