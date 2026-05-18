@@ -490,9 +490,10 @@
         </div>
     </div>
 
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // 🚨 1. getFirestore 대신 initializeFirestore를 가져옵니다.
+        import { initializeFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDW4xa4Qn5EI1AGlOyAUHwlB6Dtl3NHxHE",
@@ -504,7 +505,12 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        
+        // 🚨 2. 태블릿 무한 로딩 해결을 위해 통신 방식을 강제로 우회(Long Polling) 시킵니다!
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
+        
         const USER_DOC_ID = "minchan_data";
 
         let appData = { dailyPlanner: {}, books: [], chatHistory: [], memos: [] };
