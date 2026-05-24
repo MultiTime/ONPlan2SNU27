@@ -13,12 +13,12 @@
             /* ✅ 본문에 쓰일 밝고 모던한 색상 팔레트 */
             --primary: #4B5563;
             --primary-dark: #1F2937;
-            --text-main: #111827;
-            --text-sub: #6B7280;
-            --text-muted: #9CA3AF;
+            --text-main: #0F172A;
+            --text-sub: #475569;
+            --text-muted: #94A3B8;
 
-            --border-outer: #E2E8F0;
-            /* 깔끔한 경계선 */
+            --border-outer: rgba(226, 232, 240, 0.8);
+            /* 깔끔하고 얇은 경계선 */
             --border-inner: #F1F5F9;
 
             --success: #10B981;
@@ -26,15 +26,15 @@
             --accent: #2563EB;
             --gemini: #A855F7;
 
-            --bg-app: #FFFFFF;
-            /* 메인 본문 배경 완전 흰색 */
+            --bg-app: #F8FAFC;
+            /* 메인 본문 배경 산뜻한 연그레이 */
             --bg-panel: #FFFFFF;
             /* 카드/패널 배경 */
             --bg-offwhite: #F8FAFC;
             /* 섹션 구분용 아주 밝은 회색 */
 
-            --radius-box: 12px;
-            --radius-item: 6px;
+            --radius-box: 24px;
+            --radius-item: 12px;
         }
 
         * {
@@ -45,14 +45,14 @@
             font-family: "Pretendard Variable", -apple-system, sans-serif !important;
         }
 
-        /* 바디 배경은 기존과 동일하게 유지하여 사이드바의 반투명 효과를 살림 */
+        /* 바디 배경을 아주 미세한 연회색으로 처리하여 사이드바의 투명 유리 효과를 매치시킴 */
         body {
             font-size: 14px;
             height: 100vh;
             padding: 0;
             margin: 0;
             overflow: hidden;
-            background-color: #D1D5DB;
+            background-color: #E2E8F0;
             color: var(--text-main);
             letter-spacing: -0.01em;
         }
@@ -70,16 +70,16 @@
 
         .shape {
             position: absolute;
-            opacity: 0.2;
+            opacity: 0.25;
             border-radius: 50%;
-            filter: blur(70px);
+            filter: blur(80px);
             transition: all 1s ease;
         }
 
         .shape-1 {
             width: 80vw;
             height: 80vw;
-            background: radial-gradient(circle, #2563EB 0%, rgba(37, 99, 235, 0) 70%);
+            background: radial-gradient(circle, #DBEAFE 0%, rgba(219, 234, 254, 0) 70%);
             bottom: -20%;
             left: -10%;
         }
@@ -87,7 +87,7 @@
         .shape-2 {
             width: 70vw;
             height: 70vw;
-            background: radial-gradient(circle, #E0005A 0%, rgba(224, 0, 90, 0) 70%);
+            background: radial-gradient(circle, #FCE7F3 0%, rgba(252, 231, 243, 0) 70%);
             top: -30%;
             right: -20%;
         }
@@ -115,34 +115,38 @@
             height: 100vh;
         }
 
-        /* ✅ 최좌측 사이드 탭 메뉴 (어두운 회색 유리 효과 유지) */
+        /* ✅ 최좌측 사이드 탭 메뉴 (완벽하고 깨끗한 화이트 글라스모피즘 변환) */
         .side-nav {
-            width: 80px;
-            background: rgba(17, 24, 39, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            width: 85px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(226, 232, 240, 0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 1.5rem 0;
+            padding: 2rem 0;
             z-index: 20;
             flex-shrink: 0;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.02);
         }
 
         .nav-brand {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 900;
-            color: #FFFFFF;
-            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 3rem;
             letter-spacing: -0.05em;
+            cursor: pointer;
+            user-select: none;
         }
 
         .nav-menu {
             display: flex;
             flex-direction: column;
-            gap: 1.8rem;
+            gap: 2rem;
             width: 100%;
         }
 
@@ -151,20 +155,20 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748B;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             width: 100%;
-            padding: 0.5rem 0;
+            padding: 0.6rem 0;
         }
 
         .nav-item:hover {
-            color: #FFFFFF;
+            color: var(--accent);
         }
 
         .nav-item.active {
-            color: #FFFFFF;
+            color: var(--accent);
             font-weight: 800;
         }
 
@@ -175,18 +179,23 @@
             top: 50%;
             transform: translateY(-50%);
             width: 4px;
-            height: 30px;
+            height: 32px;
             background: var(--accent);
             border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
         }
 
         .nav-icon {
             width: 24px;
             height: 24px;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            fill: none;
         }
 
         .nav-text {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 600;
         }
 
         /* ✅ 메인 콘텐츠 영역 (완전 밝은 테마로 변경) */
