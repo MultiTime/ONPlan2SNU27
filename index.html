@@ -111,9 +111,12 @@
             --accent: #3B82F6;
             --gemini: #C084FC;
 
-            --bg-app: #0B0F19; /* Sleek slate-black */
-            --bg-panel: #111827; /* Dark slate card background */
-            --bg-offwhite: #1F2937; /* Dark gray for subtle section variation */
+            --bg-app: #0B0F19;
+            /* Sleek slate-black */
+            --bg-panel: #111827;
+            /* Dark slate card background */
+            --bg-offwhite: #1F2937;
+            /* Dark gray for subtle section variation */
 
             --bg-body: #030712;
             --bg-shapes-1: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 70%);
@@ -175,13 +178,36 @@
         }
 
         /* Smooth transition for theme switching */
-        body, .side-nav, .main-content, .calendar-panel, .detail-panel, 
-        .list-card, .memo-sidebar, .memo-editor, .modal-content, 
-        .apple-toolbar, header, .view-toggles, .view-btn, .btn-action, 
-        .btn-nav, .cal-cell, .week-header-cell, .week-col, .day-view-container, 
-        .day-item-card, .custom-checkbox, .memo-item, .form-input, .form-select, 
-        .gemini-header, .gemini-chat-area, .gemini-input-area, .chat-bubble, 
-        .nav-item, #loadingScreen {
+        body,
+        .side-nav,
+        .main-content,
+        .calendar-panel,
+        .detail-panel,
+        .list-card,
+        .memo-sidebar,
+        .memo-editor,
+        .modal-content,
+        .apple-toolbar,
+        header,
+        .view-toggles,
+        .view-btn,
+        .btn-action,
+        .btn-nav,
+        .cal-cell,
+        .week-header-cell,
+        .week-col,
+        .day-view-container,
+        .day-item-card,
+        .custom-checkbox,
+        .memo-item,
+        .form-input,
+        .form-select,
+        .gemini-header,
+        .gemini-chat-area,
+        .gemini-input-area,
+        .chat-bubble,
+        .nav-item,
+        #loadingScreen {
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -452,30 +478,6 @@
             transform: translateY(-1px);
         }
 
-        .btn-gemini {
-            background: var(--bg-btn-gemini);
-            color: var(--gemini);
-            border: 1px solid var(--border-btn-gemini);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-gemini span {
-            font-size: 1.2rem;
-        }
-
-        .btn-gemini:hover {
-            background: var(--bg-btn-gemini-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2);
-        }
 
         /* ✅ Padding 대폭 축소하여 캘린더 영역 확장 */
         .main-grid {
@@ -1605,113 +1607,200 @@
             transform: translateY(-1px);
         }
 
-        /* Gemini 팝업 */
-        #geminiModal .modal-content {
-            width: 50vw;
-            min-width: 600px;
-            max-width: 900px;
-            height: 85vh;
-            padding: 0;
-            display: flex;
+        /* ================================================================ */
+        /*   Floating Chapter-Assign Panel (Draggable)                    */
+        /* ================================================================ */
+        .chapter-assign-panel {
+            position: fixed;
+            top: 120px;
+            right: 420px;
+            width: 340px;
+            max-height: 520px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-outer);
+            border-radius: 16px;
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.22), 0 6px 16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            display: none;
             flex-direction: column;
+            z-index: 1001;
             overflow: hidden;
-            border-radius: 20px;
+            animation: panelSlideIn 0.28s cubic-bezier(.4, 0, .2, 1);
         }
 
-        .gemini-header {
-            padding: 1.5rem 2rem;
-            background: var(--bg-gemini-header);
-            border-bottom: 1px solid var(--border-gemini-header);
+        body.dark-theme .chapter-assign-panel {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.12), 0 0 60px rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .chapter-assign-panel.visible {
+            display: flex;
+        }
+
+        @keyframes panelSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .cap-header {
+            padding: 14px 18px;
+            background: linear-gradient(135deg, var(--bg-offwhite), var(--bg-panel));
+            border-bottom: 1px solid var(--border-outer);
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .cap-header-title {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            color: var(--gemini);
+            gap: 6px;
         }
 
-        .gemini-chat-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            background: var(--bg-gemini-chat);
-        }
-
-        .gemini-input-area {
-            padding: 1.2rem 2rem;
-            border-top: 1px solid var(--border-light);
-            display: flex;
-            gap: 10px;
-            background: var(--bg-gemini-input-area);
-        }
-
-        .gemini-input {
-            flex: 1;
-            padding: 14px 18px;
-            border-radius: 12px;
-            border: 1px solid var(--border-dark);
-            outline: none;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .gemini-input:focus {
-            border-color: var(--gemini);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-
-        .gemini-send {
-            background: var(--gemini);
-            color: white;
+        .cap-close {
+            background: transparent;
             border: none;
-            width: 50px;
-            border-radius: 12px;
+            font-size: 1.3rem;
+            line-height: 1;
             cursor: pointer;
-            font-size: 1.4rem;
+            color: var(--text-sub);
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
             display: flex;
             justify-content: center;
             align-items: center;
             transition: 0.2s;
         }
 
-        .chat-bubble {
-            max-width: 80%;
-            padding: 14px 18px;
-            border-radius: 16px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            line-height: 1.5;
-            word-break: break-word;
-            animation: popIn 0.3s ease-out;
+        .cap-close:hover {
+            background: var(--bg-offwhite);
+            color: var(--danger);
         }
 
-        @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .cap-body {
+            padding: 14px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
         }
 
-        .chat-bot {
-            background: var(--bg-chat-bubble-bot);
+        .cap-chapter-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 6px;
+            border: 1px solid var(--border-inner);
+            border-radius: 10px;
+            background: var(--bg-app);
+        }
+
+        .cap-chapter-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .cap-chapter-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 3px;
+        }
+
+        .cap-chip {
+            padding: 9px 14px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-outer);
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: 700;
+            font-size: 0.84rem;
             color: var(--text-main);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
+            transition: all 0.18s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .chat-user {
-            background: var(--gemini);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
+        .cap-chip::before {
+            content: '⠿';
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .cap-chip:hover {
+            border-color: var(--accent);
+            background: var(--bg-cell-selected);
+            transform: translateX(3px);
+        }
+
+        .cap-chip:active {
+            cursor: grabbing;
+            opacity: 0.5;
+        }
+
+        .cap-chip.done-chip {
+            border-left: 3px solid var(--success);
+            opacity: 0.65;
+        }
+
+        .cap-chip .done-tag {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: var(--success);
+            font-weight: 800;
+        }
+
+        .cap-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 2rem 0;
+        }
+
+        /* Drop-target highlight on calendar cells */
+        .cal-cell.drop-highlight,
+        .week-col.drop-highlight {
+            background: var(--bg-cell-selected) !important;
+            box-shadow: inset 0 0 0 2.5px var(--accent) !important;
+            transition: box-shadow 0.15s, background 0.15s;
+        }
+
+        /* Toast notification */
+        .cap-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .cap-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
@@ -1730,7 +1819,8 @@
     </div>
 
     <div id="loadingScreen">
-        <div style="font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; letter-spacing: -0.03em; color: var(--text-main);">
+        <div
+            style="font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; letter-spacing: -0.03em; color: var(--text-main);">
             ONPlan2SNU27</div>
         <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-sub);">생태계 동기화 중...</div>
     </div>
@@ -1765,7 +1855,8 @@
             <!-- 테마 토글 버튼 추가 -->
             <div class="theme-toggle-container">
                 <div class="nav-item" id="themeToggleBtn" onclick="toggleThemeMode()" title="테마 전환">
-                    <svg class="nav-icon" id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="nav-icon" id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                     <span class="nav-text" id="themeToggleText">다크 모드</span>
@@ -1786,8 +1877,8 @@
                     </div>
                     <div class="header-actions">
                         <button class="btn-action" onclick="window.goToToday()">Today</button>
-                        <button class="btn-gemini" onclick="openModal('geminiModal')" title="AI 멘토 열기"><span>✨</span>
-                            Ask AI</button>
+                        <button class="btn-action" id="btnOpenAssign" onclick="window.toggleAssignPanel()"
+                            style="background:linear-gradient(135deg,#EEF2FF,#F5F3FF); color:#4F46E5; border-color:#C7D2FE; font-weight:800;">단원배정</button>
                     </div>
                 </header>
 
@@ -1954,20 +2045,20 @@
         </div>
     </div>
 
-    <div id="geminiModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="gemini-header">
-                <div class="gemini-header-title"><span>✨</span> ONStudy AI Mentor</div>
-                <button class="btn-close-gemini" onclick="closeModal('geminiModal')">×</button>
-            </div>
-            <div class="gemini-chat-area" id="chatArea"></div>
-            <div class="gemini-input-area">
-                <input type="text" id="geminiInput" class="gemini-input" placeholder="학습 계획이나 현재 고민에 대해 자유롭게 질문해보세요..."
-                    onkeypress="if(event.key === 'Enter') sendChatMessage()">
-                <button class="gemini-send" onclick="sendChatMessage()">➤</button>
+    <!--  Chapter Assign Floating Panel -->
+    <div id="chapterAssignPanel" class="chapter-assign-panel">
+        <div class="cap-header" id="capHeader">
+            <div class="cap-header-title">단원 드래그 배정</div>
+            <button class="cap-close" onclick="window.toggleAssignPanel()">×</button>
+        </div>
+        <div class="cap-body">
+            <select id="capBookSelect" class="form-select" onchange="window.renderCapChapters()"></select>
+            <div class="cap-chapter-list" id="capChapterList">
+                <div class="cap-empty">문제집을 선택하세요</div>
             </div>
         </div>
     </div>
+    <div id="capToast" class="cap-toast"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1992,7 +2083,7 @@
 
         const USER_DOC_ID = "minchan_data";
 
-        let appData = { dailyPlanner: {}, books: [], chatHistory: [], memos: [] };
+        let appData = { dailyPlanner: {}, books: [], memos: [] };
         let currentViewMode = 'month';
         let currentDisplayDate = new Date();
         let miniDisplayDate = new Date();
@@ -2040,7 +2131,6 @@
                     const data = docSnap.data();
                     appData.dailyPlanner = data.dailyPlanner || {};
                     appData.books = data.books || [];
-                    appData.chatHistory = data.chatHistory || [];
                     appData.memos = data.memos || [];
                 }
 
@@ -2048,7 +2138,6 @@
                     renderCalendarBody();
                     renderDetailPanel();
                     renderMemoList();
-                    if (typeof window.renderChatHistory === 'function') window.renderChatHistory();
                 } catch (err) {
                     console.error("렌더링 에러:", err);
                 }
@@ -2308,6 +2397,7 @@
 
             const cell = document.createElement('div');
             cell.className = `cal-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isOtherMonth ? 'other-month' : ''}`;
+            cell.setAttribute('data-datekey', dateKey);
             cell.onclick = () => selectDate(dateKey);
 
             let previewHtml = '<div class="task-preview">';
@@ -2411,7 +2501,7 @@
                         <div class="week-day-num">${currentDay.getDate()}</div>
                     </div>`;
 
-                let colHtml = `<div class="week-col" onclick="selectDate('${dateKey}')">`;
+                let colHtml = `<div class="week-col" data-datekey="${dateKey}" onclick="selectDate('${dateKey}')">`;
                 const dayData = appData.dailyPlanner[dateKey];
                 if (dayData) {
                     (dayData.schedules || []).forEach((sch, idx) => {
@@ -2524,10 +2614,6 @@
 
         window.openModal = (id) => {
             document.getElementById(id).classList.add('show');
-            if (id === 'geminiModal') {
-                document.getElementById('geminiInput').focus();
-                if (typeof window.renderChatHistory === 'function') window.renderChatHistory();
-            }
         };
         window.closeModal = (id) => { document.getElementById(id).classList.remove('show'); };
 
@@ -2677,72 +2763,6 @@
             renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
         };
 
-        window.sendChatMessage = async () => {
-            const inputEl = document.getElementById('geminiInput');
-            const chatArea = document.getElementById('chatArea');
-            const text = inputEl.value.trim();
-            if (!text) return;
-
-            if (!appData.chatHistory) appData.chatHistory = [];
-            appData.chatHistory.push({ role: 'user', text: text });
-            inputEl.value = '';
-            renderChatHistory();
-
-            try { await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true }); }
-            catch (e) { console.error("채팅 저장 에러:", e); }
-
-            const loadingId = "loading-" + Date.now();
-            chatArea.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="opacity: 0.5;">답변을 생성하는 중...</div>`;
-            chatArea.scrollTop = chatArea.scrollHeight;
-
-            const historyContents = appData.chatHistory.map(msg => ({
-                role: msg.role === 'user' ? 'user' : 'model',
-                parts: [{ text: msg.text }]
-            }));
-
-            try {
-                const response = await fetch('https://onplan2snu27-backend.onrender.com/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        historyContents: historyContents
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('백엔드 서버 통신 에러');
-                }
-
-                const data = await response.json();
-
-                if (data.error) throw new Error(data.error);
-
-                const botReply = data.reply;
-
-                appData.chatHistory.push({ role: 'bot', text: botReply });
-                renderChatHistory();
-                await setDoc(doc(db, "users", USER_DOC_ID), { chatHistory: appData.chatHistory }, { merge: true });
-
-            } catch (error) {
-                console.error("Chat Error:", error);
-                document.getElementById(loadingId).innerHTML = `앗, 에러가 발생했어!<br><span style="font-size:0.8rem; color:var(--danger);">(${error.message})</span><br><br><span style="font-size:0.8rem; color:var(--text-sub);">💡 백엔드 서버(node server.js)가 실행 중인지 확인해줘!</span>`;
-            }
-        };
-
-        window.renderChatHistory = function () {
-            const chatArea = document.getElementById('chatArea');
-            if (!appData.chatHistory || appData.chatHistory.length === 0) {
-                chatArea.innerHTML = `<div class="chat-bubble chat-bot">안녕하세요! 학습 계획이나 고민이 있다면 편하게 말씀해주세요. 😊</div>`;
-                return;
-            }
-            let html = '';
-            appData.chatHistory.forEach(msg => {
-                const roleClass = msg.role === 'user' ? 'chat-user' : 'chat-bot';
-                html += `<div class="chat-bubble ${roleClass}">${msg.text.replace(/\n/g, '<br>')}</div>`;
-            });
-            chatArea.innerHTML = html;
-            chatArea.scrollTop = chatArea.scrollHeight;
-        };
 
         // -------------------------------------------------------------
         // 테마 모드 전환 및 초기화 로직 (Light/Dark Mode)
@@ -2757,7 +2777,7 @@
             const icon = document.getElementById('themeToggleIcon');
             const txt = document.getElementById('themeToggleText');
             if (!icon || !txt) return;
-            
+
             if (isDark) {
                 // Sun icon SVG path
                 icon.innerHTML = `
@@ -2782,6 +2802,137 @@
                 document.getElementById('themeToggleBtn').title = "다크 모드 전환";
             }
         };
+
+
+        // ================================================================
+        //  Chapter-Assign Panel: open/close, drag-to-move, drag-to-drop
+        // ================================================================
+        window.toggleAssignPanel = function () {
+            const panel = document.getElementById('chapterAssignPanel');
+            const isOpen = panel.classList.toggle('visible');
+            if (isOpen) {
+                const sel = document.getElementById('capBookSelect');
+                sel.innerHTML = '<option value="">── 문제집 선택 ──</option>';
+                appData.books.forEach(b => {
+                    sel.innerHTML += `<option value="${b.id}">${b.title}</option>`;
+                });
+                document.getElementById('capChapterList').innerHTML = '<div class="cap-empty">문제집을 선택하세요</div>';
+                initPanelDrag();
+            }
+        };
+
+        window.renderCapChapters = function () {
+            const bid = document.getElementById('capBookSelect').value;
+            const list = document.getElementById('capChapterList');
+            list.innerHTML = '';
+            const book = appData.books.find(x => x.id == bid);
+            if (!book || !book.chapters || book.chapters.length === 0) {
+                list.innerHTML = '<div class="cap-empty">단원이 없습니다</div>';
+                return;
+            }
+            book.chapters.forEach((ch, idx) => {
+                const chip = document.createElement('div');
+                chip.className = `cap-chip ${ch.done ? 'done-chip' : ''}`;
+                chip.draggable = true;
+                chip.innerHTML = `<span>${ch.name}</span>${ch.done ? '<span class="done-tag">완료</span>' : ''}`;
+                chip.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('application/cap-book', bid);
+                    e.dataTransfer.setData('application/cap-idx', String(idx));
+                    e.dataTransfer.effectAllowed = 'copy';
+                    chip.style.opacity = '0.4';
+                });
+                chip.addEventListener('dragend', () => { chip.style.opacity = ''; });
+                list.appendChild(chip);
+            });
+        };
+
+        // --- Panel dragging (move the panel itself) ---
+        function initPanelDrag() {
+            const panel = document.getElementById('chapterAssignPanel');
+            const header = document.getElementById('capHeader');
+            let ox = 0, oy = 0, sx = 0, sy = 0;
+            header.onmousedown = function (e) {
+                if (e.target.closest('.cap-close')) return;
+                e.preventDefault();
+                sx = e.clientX; sy = e.clientY;
+                document.onmousemove = function (ev) {
+                    ox = sx - ev.clientX; oy = sy - ev.clientY;
+                    sx = ev.clientX; sy = ev.clientY;
+                    panel.style.top = (panel.offsetTop - oy) + 'px';
+                    panel.style.left = (panel.offsetLeft - ox) + 'px';
+                    panel.style.right = 'auto';
+                };
+                document.onmouseup = function () {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            };
+        }
+
+        // --- Toast helper ---
+        function capToast(msg, ms = 2200) {
+            const t = document.getElementById('capToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), ms);
+        }
+
+        // --- Calendar drop listeners (event delegation) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const calBody = document.getElementById('calendarBody');
+
+            calBody.addEventListener('dragover', e => {
+                // Only react when our custom data is being dragged
+                const cell = e.target.closest('[data-datekey]');
+                if (cell) { e.preventDefault(); cell.classList.add('drop-highlight'); }
+            });
+
+            calBody.addEventListener('dragleave', e => {
+                const cell = e.target.closest('[data-datekey]');
+                if (cell) cell.classList.remove('drop-highlight');
+            });
+
+            calBody.addEventListener('drop', async e => {
+                e.preventDefault();
+                const cell = e.target.closest('[data-datekey]');
+                if (!cell) return;
+                cell.classList.remove('drop-highlight');
+
+                const dateKey = cell.getAttribute('data-datekey');
+                const bookId = e.dataTransfer.getData('application/cap-book');
+                const chapterIdx = e.dataTransfer.getData('application/cap-idx');
+                if (!bookId || chapterIdx === '') return;
+
+                const book = appData.books.find(x => x.id == bookId);
+                const cIdx = parseInt(chapterIdx, 10);
+                if (!book || !book.chapters[cIdx]) return;
+
+                // init day bucket
+                if (!appData.dailyPlanner[dateKey]) appData.dailyPlanner[dateKey] = { tasks: [], schedules: [] };
+                if (!appData.dailyPlanner[dateKey].tasks) appData.dailyPlanner[dateKey].tasks = [];
+
+                // duplicate guard
+                if (appData.dailyPlanner[dateKey].tasks.some(t => t.bookId == bookId && t.chapterIdx == cIdx)) {
+                    capToast('⚠️ 이미 배정된 단원입니다');
+                    return;
+                }
+
+                appData.dailyPlanner[dateKey].tasks.push({
+                    id: Date.now(),
+                    type: 'study',
+                    done: book.chapters[cIdx].done || false,
+                    content: `[${book.title}] ${book.chapters[cIdx].name}`,
+                    bookId: bookId,
+                    chapterIdx: cIdx
+                });
+
+                renderCalendarBody();
+                renderDetailPanel();
+                await syncToFirebase();
+                capToast(`✅ ${book.chapters[cIdx].name} → ${dateKey} 배정 완료!`);
+            });
+        });
 
         // 초기 테마 설정 로드
         const savedTheme = localStorage.getItem('theme');
