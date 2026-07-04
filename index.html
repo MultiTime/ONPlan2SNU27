@@ -72,7 +72,7 @@
 
             --bg-memo-sidebar: var(--bg-offwhite);
             --bg-memo-item-hover: #FFFFFF;
-            --bg-memo-item-active: #FFFFFF;
+            --bg-memo-item-active: #FFD230;
             --bg-memo-editor: #FFFFFF;
             --bg-apple-toolbar: rgba(255, 255, 255, 0.8);
             --border-apple-toolbar: rgba(200, 200, 200, 0.3);
@@ -153,7 +153,7 @@
 
             --bg-memo-sidebar: #111827;
             --bg-memo-item-hover: #1F2937;
-            --bg-memo-item-active: #1F2937;
+            --bg-memo-item-active: #FFD230;
             --bg-memo-editor: #0B0F19;
             --bg-apple-toolbar: rgba(30, 41, 59, 0.85);
             --border-apple-toolbar: rgba(255, 255, 255, 0.1);
@@ -227,7 +227,8 @@
 
         /* 바디 배경을 아주 미세한 연회색으로 처리하여 사이드바의 투명 유리 효과를 매치시킴 */
         body {
-            font-size: 14px;
+            font-size: 13px;
+            /* 14px -> 13px로 글로벌 폰트 축소 */
             height: 100vh;
             padding: 0;
             margin: 0;
@@ -295,87 +296,413 @@
             height: 100vh;
         }
 
-        /* ✅ 최좌측 사이드 탭 메뉴 (완벽하고 깨끗한 화이트 글라스모피즘 변환) */
-        .side-nav {
-            width: 85px;
+        /* ✅ 사이드바 스타일 개편 (Arch Calendar 스타일) */
+        .sidebar {
+            width: 230px;
             background: var(--bg-sidenav);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border-right: 1px solid var(--border-sidenav);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 2rem 0;
+            padding: 1.5rem 1rem;
             z-index: 20;
             flex-shrink: 0;
             box-shadow: 4px 0 30px rgba(0, 0, 0, 0.02);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .nav-brand {
-            font-size: 1.8rem;
+        .sidebar.collapsed {
+            width: 65px;
+            padding: 1.5rem 0.5rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .sidebar-title {
+            font-size: 1.15rem;
             font-weight: 900;
             background: linear-gradient(135deg, #3B82F6, #8B5CF6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 3rem;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
+            white-space: nowrap;
+        }
+
+        .btn-sidebar-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
             cursor: pointer;
-            user-select: none;
-        }
-
-        .nav-menu {
+            font-size: 0.9rem;
+            padding: 4px;
             display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            width: 100%;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+
+        .sidebar.collapsed .btn-sidebar-toggle {
+            transform: rotate(180deg);
+            margin: 0 auto;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             color: var(--text-nav-item);
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            width: 100%;
-            padding: 0.6rem 0;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        .nav-item:hover {
+        .sidebar-menu-item:hover,
+        .sidebar-menu-item.active {
             color: var(--accent);
+            background: rgba(37, 99, 235, 0.08);
         }
 
-        .nav-item.active {
-            color: var(--accent);
-            font-weight: 800;
-        }
-
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 32px;
-            background: var(--accent);
-            border-radius: 0 4px 4px 0;
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
             stroke: currentColor;
             stroke-width: 2.2;
             fill: none;
+            flex-shrink: 0;
         }
 
-        .nav-text {
-            font-size: 0.72rem;
+        .sidebar-section-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+            padding: 0 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .btn-add-space {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .btn-add-space:hover {
+            color: var(--accent);
+        }
+
+        .sidebar-space-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            overflow-y: auto;
+            flex: 1;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-space-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-space-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+        }
+
+        .sidebar-space-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-sub);
             font-weight: 600;
+            transition: 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 0.85rem;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-space-item:hover {
+            background: var(--bg-icon-hover);
+            color: var(--text-main);
+        }
+
+        .sidebar-space-item.active {
+            background: rgba(37, 99, 235, 0.16);
+            color: var(--accent);
+            font-weight: 800;
+            border-color: transparent;
+        }
+
+        /* 스페이스 수정/삭제 이모지 버튼 스타일 */
+        .space-actions {
+            display: none;
+            gap: 6px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-space-item:hover .space-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .space-action-btn {
+            font-size: 0.72rem;
+            opacity: 0.55;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+
+        .space-action-btn:hover {
+            opacity: 1;
+            transform: scale(1.15);
+            background: var(--bg-icon-hover);
+        }
+
+        .sidebar-space-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            width: 100%;
+            border-top: 1px solid var(--border-inner);
+            padding-top: 1rem;
+        }
+
+        .sidebar-footer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-nav-item);
+            cursor: pointer;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar-footer-item:hover {
+            background: var(--bg-icon-hover);
+            color: var(--text-main);
+        }
+
+        .sidebar.collapsed .sidebar-text,
+        .sidebar.collapsed .space-actions {
+            display: none !important;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item,
+        .sidebar.collapsed .sidebar-footer-item {
+            justify-content: center;
+            padding: 0.6rem 0;
+        }
+
+        .sidebar.collapsed .sidebar-space-item {
+            justify-content: center;
+            padding: 0.5rem 0;
+        }
+
+        .sidebar.collapsed .sidebar-space-dot {
+            width: 10px;
+            height: 10px;
+        }
+
+        /* ✅ 인박스 패널 스타일 추가 */
+        .inbox-panel {
+            width: 220px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-outer);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .inbox-header {
+            padding: 1.2rem 1rem 0.8rem 1rem;
+            border-bottom: 1px solid var(--border-inner);
+        }
+
+        .inbox-tab {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+            margin-right: 10px;
+        }
+
+        .inbox-tab.active {
+            color: var(--text-main);
+            border-bottom-color: var(--accent);
+        }
+
+        .inbox-count {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg-offwhite);
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-outer);
+        }
+
+        .inbox-add-box {
+            padding: 0.8rem 1rem;
+        }
+
+        #inboxAddInput {
+            width: 100%;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border-outer);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: var(--bg-offwhite);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        #inboxAddInput:focus {
+            border-color: var(--accent);
+            background: var(--bg-panel);
+        }
+
+        .inbox-task-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .inbox-task-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .inbox-task-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 2px;
+        }
+
+        .inbox-task-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-outer);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: grab;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            user-select: none;
+        }
+
+        .inbox-task-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            border-color: var(--border-list-card-hover);
+        }
+
+        .inbox-task-card:active {
+            cursor: grabbing;
+        }
+
+        .inbox-task-card:hover .inbox-task-actions {
+            display: flex !important;
+            align-items: center;
+        }
+
+        .inbox-task-checkbox {
+            width: 15px;
+            height: 15px;
+            border: 2px solid var(--border-checkbox);
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .inbox-task-checkbox:hover {
+            border-color: var(--accent);
+        }
+
+        .inbox-task-card.done {
+            opacity: 0.5;
+        }
+
+        .inbox-task-card.done .inbox-task-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .inbox-task-checkbox-checked {
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .inbox-task-card.done .inbox-task-text {
+            text-decoration: line-through;
+        }
+
+        .inbox-task-text {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-main);
+            word-break: break-all;
+            flex: 1;
         }
 
         /* ✅ 메인 콘텐츠 영역 (완전 밝은 테마로 변경) */
@@ -415,21 +742,10 @@
         /* ------------------------------------------------------------------ */
         /* ✨ 1. 캘린더 (Calendar) 페이지                                    */
         /* ------------------------------------------------------------------ */
-        header {
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-panel);
-            z-index: 10;
-            flex-shrink: 0;
-            border-bottom: 1px solid var(--border-outer);
-        }
-
         .view-toggles {
             display: flex;
             background: var(--bg-offwhite);
-            padding: 4px;
+            padding: 3px;
             border-radius: 8px;
             border: 1px solid var(--border-outer);
         }
@@ -437,8 +753,8 @@
         .view-btn {
             border: none;
             background: transparent;
-            padding: 6px 16px;
-            font-size: 0.85rem;
+            padding: 5px 12px;
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--text-sub);
             border-radius: 6px;
@@ -459,11 +775,11 @@
         }
 
         .btn-action {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-main);
             background: var(--bg-panel);
             border: 1px solid var(--border-outer);
-            padding: 0.5rem 1rem;
+            padding: 5px 12px;
             border-radius: 8px;
             cursor: pointer;
             transition: 0.2s;
@@ -483,7 +799,7 @@
         .main-grid {
             display: flex;
             gap: 1rem;
-            padding: 1rem 1.5rem;
+            padding: 12px 20px;
             height: 100%;
             min-height: 0;
             overflow: hidden;
@@ -491,7 +807,7 @@
 
         .calendar-panel {
             flex: 1;
-            padding: 1rem 1.5rem;
+            padding: 1.2rem 1.5rem;
             display: flex;
             flex-direction: column;
             background: var(--bg-panel);
@@ -505,7 +821,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.8rem;
+            margin-bottom: 12px;
             flex-shrink: 0;
         }
 
@@ -526,8 +842,8 @@
             width: 30px;
             height: 30px;
             border-radius: 6px;
-            background: transparent;
-            border: 1px solid var(--border-outer);
+            background: var(--bg-icon-hover);
+            border: none;
             font-size: 1.1rem;
             cursor: pointer;
             display: flex;
@@ -538,7 +854,7 @@
         }
 
         .btn-nav:hover {
-            background: var(--bg-offwhite);
+            background: var(--border-outer);
         }
 
         #calendarBody {
@@ -709,18 +1025,19 @@
         .mini-schedule {
             flex-shrink: 0;
             font-size: 0.75rem;
-            color: var(--danger);
             font-weight: 700;
-            padding: 3px 6px;
+            padding: 4px 8px;
             cursor: pointer;
-            transition: 0.2s;
-            border-radius: 4px;
-            background: var(--bg-mini-sch);
-            border: 1px solid var(--border-mini-sch);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+            border: none !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .mini-schedule:hover {
-            opacity: 0.8;
+            opacity: 0.9;
+            transform: translateY(-0.5px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .mini-task {
@@ -988,14 +1305,15 @@
             border-color: var(--border-day-card-hover);
         }
 
-        /* 우측 패널 (밝은 테마로 완벽 변경) */
+        /* 우측 패널 (밝은 테마로 완벽 변경 - 너비 및 글자 축소) */
         .detail-panel {
-            width: 380px;
+            width: 300px;
+            /* 260px -> 300px */
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             background: var(--bg-panel);
-            border-radius: 20px;
+            border-radius: 16px;
             min-height: 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             overflow: hidden;
@@ -1003,7 +1321,7 @@
         }
 
         .detail-header {
-            padding: 1.5rem 2rem;
+            padding: 1rem 1.2rem;
             text-align: left;
             border-bottom: 1px solid var(--border-outer);
             flex-shrink: 0;
@@ -1011,7 +1329,7 @@
         }
 
         .selected-day-display {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--accent);
             font-weight: 800;
             text-transform: uppercase;
@@ -1019,11 +1337,11 @@
         }
 
         .selected-date-display {
-            font-size: 2rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--text-main);
             letter-spacing: -0.03em;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         /* ✅ 수정 4: Schedules 세로 길이 대폭 연장 */
@@ -1166,7 +1484,7 @@
             flex: 1;
             font-weight: 600;
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             line-height: 1.3;
             word-break: break-word;
         }
@@ -1186,7 +1504,7 @@
         .sch-text {
             font-weight: 700;
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             line-height: 1.3;
             flex: 1;
             word-break: break-word;
@@ -1300,6 +1618,11 @@
             background: var(--bg-memo-item-active);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border-color: transparent;
+        }
+
+        .memo-item.active .memo-item-title,
+        .memo-item.active .memo-item-date {
+            color: #000000 !important;
         }
 
         .memo-item-title {
@@ -1802,6 +2125,51 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
+
+        /* ✅ 메모 팝업 모달 추가 */
+        .memo-modal-content {
+            background: var(--bg-modal-content);
+            width: 92%;
+            max-width: 1200px;
+            height: 85%;
+            max-height: 800px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-outer);
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.show .memo-modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* 메모 모달 내부 스크롤바 커스텀 */
+        .memo-list::-webkit-scrollbar,
+        .memo-editor-body::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .memo-list::-webkit-scrollbar-track,
+        .memo-editor-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .memo-list::-webkit-scrollbar-thumb,
+        .memo-editor-body::-webkit-scrollbar-thumb {
+            background: var(--border-outer);
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        .memo-list::-webkit-scrollbar-thumb:hover,
+        .memo-editor-body::-webkit-scrollbar-thumb:hover {
+            background: var(--text-sub);
+        }
     </style>
 </head>
 
@@ -1827,21 +2195,24 @@
 
     <div class="app-wrapper">
 
-        <nav class="side-nav">
-            <div class="nav-brand">O.</div>
-            <div class="nav-menu">
-                <div class="nav-item active" id="nav-calendar" onclick="switchPage('calendar')">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        <nav class="sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title sidebar-text">ONPlan2SNU27</span>
+                <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기/펴기">❮</button>
+            </div>
+            <div class="sidebar-menu">
+                <div class="sidebar-menu-item active" id="nav-calendar" onclick="switchPage('calendar')">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
-                    <span class="nav-text">캘린더</span>
+                    <span class="sidebar-text">캘린더</span>
                 </div>
-                <div class="nav-item" id="nav-memo" onclick="switchPage('memo')">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                <div class="sidebar-menu-item" id="nav-memo" onclick="openMemoModal()">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
@@ -1849,46 +2220,75 @@
                         <line x1="16" y1="17" x2="8" y2="17"></line>
                         <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
-                    <span class="nav-text">메모</span>
+                    <span class="sidebar-text">메모 보관함</span>
                 </div>
             </div>
-            <!-- 테마 토글 버튼 추가 -->
-            <div class="theme-toggle-container">
-                <div class="nav-item" id="themeToggleBtn" onclick="toggleThemeMode()" title="테마 전환">
-                    <svg class="nav-icon" id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+
+            <div class="sidebar-section-title sidebar-text">
+                <span>스페이스</span>
+                <button class="btn-add-space" onclick="addNewSpace()" title="스페이스 추가">+</button>
+            </div>
+            <div class="sidebar-space-list" id="sidebarSpaceList">
+                <!-- 스페이스 목록 동적 렌더링 -->
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-item" id="themeToggleBtn" onclick="toggleThemeMode()" title="테마 전환">
+                    <svg class="sidebar-icon" id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <span class="nav-text" id="themeToggleText">다크 모드</span>
+                    <span class="sidebar-text" id="themeToggleText">다크 모드</span>
                 </div>
             </div>
         </nav>
 
+        <div class="inbox-panel" id="inboxPanel">
+            <div class="inbox-header">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="inbox-title"
+                            style="font-size:0.9rem; font-weight:850; color:var(--text-main);">인박스</span>
+                    </div>
+                    <span class="inbox-count" id="inboxCompletedCount">0/0</span>
+                </div>
+            </div>
+
+            <div class="inbox-add-box">
+                <input type="text" id="inboxAddInput" placeholder="+ 할 일 추가" onkeydown="handleInboxAdd(event)" />
+            </div>
+
+            <div class="inbox-task-list" id="inboxTaskList">
+                <!-- 동적 렌더링 -->
+            </div>
+        </div>
+
         <div class="main-content">
 
             <div id="page-calendar" class="app-page active">
-                <header>
-                    <div style="font-weight: 800; font-size: 1.2rem; color: var(--text-main);">Planner</div>
-                    <div class="view-toggles">
-                        <button class="view-btn active" id="btnViewMonth"
-                            onclick="changeViewMode('month')">Month</button>
-                        <button class="view-btn" id="btnViewWeek" onclick="changeViewMode('week')">Week</button>
-                        <button class="view-btn" id="btnViewDay" onclick="changeViewMode('day')">Day</button>
-                    </div>
-                    <div class="header-actions">
-                        <button class="btn-action" onclick="window.goToToday()">Today</button>
-                        <button class="btn-action" id="btnOpenAssign" onclick="window.toggleAssignPanel()"
-                            style="background:linear-gradient(135deg,#EEF2FF,#F5F3FF); color:#4F46E5; border-color:#C7D2FE; font-weight:800;">단원배정</button>
-                    </div>
-                </header>
-
                 <div class="main-grid">
                     <section class="calendar-panel">
                         <div class="cal-header">
-                            <div class="month-title" id="monthDisplay">May 2026</div>
-                            <div class="cal-nav">
-                                <button class="btn-nav" onclick="changeDateRange(-1)">&lt;</button>
-                                <button class="btn-nav" onclick="changeDateRange(1)">&gt;</button>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="month-title" id="monthDisplay">May 2026</div>
+                                <div class="cal-nav">
+                                    <button class="btn-nav" onclick="changeDateRange(-1)">&lt;</button>
+                                    <button class="btn-nav" onclick="changeDateRange(1)">&gt;</button>
+                                </div>
+                                <button class="btn-action" onclick="window.goToToday()"
+                                    style="padding: 4px 10px; font-size: 0.8rem;">Today</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="view-toggles">
+                                    <button class="view-btn active" id="btnViewMonth"
+                                        onclick="changeViewMode('month')">Month</button>
+                                    <button class="view-btn" id="btnViewWeek"
+                                        onclick="changeViewMode('week')">Week</button>
+                                    <button class="view-btn" id="btnViewDay"
+                                        onclick="changeViewMode('day')">Day</button>
+                                </div>
+                                <button class="btn-action" id="btnOpenAssign" onclick="window.toggleAssignPanel()"
+                                    style="background: linear-gradient(135deg, #EEF2FF, #F5F3FF); color: #4F46E5; border-color: #C7D2FE; font-weight: 800; padding: 4px 12px; font-size: 0.8rem;">단원배정</button>
                             </div>
                         </div>
                         <div id="calendarBody"></div>
@@ -1922,45 +2322,76 @@
                 </div>
             </div>
 
-            <div id="page-memo" class="app-page">
-                <div class="memo-layout">
-                    <div class="memo-sidebar">
-                        <div class="memo-sidebar-header">
-                            <span class="memo-sidebar-title">메모 보관함</span>
-                            <button class="btn-add-memo" onclick="createNewMemo()">+</button>
-                        </div>
-                        <div class="memo-list" id="memoListContainer"></div>
+            <div id="memoModal" class="modal-overlay">
+                <div class="memo-modal-content">
+                    <div
+                        style="padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-outer); background:var(--bg-offwhite); flex-shrink:0;">
+                        <div style="font-weight:800; font-size:1rem; color:var(--text-main);">메모 보관함</div>
+                        <button onclick="closeModal('memoModal')"
+                            style="background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-sub); line-height:1;">&times;</button>
                     </div>
-
-                    <div class="memo-editor">
-                        <div class="memo-editor-toolbar-container">
-                            <div class="apple-toolbar">
-                                <button class="toolbar-btn" onclick="formatDoc('bold')" title="굵게"><b>B</b></button>
-                                <button class="toolbar-btn" onclick="formatDoc('italic')" title="기울임"><i>I</i></button>
-                                <button class="toolbar-btn" onclick="formatDoc('underline')"
-                                    title="밑줄"><u>U</u></button>
-                                <div class="toolbar-divider"></div>
-                                <button class="toolbar-btn" onclick="formatDoc('formatBlock', 'H1')"
-                                    title="가장 큰 제목">H1</button>
-                                <button class="toolbar-btn" onclick="formatDoc('formatBlock', 'H2')"
-                                    title="중간 제목">H2</button>
-                                <button class="toolbar-btn" onclick="formatDoc('formatBlock', 'H3')"
-                                    title="작은 제목">H3</button>
-                                <button class="toolbar-btn" onclick="formatDoc('formatBlock', 'P')"
-                                    title="일반 본문">본문</button>
-                                <div class="toolbar-divider"></div>
-                                <button class="toolbar-btn save" style="color:var(--success);"
-                                    onclick="saveCurrentMemo()">저장</button>
-                                <button class="toolbar-btn delete" style="color:var(--danger);"
-                                    onclick="deleteCurrentMemo()">삭제</button>
+                    <div class="memo-layout" style="flex:1; border-top:none; display:flex; height: calc(100% - 45px);">
+                        <div class="memo-sidebar"
+                            style="width:240px; border-right:1px solid var(--border-outer); background:var(--bg-memo-sidebar); display:flex; flex-direction:column; flex-shrink:0;">
+                            <div class="memo-sidebar-header"
+                                style="padding:1rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-outer);">
+                                <span class="memo-sidebar-title"
+                                    style="font-weight:800; font-size:0.95rem; color:var(--text-main);">메모 목록</span>
+                                <button class="btn-add-memo" onclick="createNewMemo()"
+                                    style="background:transparent; border:none; color:var(--accent); font-size:1.5rem; cursor:pointer;">+</button>
+                            </div>
+                            <div class="memo-list" id="memoListContainer"
+                                style="flex:1; overflow-y:auto; padding:0.5rem; display:flex; flex-direction:column; gap:0.5rem;">
                             </div>
                         </div>
-
-                        <div class="memo-editor-body">
-                            <input type="text" id="memoTitleInput" class="memo-title-input" placeholder="제목 없는 메모"
-                                oninput="markMemoUnsaved()">
-                            <div id="memoContentEditor" class="memo-content-editable" contenteditable="true"
-                                placeholder="자유롭게 메모를 작성하세요..." oninput="markMemoUnsaved()"></div>
+                        <div class="memo-editor"
+                            style="flex:1; display:flex; flex-direction:column; background:var(--bg-memo-editor); position:relative;">
+                            <div class="memo-editor-toolbar-container"
+                                style="position:relative; padding:10px 0; display:flex; justify-content:center; flex-shrink:0;">
+                                <div class="apple-toolbar"
+                                    style="display:flex; align-items:center; gap:6px; background:var(--bg-apple-toolbar); padding:6px 12px; border-radius:20px; border:1px solid var(--border-apple-toolbar);">
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('bold')" title="굵게"><b>B</b></button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('italic')" title="기울임"><i>I</i></button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('underline')" title="밑줄"><u>U</u></button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('strikeThrough')" title="취소선"><s>S</s></button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('hiliteColor', '#FDE047')" title="형광펜"><span
+                                            style="background:#FDE047; color:#000; padding:1px 4px; border-radius:3px; font-weight:bold; font-size:10px; line-height:1;">H</span></button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('hiliteColor', 'transparent')" title="형광펜 지우기"><span
+                                            style="background:#fffbe4; color:#000; padding:1px 4px; border-radius:3px; font-weight:bold; font-size:10px; line-height:1;">H</span></button>
+                                    <div class="toolbar-divider"></div>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('formatBlock', 'H1')">H1</button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('formatBlock', 'H2')">H2</button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('formatBlock', 'H3')">H3</button>
+                                    <button class="toolbar-btn" onmousedown="event.preventDefault()"
+                                        onclick="formatDoc('formatBlock', 'P')">본문</button>
+                                    <div class="toolbar-divider"></div>
+                                    <button class="toolbar-btn save"
+                                        style="color:var(--success); background:transparent; border:none; font-weight:700; cursor:pointer;"
+                                        onclick="saveCurrentMemo()">저장</button>
+                                    <button class="toolbar-btn delete"
+                                        style="color:var(--danger); background:transparent; border:none; font-weight:700; cursor:pointer;"
+                                        onclick="deleteCurrentMemo()">삭제</button>
+                                </div>
+                            </div>
+                            <div class="memo-editor-body"
+                                style="flex:1; display:flex; flex-direction:column; padding:20px 2.5rem; overflow-y:auto;">
+                                <input type="text" id="memoTitleInput" class="memo-title-input" placeholder="제목 없는 메모"
+                                    oninput="markMemoUnsaved()"
+                                    style="padding:0 0 1rem 0; border:none; font-size:1.8rem; font-weight:900; background:transparent; outline:none; color:var(--text-main);">
+                                <div id="memoContentEditor" class="memo-content-editable" contenteditable="true"
+                                    placeholder="자유롭게 메모를 작성하세요..." oninput="markMemoUnsaved()"
+                                    style="flex:1; outline:none; font-size:1rem; line-height:1.6; color:var(--text-main);">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2083,7 +2514,20 @@
 
         const USER_DOC_ID = "minchan_data";
 
-        let appData = { dailyPlanner: {}, books: [], memos: [] };
+        let appData = { dailyPlanner: {}, books: [], memos: [], spaces: ['Work', 'Personal', 'Routines', '미분류'], inboxTasks: [] };
+        let currentInboxTab = 'inbox';
+        let currentSelectedSpace = null;
+        const SPACE_COLORS = {
+            'Work': '#3B82F6',
+            'Personal': '#10B981',
+            'Routines': '#A855F7',
+            '미분류': '#64748B'
+        };
+        const PALETTE = ['#3B82F6', '#10B981', '#A855F7', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4'];
+        function getSpaceColor(spaceName, idx) {
+            if (SPACE_COLORS[spaceName]) return SPACE_COLORS[spaceName];
+            return PALETTE[idx % PALETTE.length];
+        }
         let currentViewMode = 'month';
         let currentDisplayDate = new Date();
         let miniDisplayDate = new Date();
@@ -2114,7 +2558,8 @@
                     setTimeout(() => { loadingScreen.style.display = 'none'; }, 400);
                     renderCalendarBody();
                     renderDetailPanel();
-                    renderMemoList();
+                    renderSpaces();
+                    renderInboxTasks();
                 }
             }, 3000);
 
@@ -2132,12 +2577,15 @@
                     appData.dailyPlanner = data.dailyPlanner || {};
                     appData.books = data.books || [];
                     appData.memos = data.memos || [];
+                    appData.spaces = data.spaces || ['Work', 'Personal', 'Routines', '미분류'];
+                    appData.inboxTasks = data.inboxTasks || [];
                 }
 
                 try {
                     renderCalendarBody();
                     renderDetailPanel();
-                    renderMemoList();
+                    renderSpaces();
+                    renderInboxTasks();
                 } catch (err) {
                     console.error("렌더링 에러:", err);
                 }
@@ -2148,14 +2596,346 @@
 
 
         window.switchPage = function (pageId) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('nav-' + pageId).classList.add('active');
+            document.querySelectorAll('.sidebar-menu-item').forEach(el => el.classList.remove('active'));
+            const navEl = document.getElementById('nav-' + pageId);
+            if (navEl) navEl.classList.add('active');
 
             document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
+            const pageEl = document.getElementById('page-' + pageId);
+            if (pageEl) pageEl.classList.add('active');
+        };
 
-            if (pageId === 'memo') renderMemoList();
-        }
+        // ✅ 사이드바 접기/펴기
+        window.toggleSidebar = function () {
+            const sidebar = document.getElementById('appSidebar');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
+        };
+
+        // DOM 로드 시 사이드바 접기 상태 복원
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                const sidebar = document.getElementById('appSidebar');
+                if (sidebar) sidebar.classList.add('collapsed');
+            }
+        });
+
+        // ✅ 스페이스 관리
+        window.addNewSpace = async function () {
+            const name = prompt("새로운 스페이스 이름을 입력하세요:");
+            if (!name) return;
+            const trimmed = name.trim();
+            if (!trimmed) return;
+            if (appData.spaces.includes(trimmed)) return alert("이미 존재하는 스페이스입니다.");
+
+            appData.spaces.push(trimmed);
+            renderSpaces();
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), { spaces: appData.spaces }, { merge: true });
+            } catch (err) {
+                console.error("Space Save Error:", err);
+            }
+        };
+
+        window.renderSpaces = function () {
+            const container = document.getElementById('sidebarSpaceList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            appData.spaces.forEach((space, idx) => {
+                const color = getSpaceColor(space, idx);
+                const div = document.createElement('div');
+                div.className = `sidebar-space-item ${currentSelectedSpace === space ? 'active' : ''}`;
+                div.onclick = (e) => {
+                    if (e.target.closest('.space-actions')) return;
+                    selectSpace(space);
+                };
+
+                const isSystemSpace = ['Work', 'Personal', 'Routines', '미분류'].includes(space);
+                let actionHtml = '';
+                if (!isSystemSpace) {
+                    actionHtml = `
+                        <div class="space-actions">
+                            <span class="space-action-btn" onclick="editSpaceName('${space}', event)" title="이름 수정">✏️</span>
+                            <span class="space-action-btn" onclick="deleteSpaceName('${space}', event)" title="삭제">❌</span>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <span class="sidebar-space-dot" style="background-color: ${color}; flex-shrink:0;"></span>
+                    <span class="sidebar-text truncate-text" style="margin-left: 10px; flex: 1; min-width: 0;">${space}</span>
+                    ${actionHtml}
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.selectSpace = function (spaceName) {
+            if (currentSelectedSpace === spaceName) {
+                currentSelectedSpace = null; // 토글식 해제
+            } else {
+                currentSelectedSpace = spaceName;
+            }
+            renderSpaces();
+            renderInboxTasks();
+        };
+
+        window.editSpaceName = async function (oldName, e) {
+            if (e) e.stopPropagation();
+            const newName = prompt("새로운 스페이스 이름을 입력하세요:", oldName);
+            if (!newName) return;
+            const trimmed = newName.trim();
+            if (!trimmed || trimmed === oldName) return;
+            if (appData.spaces.includes(trimmed)) return alert("이미 존재하는 스페이스입니다.");
+
+            const idx = appData.spaces.indexOf(oldName);
+            if (idx === -1) return;
+
+            appData.spaces[idx] = trimmed;
+
+            if (appData.inboxTasks) {
+                appData.inboxTasks.forEach(t => {
+                    if (t.space === oldName) t.space = trimmed;
+                });
+            }
+
+            Object.keys(appData.dailyPlanner).forEach(dateKey => {
+                const dayData = appData.dailyPlanner[dateKey];
+                if (dayData && dayData.tasks) {
+                    dayData.tasks.forEach(t => {
+                        if (t.content.startsWith(`[${oldName}]`)) {
+                            t.content = t.content.replace(`[${oldName}]`, `[${trimmed}]`);
+                        }
+                    });
+                }
+            });
+
+            if (currentSelectedSpace === oldName) currentSelectedSpace = trimmed;
+
+            renderSpaces();
+            renderInboxTasks();
+            renderCalendarBody();
+            renderDetailPanel();
+
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), {
+                    spaces: appData.spaces,
+                    inboxTasks: appData.inboxTasks,
+                    dailyPlanner: appData.dailyPlanner
+                }, { merge: true });
+            } catch (err) {
+                console.error("Space Edit Sync Error:", err);
+            }
+        };
+
+        window.deleteSpaceName = async function (spaceName, e) {
+            if (e) e.stopPropagation();
+            if (!confirm(`'${spaceName}' 스페이스를 삭제하시겠습니까? 소속된 인박스 할 일은 '미분류'로 이동됩니다.`)) return;
+
+            const idx = appData.spaces.indexOf(spaceName);
+            if (idx === -1) return;
+
+            appData.spaces.splice(idx, 1);
+
+            if (appData.inboxTasks) {
+                appData.inboxTasks.forEach(t => {
+                    if (t.space === spaceName) t.space = '미분류';
+                });
+            }
+
+            Object.keys(appData.dailyPlanner).forEach(dateKey => {
+                const dayData = appData.dailyPlanner[dateKey];
+                if (dayData && dayData.tasks) {
+                    dayData.tasks.forEach(t => {
+                        if (t.content.startsWith(`[${spaceName}]`)) {
+                            t.content = t.content.replace(`[${spaceName}]`, `[미분류]`);
+                        }
+                    });
+                }
+            });
+
+            if (currentSelectedSpace === spaceName) currentSelectedSpace = null;
+
+            renderSpaces();
+            renderInboxTasks();
+            renderCalendarBody();
+            renderDetailPanel();
+
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), {
+                    spaces: appData.spaces,
+                    inboxTasks: appData.inboxTasks,
+                    dailyPlanner: appData.dailyPlanner
+                }, { merge: true });
+            } catch (err) {
+                console.error("Space Delete Sync Error:", err);
+            }
+        };
+
+        window.handleInboxAdd = async function (e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('inboxAddInput');
+                const content = input.value.trim();
+                if (!content) return;
+
+                const space = currentSelectedSpace || '미분류';
+                const newTask = {
+                    id: Date.now(),
+                    content: content,
+                    space: space,
+                    done: false
+                };
+
+                if (!appData.inboxTasks) appData.inboxTasks = [];
+                appData.inboxTasks.push(newTask);
+                input.value = '';
+                renderInboxTasks();
+
+                try {
+                    await setDoc(doc(db, "users", USER_DOC_ID), { inboxTasks: appData.inboxTasks }, { merge: true });
+                } catch (err) {
+                    console.error("Inbox Task Add Error:", err);
+                }
+            }
+        };
+
+        window.renderInboxTasks = function () {
+            const container = document.getElementById('inboxTaskList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const tasks = appData.inboxTasks || [];
+
+            // 필터링 적용 (스페이스 & 탭)
+            let filtered = tasks;
+            if (currentSelectedSpace) {
+                filtered = filtered.filter(t => t.space === currentSelectedSpace);
+            }
+
+            // 완료 카운트 계산
+            const completedCount = filtered.filter(t => t.done).length;
+            document.getElementById('inboxCompletedCount').innerText = `${completedCount}/${filtered.length}`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 2rem 0; color:var(--text-muted); font-size:0.8rem;">할 일이 없습니다.</div>`;
+                return;
+            }
+
+            filtered.forEach(task => {
+                const spaceIdx = appData.spaces.indexOf(task.space);
+                const spaceColor = getSpaceColor(task.space, spaceIdx);
+
+                const div = document.createElement('div');
+                div.className = `inbox-task-card ${task.done ? 'done' : ''}`;
+                div.style.borderLeftColor = spaceColor;
+                div.draggable = true;
+                div.ondragstart = (e) => handleDragStart(e, task.id);
+
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                        <div class="inbox-task-checkbox" onclick="toggleInboxTaskDone(${task.id})">
+                            ${task.done ? '<span class="inbox-task-checkbox-checked">✓</span>' : ''}
+                        </div>
+                        <span class="inbox-task-text truncate-text" style="flex:1;">${task.content}</span>
+                    </div>
+                    <div class="inbox-task-actions" style="display:none; gap:4px; flex-shrink:0;">
+                        <span style="cursor:pointer; font-size:0.75rem;" onclick="editInboxTask(${task.id}, event)" title="수정">✏️</span>
+                        <span style="cursor:pointer; font-size:0.75rem;" onclick="deleteInboxTask(${task.id}, event)" title="삭제">❌</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.toggleInboxTaskDone = async function (taskId) {
+            const task = appData.inboxTasks.find(t => t.id === taskId);
+            if (!task) return;
+            task.done = !task.done;
+            renderInboxTasks();
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), { inboxTasks: appData.inboxTasks }, { merge: true });
+            } catch (err) {
+                console.error("Inbox Toggle Error:", err);
+            }
+        };
+
+        window.editInboxTask = async function (id, e) {
+            if (e) e.stopPropagation();
+            const task = appData.inboxTasks.find(t => t.id === id);
+            if (!task) return;
+            
+            const newContent = prompt("할 일 내용을 수정하세요:", task.content);
+            if (!newContent) return;
+            const trimmed = newContent.trim();
+            if (!trimmed || trimmed === task.content) return;
+            
+            task.content = trimmed;
+            renderInboxTasks();
+            
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), { inboxTasks: appData.inboxTasks }, { merge: true });
+            } catch (err) {
+                console.error("Inbox Edit Sync Error:", err);
+            }
+        };
+
+        window.deleteInboxTask = async function (id, e) {
+            if (e) e.stopPropagation();
+            if (!confirm("이 할 일을 삭제하시겠습니까?")) return;
+            
+            const idx = appData.inboxTasks.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            
+            appData.inboxTasks.splice(idx, 1);
+            renderInboxTasks();
+            
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), { inboxTasks: appData.inboxTasks }, { merge: true });
+            } catch (err) {
+                console.error("Inbox Delete Sync Error:", err);
+            }
+        };
+
+        // ✅ 드래그앤드롭 이벤트 핸들러
+        window.handleDragStart = function (e, taskId) {
+            e.dataTransfer.setData('text/plain', taskId);
+        };
+
+        window.handleCalendarItemDragStart = function (e, dateKey, idx, type) {
+            e.dataTransfer.setData('text/calendar-item-date', dateKey);
+            e.dataTransfer.setData('text/calendar-item-idx', String(idx));
+            e.dataTransfer.setData('text/calendar-item-type', type);
+            e.currentTarget.style.opacity = '0.5';
+
+            e.currentTarget.addEventListener('dragend', function onDragEnd() {
+                e.currentTarget.style.opacity = '';
+                e.currentTarget.removeEventListener('dragend', onDragEnd);
+            });
+        };
+
+        window.allowDrop = function (e) {
+            e.preventDefault();
+        };
+
+        window.handleDragEnter = function (e) {
+            e.currentTarget.classList.add('drop-highlight');
+        };
+
+        window.handleDragLeave = function (e) {
+            e.currentTarget.classList.remove('drop-highlight');
+        };
+
+        // ✅ 메모 모달 열기
+        window.openMemoModal = function () {
+            openModal('memoModal');
+            renderMemoList();
+
+            if (appData.memos && appData.memos.length > 0) {
+                const sorted = [...appData.memos].sort((a, b) => b.id - a.id);
+                loadMemo(sorted[0].id);
+            }
+        };
 
         window.formatDoc = function (cmd, value = null) {
             document.execCommand(cmd, false, value);
@@ -2410,15 +3190,16 @@
                 if (schedules.length > 0) {
                     schedules.forEach((sch, idx) => {
                         colorDotsHtml += `<div class="color-dot" style="background-color: ${sch.color || '#EF4444'};"></div>`;
-                        previewHtml += `<div class="mini-schedule truncate-text" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                        previewHtml += `<div class="mini-schedule truncate-text" style="background-color: ${sch.color || '#EF4444'}; color: #fff;" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'schedule')" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
                     });
                 }
                 const tasks = dayData.tasks || [];
                 if (tasks.length > 0) {
-                    taskCountHtml = `<div class="task-count-badge">📝 ${tasks.length}</div>`;
+                    const remainingTasksCount = tasks.filter(t => !t.done).length;
+                    taskCountHtml = remainingTasksCount > 0 ? `<div class="task-count-badge">${remainingTasksCount}</div>` : '';
                     const displayLimit = 4;
                     for (let i = 0; i < Math.min(tasks.length, displayLimit); i++) {
-                        previewHtml += `<div class="mini-task truncate-text ${tasks[i].done ? 'done' : ''}" onclick="showItemDetail('task', '${dateKey}', ${i}, event)">${tasks[i].content}</div>`;
+                        previewHtml += `<div class="mini-task truncate-text ${tasks[i].done ? 'done' : ''}" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${i}, 'task')" onclick="showItemDetail('task', '${dateKey}', ${i}, event)">${tasks[i].content}</div>`;
                     }
                     if (tasks.length > displayLimit) previewHtml += `<div class="more-tasks">+${tasks.length - displayLimit} more</div>`;
                 }
@@ -2501,14 +3282,14 @@
                         <div class="week-day-num">${currentDay.getDate()}</div>
                     </div>`;
 
-                let colHtml = `<div class="week-col" data-datekey="${dateKey}" onclick="selectDate('${dateKey}')">`;
+                let colHtml = `<div class="week-col" data-datekey="${dateKey}" onclick="selectDate('${dateKey}')" ondragover="allowDrop(event)" ondrop="handleDropOnDate(event, '${dateKey}')" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">`;
                 const dayData = appData.dailyPlanner[dateKey];
                 if (dayData) {
                     (dayData.schedules || []).forEach((sch, idx) => {
-                        colHtml += `<div class="mini-schedule truncate-text" style="background:var(--bg-mini-sch); border:1px solid var(--border-mini-sch); color:var(--danger);" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                        colHtml += `<div class="mini-schedule truncate-text" style="background-color:${sch.color || '#EF4444'}; color:#fff;" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'schedule')" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
                     });
                     (dayData.tasks || []).forEach((task, idx) => {
-                        colHtml += `<div class="mini-task truncate-text ${task.done ? 'done' : ''}" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
+                        colHtml += `<div class="mini-task truncate-text ${task.done ? 'done' : ''}" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'task')" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
                     });
                 }
                 colHtml += `</div>`;
@@ -2900,6 +3681,76 @@
                 cell.classList.remove('drop-highlight');
 
                 const dateKey = cell.getAttribute('data-datekey');
+
+                // 0) 캘린더 내부 아이템 이동 드롭 처리
+                const sourceDateKey = e.dataTransfer.getData('text/calendar-item-date');
+                const sourceIdxStr = e.dataTransfer.getData('text/calendar-item-idx');
+                const itemType = e.dataTransfer.getData('text/calendar-item-type');
+
+                if (sourceDateKey && sourceIdxStr && itemType) {
+                    const sourceIdx = parseInt(sourceIdxStr, 10);
+                    const dayData = appData.dailyPlanner[sourceDateKey];
+                    if (dayData) {
+                        let draggedItem;
+                        if (itemType === 'schedule' && dayData.schedules) {
+                            draggedItem = dayData.schedules.splice(sourceIdx, 1)[0];
+                        } else if (itemType === 'task' && dayData.tasks) {
+                            draggedItem = dayData.tasks.splice(sourceIdx, 1)[0];
+                        }
+
+                        if (draggedItem) {
+                            if (!appData.dailyPlanner[dateKey]) appData.dailyPlanner[dateKey] = { tasks: [], schedules: [] };
+
+                            if (itemType === 'schedule') {
+                                if (!appData.dailyPlanner[dateKey].schedules) appData.dailyPlanner[dateKey].schedules = [];
+                                appData.dailyPlanner[dateKey].schedules.push(draggedItem);
+                            } else {
+                                if (!appData.dailyPlanner[dateKey].tasks) appData.dailyPlanner[dateKey].tasks = [];
+                                appData.dailyPlanner[dateKey].tasks.push(draggedItem);
+                            }
+
+                            renderCalendarBody();
+                            renderDetailPanel();
+                            await syncToFirebase();
+                            capToast('✅ 일정이 이동되었습니다!');
+                            return;
+                        }
+                    }
+                }
+
+                // 1) 인박스 할 일 드롭 처리
+                const inboxTaskId = e.dataTransfer.getData('text/plain');
+                if (inboxTaskId) {
+                    const taskIdx = appData.inboxTasks.findIndex(t => t.id == inboxTaskId);
+                    if (taskIdx !== -1) {
+                        const inboxTask = appData.inboxTasks[taskIdx];
+                        if (!appData.dailyPlanner[dateKey]) appData.dailyPlanner[dateKey] = { tasks: [], schedules: [] };
+                        if (!appData.dailyPlanner[dateKey].tasks) appData.dailyPlanner[dateKey].tasks = [];
+
+                        appData.dailyPlanner[dateKey].tasks.push({
+                            id: Date.now(),
+                            type: 'normal',
+                            done: inboxTask.done || false,
+                            content: `[${inboxTask.space}] ${inboxTask.content}`
+                        });
+
+                        // 인박스에서 삭제
+                        appData.inboxTasks.splice(taskIdx, 1);
+
+                        renderCalendarBody();
+                        renderDetailPanel();
+                        renderInboxTasks();
+
+                        await setDoc(doc(db, "users", USER_DOC_ID), {
+                            dailyPlanner: appData.dailyPlanner,
+                            inboxTasks: appData.inboxTasks
+                        }, { merge: true });
+                        capToast('✅ 일정이 배정되었습니다!');
+                        return;
+                    }
+                }
+
+                // 2) 기존 단원 배정 드롭 처리
                 const bookId = e.dataTransfer.getData('application/cap-book');
                 const chapterIdx = e.dataTransfer.getData('application/cap-idx');
                 if (!bookId || chapterIdx === '') return;
