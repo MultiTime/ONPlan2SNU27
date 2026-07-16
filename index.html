@@ -898,7 +898,8 @@
         .app-page {
             display: none;
             width: 100%;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
             flex-direction: column;
         }
 
@@ -979,7 +980,7 @@
         .main-grid {
             display: flex;
             gap: 1rem;
-            padding: 30px 20px;
+            padding: 30px 20px 13px 20px;
             height: 100%;
             min-height: 0;
             overflow: hidden;
@@ -2833,6 +2834,348 @@
             margin-bottom: 1.5rem;
             border: 1px solid var(--border-outer);
         }
+
+        /* ================================================================ */
+        /* ✨ 3. 경험치(XP) 및 서울대 정문 Evolution 스타일                */
+        /* ================================================================ */
+        #xpEffectsContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        @keyframes floatUpFade {
+            0% {
+                opacity: 0;
+                transform: translate3d(-50%, 0, 0) scale(0.5);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translate3d(-50%, -20px, 0) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate3d(-50%, -60px, 0) scale(1);
+            }
+        }
+
+        .xp-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate3d(-50%, -50%, 0);
+            color: #F59E0B;
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-shadow: 0 4px 18px rgba(245, 158, 11, 0.6), 0 1px 3px rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 10000;
+            will-change: transform, opacity;
+        }
+
+        .xp-popup.animate {
+            animation: floatUpFade 1.5s ease-out forwards;
+        }
+
+        /* 서울대 정문 위젯 */
+        .status-box {
+            position: relative;
+            text-align: center;
+            border-radius: var(--radius-item);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+
+        .campus-bg {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            background: rgba(128, 128, 128, 0.03);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            transition: all 1.2s ease;
+            overflow: hidden;
+        }
+
+        .sha-container {
+            position: relative;
+            width: 150px;
+            height: 110px;
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+
+        .sha-part {
+            position: absolute;
+            background: transparent;
+            transition: all 1.2s ease;
+        }
+
+        .sha-s-left {
+            width: 15px;
+            height: 80px;
+            left: 25px;
+            bottom: 0;
+            transform: skewX(-25deg);
+        }
+
+        .sha-s-right {
+            width: 15px;
+            height: 80px;
+            left: 55px;
+            bottom: 0;
+            transform: skewX(25deg);
+        }
+
+        .sha-ya-main {
+            width: 15px;
+            height: 100px;
+            right: 30px;
+            bottom: 0;
+        }
+
+        .sha-ya-top {
+            width: 25px;
+            height: 12px;
+            right: 5px;
+            top: 30px;
+        }
+
+        .sha-ya-bot {
+            width: 25px;
+            height: 12px;
+            right: 5px;
+            top: 60px;
+        }
+
+        .sha-bridge {
+            width: 30px;
+            height: 10px;
+            left: 65px;
+            top: 40px;
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 0;
+            font-size: 1.8rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 15;
+            filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.15));
+        }
+
+        .tree-left {
+            left: -30px;
+        }
+
+        .tree-right {
+            right: -40px;
+            font-size: 2.2rem;
+        }
+
+        .ground {
+            width: 100%;
+            height: 15px;
+            background: rgba(128, 128, 128, 0.08);
+            position: absolute;
+            bottom: 0;
+            z-index: 5;
+            transition: 1.2s;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(white, rgba(255, 255, 255, 0) 2px);
+            background-size: 50px 50px;
+            opacity: 0;
+            transition: 2s ease;
+            z-index: 1;
+        }
+
+        /* 정문 Evolution Stages */
+        .stage-1 .sha-part {
+            border: 1px dashed var(--text-muted);
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .stage-2 .sha-part {
+            border: 1px solid var(--text-sub);
+            background: rgba(128, 128, 128, 0.15);
+        }
+
+        .stage-3 .sha-part {
+            border: none;
+            background: #64748B;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .stage-3 .ground {
+            background: rgba(128, 128, 128, 0.2);
+        }
+
+        .stage-4 .sha-part {
+            background: var(--accent);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .stage-4 .sha-ya-top,
+        .stage-4 .sha-ya-bot,
+        .stage-4 .sha-bridge {
+            background: #60A5FA;
+        }
+
+        .stage-4 .tree {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stage-4 .ground {
+            background: #86EFAC;
+            border-top: 1px solid #4ADE80;
+        }
+
+        /* stage-5: 은하수 밤하늘 및 오로라 골드 글로우 */
+        .stage-5 .campus-bg {
+            background: linear-gradient(to bottom, #0F172A, #1E1B4B);
+        }
+
+        .stage-5 .sha-part {
+            background: #0F172A;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6), inset 0 1px 2px rgba(245, 158, 11, 0.8);
+            border: 1px solid #F59E0B;
+        }
+
+        .stage-5 .sha-s-left,
+        .stage-5 .sha-s-right,
+        .stage-5 .sha-ya-main {
+            background: linear-gradient(to top, #1E3A8A, #F59E0B);
+        }
+
+        .stage-5 .stars {
+            opacity: 0.8;
+        }
+
+        .stage-5 .ground {
+            background: #064E3B;
+            border-top: 1px solid #059669;
+        }
+
+        /* 글로벌 경험치(XP) 실시간 트래킹 바 */
+        .global-xp-bottom-bar {
+            margin: 4px 24px 16px 24px;
+            padding: 10px 20px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-outer);
+            border-radius: var(--radius-item);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            user-select: none;
+        }
+
+        .global-xp-bottom-bar:hover {
+            background: var(--bg-offwhite);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.08);
+        }
+
+        body.glass-theme .global-xp-bottom-bar {
+            background: rgba(255, 255, 255, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        }
+
+        body.glass-theme .global-xp-bottom-bar:hover {
+            background: rgba(255, 255, 255, 0.45) !important;
+        }
+
+        .cal-xp-bar-track {
+            flex: 1;
+            height: 7px;
+            background: var(--bg-form-input);
+            border-radius: 4px;
+            margin: 0 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+
+        .cal-xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 인박스 토글 접기/펴기 (둥둥 떠 있는 아일랜드 디자인) */
+        .inbox-panel {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .inbox-panel.collapsed {
+            width: 48px;
+            height: 48px;
+            margin: 16px 12px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--border-outer);
+            align-self: flex-start;
+            padding: 0 !important;
+            overflow: hidden;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-outer) !important;
+        }
+
+        .inbox-panel.collapsed:hover {
+            background: var(--bg-offwhite);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 36px rgba(37, 99, 235, 0.12);
+        }
+
+        .inbox-panel.collapsed .inbox-text,
+        .inbox-panel.collapsed .inbox-add-box,
+        .inbox-panel.collapsed .inbox-task-list {
+            display: none !important;
+        }
+
+        .inbox-panel.collapsed .inbox-header {
+            padding: 0 !important;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: none !important;
+        }
+
+        .inbox-panel.collapsed .btn-inbox-toggle {
+            transform: rotate(180deg);
+            width: 100%;
+            height: 100%;
+            margin: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -2920,6 +3263,15 @@
             </div>
 
             <div class="sidebar-footer">
+                <div class="sidebar-footer-item" id="xpToggleBtn" onclick="openXpModal()" title="경험치 보기"
+                    style="margin-bottom: 0.2rem;">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="7"></circle>
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                    </svg>
+                    <span class="sidebar-text">경험치 & 레벨</span>
+                </div>
                 <div class="sidebar-footer-item" id="themeToggleBtn" onclick="toggleThemeMode()" title="테마 전환">
                     <svg class="sidebar-icon" id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2933,11 +3285,13 @@
         <div class="inbox-panel" id="inboxPanel">
             <div class="inbox-header">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span class="inbox-title"
-                            style="font-size:0.9rem; font-weight:850; color:var(--text-main);">인박스</span>
+                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                        <span class="inbox-title inbox-text"
+                            style="font-size:0.9rem; font-weight:850; color:var(--text-main); white-space:nowrap; overflow:hidden;">인박스</span>
+                        <span class="inbox-count inbox-text" id="inboxCompletedCount">0/0</span>
                     </div>
-                    <span class="inbox-count" id="inboxCompletedCount">0/0</span>
+                    <button class="btn-inbox-toggle" onclick="toggleInbox()" title="인박스 접기/펴기"
+                        style="background:transparent; border:none; color:var(--text-sub); cursor:pointer; font-size:0.8rem; padding:4px; display:flex; align-items:center; justify-content:center; transition:transform 0.3s;">❮</button>
                 </div>
             </div>
 
@@ -3387,6 +3741,22 @@
                 </div>
             </div>
 
+            <!-- 글로벌 경험치(XP) 트래킹 Bottom-Bar -->
+            <div class="global-xp-bottom-bar" onclick="openXpModal()">
+                <div
+                    style="display:flex; align-items:center; gap:8px; font-weight:800; color:var(--text-main); font-size:0.85rem; flex-shrink:0;">
+                    <span>오늘의 레벨:</span>
+                    <span id="calXpBarLevel" style="color:var(--accent);">Lv. 1</span>
+                </div>
+                <div class="cal-xp-bar-track">
+                    <div class="cal-xp-bar-fill" id="calXpBarFill"></div>
+                </div>
+                <div
+                    style="font-weight:700; color:var(--text-sub); font-size:0.8rem; display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                    <span id="calXpBarText">0 / 30 XP</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">상세보기 ➔</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -3466,6 +3836,66 @@
         </div>
     </div>
 
+    <!-- 나만의 학습 경험치 모달 -->
+    <div id="xpModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 420px; padding: 2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                <h3 style="margin: 0; font-size: 1.3rem; font-weight: 850;">나의 학습 경험치</h3>
+                <button onclick="closeModal('xpModal')"
+                    style="background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-sub); line-height:1;">&times;</button>
+            </div>
+
+            <!-- Level and XP progress -->
+            <div style="margin-bottom: 1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 0.5rem;">
+                    <span style="font-size: 1.8rem; font-weight: 900; color: var(--text-main);" id="xpModalLevel">Lv.
+                        1</span>
+                    <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-sub);" id="xpModalText">0 / 30
+                        XP</span>
+                </div>
+                <div
+                    style="width: 100%; height: 10px; background: var(--bg-form-input); border: 1px solid var(--border-outer); border-radius: 5px; overflow: hidden;">
+                    <div id="xpModalBar"
+                        style="width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #8B5CF6); border-radius: 5px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SNU Gate evolution widget -->
+            <div class="status-box liquid-card stage-1" id="campusWidget"
+                style="border: 1px solid var(--border-outer); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);">
+                <div class="campus-bg">
+                    <div class="stars"></div>
+                    <div class="sha-container">
+                        <div class="tree tree-left">🌳</div>
+                        <div class="tree tree-right">🌲</div>
+                        <div class="sha-part sha-s-left"></div>
+                        <div class="sha-part sha-s-right"></div>
+                        <div class="sha-part sha-ya-main"></div>
+                        <div class="sha-part sha-ya-top"></div>
+                        <div class="sha-part sha-ya-bot"></div>
+                        <div class="sha-part sha-bridge"></div>
+                    </div>
+                    <div class="ground"></div>
+                </div>
+                <div class="status-content"
+                    style="padding: 1rem; background: var(--bg-panel); border-top: 1px solid var(--border-inner); text-align: center;">
+                    <div class="status-sub" id="campusMsg"
+                        style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;">오늘의 공부 씨앗을 심어주세요.</div>
+                </div>
+            </div>
+
+            <div
+                style="font-size: 0.75rem; color: var(--text-muted); text-align: center; line-height: 1.4; margin-top: 1rem;">
+                💡 오늘 계획을 완료할 때마다 <b>10 XP</b>를 획득합니다.<br>
+                계획 취소 시 10 XP가 차감되며, 매일 오전 5시에 레벨이 초기화됩니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- 경험치 획득 플로팅 이펙트 컨테이너 -->
+    <div id="xpEffectsContainer"></div>
+
     <!--  Chapter Assign Floating Panel -->
     <div id="chapterAssignPanel" class="chapter-assign-panel">
         <div class="cap-header" id="capHeader">
@@ -3504,7 +3934,16 @@
 
         const USER_DOC_ID = "minchan_data";
 
-        let appData = { dailyPlanner: {}, books: [], memos: [], wrongNotes: [], spaces: ['Work', 'Personal', 'Routines', '미분류'], inboxTasks: [] };
+        let appData = {
+            dailyPlanner: {},
+            books: [],
+            memos: [],
+            wrongNotes: [],
+            spaces: ['Work', 'Personal', 'Routines', '미분류'],
+            inboxTasks: [],
+            user: { level: 1, xp: 0, nextXp: 30 },
+            lastDate: ""
+        };
         let currentInboxTab = 'inbox';
         let currentSelectedSpace = null;
         const SPACE_COLORS = {
@@ -3537,6 +3976,121 @@
             return `${y}.${m}.${d}`;
         }
         function getRealTodayString() { return getFixedDateKey(new Date()); }
+        function getStudyDateString() {
+            const now = new Date();
+            if (now.getHours() < 5) now.setDate(now.getDate() - 1);
+            return getFixedDateKey(now);
+        }
+
+        // --- 경험치(XP) 및 레벨 관련 전역 비즈니스 로직 ---
+        function checkDailyReset() {
+            const currentStudyDate = getStudyDateString();
+            if (appData.lastDate !== currentStudyDate) {
+                appData.user = { level: 1, xp: 0, nextXp: 30 };
+                appData.lastDate = currentStudyDate;
+                saveUserToCloud();
+                return true;
+            }
+            return false;
+        }
+
+        async function saveUserToCloud() {
+            try {
+                await setDoc(doc(db, "users", USER_DOC_ID), {
+                    user: appData.user,
+                    lastDate: appData.lastDate
+                }, { merge: true });
+            } catch (e) {
+                console.error("saveUserToCloud Error:", e);
+            }
+        }
+
+        window.gainXp = function (amount) {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30 };
+            appData.user.xp += amount;
+            let leveledUp = false;
+            while (appData.user.xp >= appData.user.nextXp) {
+                appData.user.xp -= appData.user.nextXp;
+                appData.user.level++;
+                appData.user.nextXp = 30 + (appData.user.level * 5);
+                leveledUp = true;
+            }
+            while (appData.user.xp < 0) {
+                if (appData.user.level > 1) {
+                    appData.user.level--;
+                    appData.user.nextXp = 30 + (appData.user.level * 5);
+                    appData.user.xp += appData.user.nextXp;
+                } else {
+                    appData.user.xp = 0;
+                }
+            }
+
+            showXpEffect(amount);
+            saveUserToCloud();
+
+            // 모달이 열려있는 상태라면 바로 갱신
+            const xpModal = document.getElementById('xpModal');
+            if (xpModal && xpModal.classList.contains('show')) {
+                renderXpModal();
+            }
+        };
+
+        function showXpEffect(amount) {
+            const container = document.getElementById('xpEffectsContainer');
+            if (!container) return;
+            const el = document.createElement('div');
+            el.className = 'xp-popup animate';
+            el.innerText = amount > 0 ? `+${amount} XP` : `${amount} XP`;
+            el.style.color = amount > 0 ? '#F59E0B' : '#94A3B8';
+            container.appendChild(el);
+            setTimeout(() => { el.remove(); }, 1500);
+        }
+
+        window.openXpModal = function () {
+            renderXpModal();
+            openModal('xpModal');
+        };
+
+        function renderXpModal() {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30 };
+            const { level, xp, nextXp } = appData.user;
+
+            // 모달 내부 갱신
+            const lvlEl = document.getElementById('xpModalLevel');
+            const txtEl = document.getElementById('xpModalText');
+            const barEl = document.getElementById('xpModalBar');
+
+            if (lvlEl) lvlEl.innerText = `Lv. ${level}`;
+            if (txtEl) txtEl.innerText = `${xp} / ${nextXp} XP`;
+            if (barEl) barEl.style.width = `${Math.min((xp / nextXp) * 100, 100)}%`;
+
+            // 캘린더 하단 트래킹 바 갱신
+            const calLvlEl = document.getElementById('calXpBarLevel');
+            const calTxtEl = document.getElementById('calXpBarText');
+            const calBarEl = document.getElementById('calXpBarFill');
+
+            if (calLvlEl) calLvlEl.innerText = `Lv. ${level}`;
+            if (calTxtEl) calTxtEl.innerText = `${xp} / ${nextXp} XP`;
+            if (calBarEl) calBarEl.style.width = `${Math.min((xp / nextXp) * 100, 100)}%`;
+
+            renderCampusEvolution();
+        }
+
+        function renderCampusEvolution() {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30 };
+            const lvl = appData.user.level;
+            const widget = document.getElementById('campusWidget');
+            const msg = document.getElementById('campusMsg');
+            if (!widget || !msg) return;
+
+            widget.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5');
+
+            if (lvl <= 3) { widget.classList.add('stage-1'); msg.innerText = "오늘의 공부 씨앗을 심어주세요."; }
+            else if (lvl <= 7) { widget.classList.add('stage-2'); msg.innerText = "기초가 탄탄해지고 있습니다!"; }
+            else if (lvl <= 11) { widget.classList.add('stage-3'); msg.innerText = "구조가 완성되었습니다. (콘크리트 양생)"; }
+            else if (lvl <= 15) { widget.classList.add('stage-4'); msg.innerText = "지식이 뿌리내렸습니다. (조경 완료)"; }
+            else { widget.classList.add('stage-5'); msg.innerText = "완벽한 하루! 수고하셨습니다. 🎇"; }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const docRef = doc(db, "users", USER_DOC_ID);
@@ -3570,6 +4124,11 @@
                     appData.wrongNotes = data.wrongNotes || [];
                     appData.spaces = data.spaces || ['Work', 'Personal', 'Routines', '미분류'];
                     appData.inboxTasks = data.inboxTasks || [];
+                    appData.user = data.user || { level: 1, xp: 0, nextXp: 30 };
+                    appData.lastDate = data.lastDate || getRealTodayString();
+
+                    // 일일 초기화(오전 5시 기준) 점검
+                    checkDailyReset();
                 }
 
                 try {
@@ -3579,6 +4138,7 @@
                     renderInboxTasks();
                     renderBooks();
                     renderWrongNotes();
+                    renderXpModal();
                 } catch (err) {
                     console.error("렌더링 에러:", err);
                 }
@@ -3605,11 +4165,22 @@
             localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
         };
 
-        // DOM 로드 시 사이드바 접기 상태 복원
+        // ✅ 인박스 접기/펴기
+        window.toggleInbox = function () {
+            const inbox = document.getElementById('inboxPanel');
+            const isCollapsed = inbox.classList.toggle('collapsed');
+            localStorage.setItem('inboxCollapsed', isCollapsed ? 'true' : 'false');
+        };
+
+        // DOM 로드 시 사이드바 및 인박스 접기 상태 복원
         document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('sidebarCollapsed') === 'true') {
                 const sidebar = document.getElementById('appSidebar');
                 if (sidebar) sidebar.classList.add('collapsed');
+            }
+            if (localStorage.getItem('inboxCollapsed') === 'true') {
+                const inbox = document.getElementById('inboxPanel');
+                if (inbox) inbox.classList.add('collapsed');
             }
         });
 
@@ -3619,6 +4190,7 @@
             if (!name) return;
             const trimmed = name.trim();
             if (!trimmed) return;
+            if (trimmed === '완료') return alert("'완료'는 시스템 스페이스 이름으로 사용할 수 없습니다.");
             if (appData.spaces.includes(trimmed)) return alert("이미 존재하는 스페이스입니다.");
 
             appData.spaces.push(trimmed);
@@ -3635,7 +4207,9 @@
             if (!container) return;
             container.innerHTML = '';
 
-            appData.spaces.forEach((space, idx) => {
+            // 1. 기존 스페이스 렌더링 (완료 스페이스 제외)
+            const normalSpaces = appData.spaces.filter(s => s !== '완료');
+            normalSpaces.forEach((space, idx) => {
                 const color = getSpaceColor(space, idx);
                 const div = document.createElement('div');
                 div.className = `sidebar-space-item ${currentSelectedSpace === space ? 'active' : ''}`;
@@ -3662,6 +4236,24 @@
                 `;
                 container.appendChild(div);
             });
+
+            // 2. 구분선 추가
+            const hr = document.createElement('div');
+            hr.style.height = '1px';
+            hr.style.background = 'var(--border-inner)';
+            hr.style.margin = '0.5rem 0.8rem';
+            container.appendChild(hr);
+
+            // 3. 완료 스페이스 렌더링 (완료 보관함)
+            const doneDiv = document.createElement('div');
+            doneDiv.className = `sidebar-space-item ${currentSelectedSpace === '완료' ? 'active' : ''}`;
+            doneDiv.onclick = () => selectSpace('완료');
+            doneDiv.style.color = 'var(--text-muted)';
+            doneDiv.innerHTML = `
+                <span class="sidebar-space-dot" style="background-color: #10B981; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:7px; color:white; font-weight:bold;">✓</span>
+                <span class="sidebar-text truncate-text" style="margin-left: 10px; flex: 1; min-width: 0; font-weight:800;">완료 보관함</span>
+            `;
+            container.appendChild(doneDiv);
         };
 
         window.selectSpace = function (spaceName) {
@@ -3680,6 +4272,7 @@
             if (!newName) return;
             const trimmed = newName.trim();
             if (!trimmed || trimmed === oldName) return;
+            if (trimmed === '완료') return alert("'완료'는 시스템 스페이스 이름으로 사용할 수 없습니다.");
             if (appData.spaces.includes(trimmed)) return alert("이미 존재하는 스페이스입니다.");
 
             const idx = appData.spaces.indexOf(oldName);
@@ -3772,7 +4365,9 @@
                 const content = input.value.trim();
                 if (!content) return;
 
-                const space = currentSelectedSpace || '미분류';
+                let space = currentSelectedSpace || '미분류';
+                if (space === '완료') space = '미분류';
+
                 const newTask = {
                     id: Date.now(),
                     content: content,
@@ -3802,13 +4397,27 @@
 
             // 필터링 적용 (스페이스 & 탭)
             let filtered = tasks;
-            if (currentSelectedSpace) {
-                filtered = filtered.filter(t => t.space === currentSelectedSpace);
+            if (currentSelectedSpace === '완료') {
+                filtered = filtered.filter(t => t.space === '완료' || t.done);
+            } else if (currentSelectedSpace) {
+                filtered = filtered.filter(t => t.space === currentSelectedSpace && t.space !== '완료' && !t.done);
+            } else {
+                // 첫 화면 (전체 보기) - 완료되지 않은 태스크들만 표시
+                filtered = filtered.filter(t => t.space !== '완료' && !t.done);
             }
 
-            // 완료 카운트 계산
-            const completedCount = filtered.filter(t => t.done).length;
-            document.getElementById('inboxCompletedCount').innerText = `${completedCount}/${filtered.length}`;
+            // 완료 카운트 계산: 해당 스페이스에 배정되었거나 완료된 전체 태스크 개수 기준
+            let spaceTasks = tasks;
+            if (currentSelectedSpace === '완료') {
+                spaceTasks = tasks.filter(t => t.space === '완료' || t.done);
+            } else if (currentSelectedSpace) {
+                spaceTasks = tasks.filter(t => (t.space === currentSelectedSpace) || (t.originalSpace === currentSelectedSpace && t.space === '완료'));
+            } else {
+                spaceTasks = tasks.filter(t => t.space !== '완료' || t.done); // 완료처리된 태스크 전체 포함
+            }
+            const totalCount = spaceTasks.length;
+            const completedCount = spaceTasks.filter(t => t.done).length;
+            document.getElementById('inboxCompletedCount').innerText = `${completedCount}/${totalCount}`;
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding: 2rem 0; color:var(--text-muted); font-size:0.8rem;">할 일이 없습니다.</div>`;
@@ -3845,7 +4454,21 @@
             const task = appData.inboxTasks.find(t => t.id === taskId);
             if (!task) return;
             task.done = !task.done;
+
+            // 완료 상태에 따른 스페이스 이동 처리
+            if (task.done) {
+                task.originalSpace = task.space || '미분류';
+                task.space = '완료';
+            } else {
+                task.space = task.originalSpace || '미분류';
+                delete task.originalSpace;
+            }
+
+            // 경험치 지급
+            window.gainXp(task.done ? 10 : -10);
+
             renderInboxTasks();
+            renderSpaces();
             try {
                 await setDoc(doc(db, "users", USER_DOC_ID), { inboxTasks: appData.inboxTasks }, { merge: true });
             } catch (err) {
@@ -4062,16 +4685,24 @@
             chapter.done = !chapter.done;
 
             // Also toggle done state of any study-linked planner tasks
+            let todayTaskFound = false;
             Object.keys(appData.dailyPlanner).forEach(dateKey => {
                 const dayData = appData.dailyPlanner[dateKey];
                 if (dayData && dayData.tasks) {
                     dayData.tasks.forEach(t => {
                         if (t.type === 'study' && t.bookId == bookId && t.chapterIdx == chIdx) {
                             t.done = chapter.done;
+                            if (dateKey === getStudyDateString()) {
+                                todayTaskFound = true;
+                            }
                         }
                     });
                 }
             });
+
+            if (todayTaskFound || selectedDateStr === getStudyDateString()) {
+                window.gainXp(chapter.done ? 10 : -10);
+            }
 
             renderBooks();
             renderCalendarBody();
@@ -5020,6 +5651,11 @@
             if (e) e.stopPropagation();
             const task = appData.dailyPlanner[dateKey].tasks[idx];
             task.done = !task.done;
+
+            // 경험치 지급 (오늘 날짜의 계획일 때만)
+            if (dateKey === getStudyDateString()) {
+                window.gainXp(task.done ? 10 : -10);
+            }
 
             if (task.type === 'study' && task.bookId != null && task.chapterIdx != null) {
                 const bookIndex = appData.books.findIndex(x => x.id == task.bookId);
