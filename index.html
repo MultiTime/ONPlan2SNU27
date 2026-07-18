@@ -239,7 +239,7 @@
             --divider-apple-toolbar: rgba(0, 0, 0, 0.05);
 
             --bg-modal-overlay: rgba(15, 23, 42, 0.2);
-            --bg-modal-content: rgba(255, 255, 255, 0.8);
+            --bg-modal-content: rgba(255, 255, 255, 0.85);
             --bg-btn-close-detail-hover: rgba(0, 0, 0, 0.05);
 
             --bg-form-input: rgba(255, 255, 255, 0.4);
@@ -278,13 +278,20 @@
         body.glass-theme .calendar-panel,
         body.glass-theme .detail-panel,
         body.glass-theme .week-view-container,
-        body.glass-theme .memo-modal-content,
-        body.glass-theme .modal-content,
-        body.glass-theme .chapter-assign-panel,
         body.glass-theme .apple-toolbar {
             backdrop-filter: blur(20px) saturate(140%) !important;
             -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
             background: rgba(255, 255, 255, 0.45) !important;
+            border: 1px solid rgba(255, 255, 255, 0.65) !important;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 8px 32px 0 rgba(0, 0, 0, 0.06) !important;
+        }
+
+        body.glass-theme .memo-modal-content,
+        body.glass-theme .modal-content,
+        body.glass-theme .chapter-assign-panel {
+            backdrop-filter: blur(20px) saturate(140%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+            background: rgba(255, 255, 255, 0.85) !important;
             border: 1px solid rgba(255, 255, 255, 0.65) !important;
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 8px 32px 0 rgba(0, 0, 0, 0.06) !important;
         }
@@ -474,6 +481,7 @@
             display: flex;
             width: 100vw;
             height: 100vh;
+            position: relative;
         }
 
         /* ✅ 사이드바 스타일 개편 (Arch Calendar 스타일) */
@@ -740,6 +748,7 @@
             flex-direction: column;
             flex-shrink: 0;
             z-index: 10;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, border-color 0.3s;
         }
 
         .inbox-header {
@@ -1088,7 +1097,7 @@
         /* ✅ 셀 패딩 축소 */
         .cal-cell {
             background: var(--bg-panel);
-            padding: 4px 6px;
+            padding: 4px 6px 4px 10px;
             display: flex;
             flex-direction: column;
             cursor: pointer;
@@ -1097,6 +1106,18 @@
             overflow: hidden;
             min-height: 0;
             min-width: 0;
+        }
+
+        /* ✅ 히트맵 좌측 에지 스트립 (경험치 레벨 기반) */
+        .cal-cell .heatmap-edge {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 7px;
+            border-radius: 0 4px 4px 0;
+            background: var(--accent);
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+            z-index: 4;
         }
 
         .cal-cell:hover {
@@ -2306,6 +2327,63 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* ✅ 열품타(YPT) 연동 토스트 */
+        .ypt-toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s, transform 0.35s;
+            box-shadow: 0 6px 24px rgba(37, 99, 235, 0.35);
+        }
+
+        .ypt-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ✅ 디테일 패널 공부 기록 배지 */
+        .study-record-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 14px;
+            margin-top: 8px;
+            background: var(--bg-offwhite);
+            border: 1px solid var(--border-inner);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-sub);
+        }
+
+        .study-record-badge .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .study-record-badge .badge-level {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .study-record-badge .badge-time {
+            font-family: 'Courier New', monospace;
+            color: var(--text-main);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
         /* ✅ 메모 팝업 모달 추가 */
         .memo-modal-content {
             background: var(--bg-modal-content);
@@ -3006,72 +3084,303 @@
             z-index: 1;
         }
 
-        /* 정문 Evolution Stages */
+        /* 정문 Evolution 10 Stages & 엠블럼 애니메이션 */
+        @keyframes floatEmblem {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(180deg);
+                opacity: 1;
+                filter: drop-shadow(0 0 15px #FDE047);
+            }
+
+            100% {
+                transform: translateY(0) rotate(360deg);
+                opacity: 0.9;
+            }
+        }
+
+        .sha-emblem {
+            position: absolute;
+            top: 15px;
+            left: calc(50% - 16px);
+            font-size: 2.2rem;
+            z-index: 20;
+            display: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        /* 10단계 정문 진화 세부 CSS */
         .stage-1 .sha-part {
-            border: 1px dashed var(--text-muted);
-            background: rgba(128, 128, 128, 0.05);
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
+            background: transparent;
         }
 
         .stage-2 .sha-part {
-            border: 1px solid var(--text-sub);
-            background: rgba(128, 128, 128, 0.15);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .stage-3 .sha-part {
-            border: none;
-            background: #64748B;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        .stage-3 .sha-s-left {
+            background: #334155;
+            border: 1px solid #475569;
         }
 
-        .stage-3 .ground {
-            background: rgba(128, 128, 128, 0.2);
+        .stage-3 .sha-s-right,
+        .stage-3 .sha-ya-main,
+        .stage-3 .sha-ya-top,
+        .stage-3 .sha-ya-bot,
+        .stage-3 .sha-bridge {
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
         }
 
-        .stage-4 .sha-part {
-            background: var(--accent);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        .stage-4 .sha-s-left,
+        .stage-4 .sha-s-right {
+            background: #334155;
+            border: 1px solid #475569;
         }
 
+        .stage-4 .sha-ya-main,
         .stage-4 .sha-ya-top,
         .stage-4 .sha-ya-bot,
         .stage-4 .sha-bridge {
-            background: #60A5FA;
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
         }
 
-        .stage-4 .tree {
+        .stage-5 .sha-part {
+            background: #475569;
+            border: 1px solid #64748B;
+        }
+
+        .stage-6 .sha-part {
+            background: #E2E8F0;
+            border: 1px solid #CBD5E1;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .stage-7 .sha-part {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .stage-7 .tree {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .stage-4 .ground {
-            background: #86EFAC;
-            border-top: 1px solid #4ADE80;
+        .stage-7 .ground {
+            background: #15803D;
+            border-top: 1px solid #22C55E;
         }
 
-        /* stage-5: 은하수 밤하늘 및 오로라 골드 글로우 */
-        .stage-5 .campus-bg {
-            background: linear-gradient(to bottom, #0F172A, #1E1B4B);
+        .stage-8 .sha-part {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
         }
 
-        .stage-5 .sha-part {
-            background: #0F172A;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6), inset 0 1px 2px rgba(245, 158, 11, 0.8);
+        .stage-8 .tree {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stage-8 .ground {
+            background: #15803D;
+            border-top: 1px solid #22C55E;
+        }
+
+        .stage-8 .campus-bg {
+            background: linear-gradient(to bottom, #38BDF8, #bae6fd) !important;
+        }
+
+        .stage-9 .sha-part {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+        }
+
+        .stage-9 .tree {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stage-9 .ground {
+            background: #15803D;
+            border-top: 1px solid #22C55E;
+        }
+
+        .stage-9 .campus-bg {
+            background: linear-gradient(to bottom, #0F172A, #1E1B4B) !important;
+        }
+
+        .stage-9 .stars {
+            opacity: 0.6;
+        }
+
+        /* 10단계: 완전체 오로라 학사모 엠블럼 회전 및 조명 폭죽 */
+        .stage-10 .sha-part {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             border: 1px solid #F59E0B;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.8);
         }
 
-        .stage-5 .sha-s-left,
-        .stage-5 .sha-s-right,
-        .stage-5 .sha-ya-main {
-            background: linear-gradient(to top, #1E3A8A, #F59E0B);
+        .stage-10 .tree {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .stage-5 .stars {
-            opacity: 0.8;
+        .stage-10 .ground {
+            background: #052e16;
+            border-top: 1px solid #16a34a;
         }
 
-        .stage-5 .ground {
-            background: #064E3B;
-            border-top: 1px solid #059669;
+        .stage-10 .campus-bg {
+            background: linear-gradient(to bottom, #020617, #0F172A) !important;
+        }
+
+        .stage-10 .stars {
+            opacity: 0.9;
+        }
+
+        .stage-10 .sha-emblem {
+            display: block;
+            animation: floatEmblem 6s linear infinite;
+        }
+
+        /* 타이쿤 상점 아이템 스타일 */
+        .shop-item {
+            background: var(--bg-offwhite);
+            border: 1px solid var(--border-inner);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.25s ease;
+        }
+
+        .shop-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .shop-item.purchased {
+            opacity: 0.75;
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-buy {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-buy:hover:not(:disabled) {
+            opacity: 0.95;
+            transform: scale(1.03);
+        }
+
+        .btn-buy:disabled {
+            background: var(--bg-form-input);
+            color: var(--text-muted);
+            border: 1px solid var(--border-inner);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 팝업창 불투명도 98% 전용 스타일 (2열 확보) */
+        .xp-modal-content {
+            background: var(--bg-panel-solid) !important;
+            border: 1px solid var(--border-outer) !important;
+            backdrop-filter: none !important;
+            width: 90% !important;
+            max-width: 860px !important;
+            height: auto !important;
+            max-height: 90% !important;
+        }
+
+        /* 미니 캠퍼스 맵 배치 아이콘 스타일 */
+        .map-building-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+            position: relative;
+            animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transition: transform 0.2s;
+        }
+
+        .map-building-icon:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .map-building-name {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #fff;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .shop-tab-btn {
+            background: transparent;
+            color: var(--text-sub) !important;
+        }
+
+        .shop-tab-btn.active {
+            background: var(--bg-panel) !important;
+            color: var(--accent) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 경험치 팝업창(xpModal) 내부 모든 스크롤바 커스텀 스타일 */
+        #xpModal *::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        #xpModal *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #xpModal *::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3) !important;
+            border-radius: 10px;
+        }
+
+        #xpModal *::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.5) !important;
         }
 
         /* 글로벌 경험치(XP) 실시간 트래킹 바 */
@@ -3131,24 +3440,60 @@
         }
 
         .inbox-panel.collapsed {
-            width: 48px;
-            height: 48px;
-            margin: 16px 12px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            border: 1px solid var(--border-outer);
-            align-self: flex-start;
+            width: 0 !important;
             padding: 0 !important;
-            overflow: hidden;
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border-outer) !important;
+            border-right: none !important;
+            overflow: visible !important;
+            background: transparent !important;
         }
 
-        .inbox-panel.collapsed:hover {
-            background: var(--bg-offwhite);
-            border-color: var(--accent);
-            transform: translateY(-1px);
-            box-shadow: 0 12px 36px rgba(37, 99, 235, 0.12);
+        /* 글래스 모드에서 접혔을 때의 인박스 패널 자체 투명화 유지 */
+        body.glass-theme .inbox-panel.collapsed {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        /* 닫혔을 때 캘린더 위에 둥둥 뜨는 진한 원형 아이콘 */
+        .inbox-panel.collapsed .btn-inbox-toggle {
+            position: absolute;
+            z-index: 99;
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--accent) !important;
+            background: var(--accent) !important;
+            color: #FFFFFF !important;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 900;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .inbox-panel.collapsed .btn-inbox-toggle:hover {
+            opacity: 1;
+            transform: scale(1.08);
+            box-shadow: 0 12px 36px rgba(37, 99, 235, 0.4);
+        }
+
+        /* 사이드바가 열려있을 때의 인박스 버튼 위치 */
+        .sidebar:not(.collapsed)~.inbox-panel.collapsed .btn-inbox-toggle {
+            left: 246px;
+            /* 사이드바 230px + 마진 16px */
+            bottom: 80px;
+        }
+
+        /* 사이드바가 닫혀있을 때의 인박스 버튼 위치 */
+        .sidebar.collapsed~.inbox-panel.collapsed .btn-inbox-toggle {
+            left: 81px;
+            /* 사이드바 65px + 마진 16px */
+            bottom: 80px;
         }
 
         .inbox-panel.collapsed .inbox-text,
@@ -3159,22 +3504,14 @@
 
         .inbox-panel.collapsed .inbox-header {
             padding: 0 !important;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border-bottom: none !important;
+            background: transparent !important;
+            display: contents;
         }
 
         .inbox-panel.collapsed .btn-inbox-toggle {
             transform: rotate(180deg);
-            width: 100%;
-            height: 100%;
             margin: 0 !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
     </style>
 </head>
@@ -3836,65 +4173,136 @@
         </div>
     </div>
 
-    <!-- 나만의 학습 경험치 모달 -->
+    <!-- 나만의 학습 경험치 모달 (2열 레이아웃 & 98% 불투명도 적용) -->
     <div id="xpModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 420px; padding: 2rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-                <h3 style="margin: 0; font-size: 1.3rem; font-weight: 850;">나의 학습 경험치</h3>
+        <div class="modal-content xp-modal-content" style="max-width: 840px; padding: 2rem;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom: 1px solid var(--border-inner); padding-bottom: 1rem;">
+                <h3
+                    style="margin: 0; font-size: 1.4rem; font-weight: 850; display: flex; align-items: center; gap: 8px;">
+                    🎓 <span>나의 학습 경험치 & 서울대 캠퍼스 빌더</span>
+                </h3>
                 <button onclick="closeModal('xpModal')"
                     style="background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-sub); line-height:1;">&times;</button>
             </div>
 
-            <!-- Level and XP progress -->
-            <div style="margin-bottom: 1.5rem;">
-                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 0.5rem;">
-                    <span style="font-size: 1.8rem; font-weight: 900; color: var(--text-main);" id="xpModalLevel">Lv.
-                        1</span>
-                    <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-sub);" id="xpModalText">0 / 30
-                        XP</span>
-                </div>
-                <div
-                    style="width: 100%; height: 10px; background: var(--bg-form-input); border: 1px solid var(--border-outer); border-radius: 5px; overflow: hidden;">
-                    <div id="xpModalBar"
-                        style="width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #8B5CF6); border-radius: 5px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
-                    </div>
-                </div>
-            </div>
+            <!-- 2열 컨테이너 -->
+            <div style="display: flex; gap: 2rem; align-items: stretch;">
 
-            <!-- SNU Gate evolution widget -->
-            <div class="status-box liquid-card stage-1" id="campusWidget"
-                style="border: 1px solid var(--border-outer); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);">
-                <div class="campus-bg">
-                    <div class="stars"></div>
-                    <div class="sha-container">
-                        <div class="tree tree-left">🌳</div>
-                        <div class="tree tree-right">🌲</div>
-                        <div class="sha-part sha-s-left"></div>
-                        <div class="sha-part sha-s-right"></div>
-                        <div class="sha-part sha-ya-main"></div>
-                        <div class="sha-part sha-ya-top"></div>
-                        <div class="sha-part sha-ya-bot"></div>
-                        <div class="sha-part sha-bridge"></div>
+                <!-- 좌측 영역: 레벨 정보 & 10단계 정문 위젯 -->
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 1.2rem; min-width: 0;">
+                    <!-- Level and XP progress -->
+                    <div
+                        style="background: var(--bg-offwhite); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-inner);">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 0.5rem;">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: var(--text-main);"
+                                id="xpModalLevel">Lv. 1</span>
+                            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-sub);"
+                                id="xpModalText">0 / 30 XP</span>
+                        </div>
+                        <div
+                            style="width: 100%; height: 10px; background: var(--bg-form-input); border: 1px solid var(--border-outer); border-radius: 5px; overflow: hidden; margin-bottom: 0.8rem;">
+                            <div id="xpModalBar"
+                                style="width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #8B5CF6); border-radius: 5px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
+                            </div>
+                        </div>
+                        <!-- 코인 보유 현황 -->
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:1rem; color:#F59E0B;">
+                            <span style="display:flex; align-items:center; gap:4px;">🪙 보유 SNU 코인:</span>
+                            <span id="snuCoinDisplay"
+                                style="font-size:1.00rem; font-family:'Courier New', monospace; font-weight: 900;">0
+                                SNU</span>
+                        </div>
                     </div>
-                    <div class="ground"></div>
+
+                    <!-- SNU Gate evolution widget (10단계로 고도화) -->
+                    <div class="status-box liquid-card stage-1" id="campusWidget"
+                        style="border: 1px solid var(--border-outer); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); flex: 1; min-height: 250px; display: flex; flex-direction: column; margin-bottom: 0;">
+                        <div class="campus-bg"
+                            style="position: relative; flex: 1; min-height: 180px; overflow: hidden; background: linear-gradient(to bottom, #1E293B, #0F172A); border-radius: 12px 12px 0 0; display: flex; justify-content: center; align-items: flex-end;">
+                            <div class="stars"></div>
+                            <div class="sha-container"
+                                style="position: relative; width: 150px; height: 110px; margin-bottom: 10px; z-index: 10;">
+                                <div class="tree tree-left">🌳</div>
+                                <div class="tree tree-right">🌲</div>
+                                <div class="sha-part sha-s-left"></div>
+                                <div class="sha-part sha-s-right"></div>
+                                <div class="sha-part sha-ya-main"></div>
+                                <div class="sha-part sha-ya-top"></div>
+                                <div class="sha-part sha-ya-bot"></div>
+                                <div class="sha-part sha-bridge"></div>
+                                <!-- 10단계 엠블럼 학사모 -->
+                                <div class="sha-emblem">🎓</div>
+                            </div>
+                            <div class="ground"></div>
+                        </div>
+                        <div class="status-content"
+                            style="padding: 1rem; background: var(--bg-panel); border-top: 1px solid var(--border-inner); text-align: center;">
+                            <div class="status-sub" id="campusMsg"
+                                style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;">오늘의 공부 씨앗을 심어주세요.
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="status-content"
-                    style="padding: 1rem; background: var(--bg-panel); border-top: 1px solid var(--border-inner); text-align: center;">
-                    <div class="status-sub" id="campusMsg"
-                        style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;">오늘의 공부 씨앗을 심어주세요.</div>
+
+                <!-- 우측 영역: 캠퍼스 빌더 타이쿤 -->
+                <div
+                    style="flex: 1.2; display: flex; flex-direction: column; gap: 0.8rem; border-left: 1px solid var(--border-inner); padding-left: 1.5rem; min-width: 0;">
+                    <div
+                        style="font-size: 1.1rem; font-weight: 850; color: var(--text-main); display:flex; justify-content:space-between; align-items:center; margin-bottom: 2px;">
+                        <span>🏛️ 서울대 캠퍼스 빌더</span>
+                        <span style="font-size: 0.78rem; color: var(--accent); font-weight: 800;">버프 상시 중첩!</span>
+                    </div>
+
+                    <!-- 미니 캠퍼스 맵 보드 -->
+                    <div id="campusMapBoard"
+                        style="height: 140px; background: #0F172A; border-radius: 12px; border: 1px solid var(--border-outer); display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px; overflow-x: auto;">
+                        <div id="mapGrid"
+                            style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                            <!-- 지어진 건물들이 아기자기하게 렌더링될 영역 -->
+                        </div>
+                    </div>
+
+                    <!-- 상점 카테고리 탭 버튼 -->
+                    <div
+                        style="display: flex; gap: 6px; background: var(--bg-form-input); padding: 4px; border-radius: 8px; border: 1px solid var(--border-inner); flex-shrink: 0;">
+                        <button class="shop-tab-btn active" data-tab="buildings" onclick="window.changeTab('buildings')"
+                            style="flex:1; border:none; padding:6px 2px; border-radius:6px; font-size:0.9rem; font-weight:800; cursor:pointer; transition:0.2s; background:transparent; color:var(--text-sub);">건물
+                        </button>
+                        <button class="shop-tab-btn" data-tab="boosters" onclick="window.changeTab('boosters')"
+                            style="flex:1; border:none; padding:6px 2px; border-radius:6px; font-size:0.9rem; font-weight:800; cursor:pointer; transition:0.2s; background:transparent; color:var(--text-sub);">도핑
+                        </button>
+                        <button class="shop-tab-btn" data-tab="decors" onclick="window.changeTab('decors')"
+                            style="flex:1; border:none; padding:6px 2px; border-radius:6px; font-size:0.9rem; font-weight:800; cursor:pointer; transition:0.2s; background:transparent; color:var(--text-sub);">조경
+                        </button>
+                        <button class="shop-tab-btn" data-tab="prestige" onclick="window.changeTab('prestige')"
+                            style="flex:1; border:none; padding:6px 2px; border-radius:6px; font-size:0.9rem; font-weight:800; cursor:pointer; transition:0.2s; background:transparent; color:var(--text-sub);">졸업
+                        </button>
+                    </div>
+
+                    <!-- 건물 상점 목록 -->
+                    <div style="flex: 1; overflow-y: auto; max-height: 200px; display: flex; flex-direction: column; gap: 0.6rem; padding-right: 4px;"
+                        id="buildingShopList">
+                        <!-- 건물 슬롯 동적 생성 -->
+                    </div>
                 </div>
+
             </div>
 
             <div
-                style="font-size: 0.75rem; color: var(--text-muted); text-align: center; line-height: 1.4; margin-top: 1rem;">
-                💡 오늘 계획을 완료할 때마다 <b>10 XP</b>를 획득합니다.<br>
-                계획 취소 시 10 XP가 차감되며, 매일 오전 5시에 레벨이 초기화됩니다.
+                style="font-size: 0.75rem; color: var(--text-muted); text-align: center; line-height: 1.4; margin-top: 1.5rem; border-top: 1px solid var(--border-inner); padding-top: 1rem;">
+                💡 오늘 계획을 완료하면 <b>10 XP + 10 SNU 코인</b>을, 공부 시간 동기화 시 <b>1분당 1 XP + 1 SNU 코인</b>을 획득합니다.<br>
+                경험치 레벨은 매일 오전 5시에 초기화되지만, <b>보유한 코인과 건설된 캠퍼스 건물(및 버프)은 보존</b>됩니다!
             </div>
         </div>
     </div>
 
     <!-- 경험치 획득 플로팅 이펙트 컨테이너 -->
     <div id="xpEffectsContainer"></div>
+    <!-- 열품타 연동 토스트 -->
+    <div id="yptToast" class="ypt-toast"></div>
 
     <!--  Chapter Assign Floating Panel -->
     <div id="chapterAssignPanel" class="chapter-assign-panel">
@@ -3941,8 +4349,10 @@
             wrongNotes: [],
             spaces: ['Work', 'Personal', 'Routines', '미분류'],
             inboxTasks: [],
-            user: { level: 1, xp: 0, nextXp: 30 },
-            lastDate: ""
+            user: { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] },
+            lastDate: "",
+            calendarHistory: {},
+            lastYptTime: "00:00:00"
         };
         let currentInboxTab = 'inbox';
         let currentSelectedSpace = null;
@@ -3981,13 +4391,106 @@
             if (now.getHours() < 5) now.setDate(now.getDate() - 1);
             return getFixedDateKey(now);
         }
+        function timeToSeconds(timeStr) {
+            if (!timeStr) return 0;
+            const parts = timeStr.split(':');
+            return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+        }
 
-        // --- 경험치(XP) 및 레벨 관련 전역 비즈니스 로직 ---
+        // --- 열품타(YPT) 공부 시간 실시간 동기화 메커니즘 ---
+        window.processYptUpdate = function (newTimeStr) {
+            let shouldSave = false;
+            const today = getStudyDateString();
+
+            if (newTimeStr !== appData.lastYptTime) {
+                const newSec = timeToSeconds(newTimeStr);
+                const oldSec = timeToSeconds(appData.lastYptTime);
+                let diffSec = newSec > oldSec ? newSec - oldSec : newSec;
+
+                if (diffSec > 0) {
+                    const gainedXp = Math.floor(diffSec / 60);
+                    if (gainedXp > 0) {
+                        window.gainXpAndCoins(gainedXp, gainedXp, true);
+                        window.showYptToast(gainedXp);
+                    }
+                }
+                appData.lastYptTime = newTimeStr;
+                shouldSave = true;
+            }
+
+            if (!appData.calendarHistory) appData.calendarHistory = {};
+
+            const existingCalSec = timeToSeconds(appData.calendarHistory[today]?.time || "00:00:00");
+            const incomingCalSec = timeToSeconds(newTimeStr);
+
+            if (!appData.calendarHistory[today] || typeof appData.calendarHistory[today] !== 'object') {
+                appData.calendarHistory[today] = { level: appData.user.level, time: newTimeStr };
+                shouldSave = true;
+            } else if (incomingCalSec > existingCalSec) {
+                appData.calendarHistory[today].time = newTimeStr;
+                appData.calendarHistory[today].level = Math.max(appData.calendarHistory[today].level, appData.user.level);
+                shouldSave = true;
+            }
+
+            if (shouldSave) {
+                saveUserToCloud();
+            }
+        }
+
+        window.gainXpNoSave = function (amount) {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30 };
+            appData.user.xp += amount;
+            while (appData.user.xp >= appData.user.nextXp) {
+                appData.user.xp -= appData.user.nextXp;
+                appData.user.level++;
+                appData.user.nextXp = 30 + (appData.user.level * 5);
+                showXpEffect(amount);
+            }
+            while (appData.user.xp < 0) {
+                if (appData.user.level > 1) {
+                    appData.user.level--;
+                    appData.user.nextXp = 30 + (appData.user.level * 5);
+                    appData.user.xp += appData.user.nextXp;
+                } else { appData.user.xp = 0; }
+            }
+        }
+
+        window.showYptToast = function (xp) {
+            const toast = document.getElementById('yptToast');
+            if (!toast) return;
+            toast.innerText = `🔄 열품타 연동: +${xp} XP 획득!`;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // --- 경험치(XP), 레벨 및 코인 관련 전역 비즈니스 로직 ---
         function checkDailyReset() {
             const currentStudyDate = getStudyDateString();
             if (appData.lastDate !== currentStudyDate) {
-                appData.user = { level: 1, xp: 0, nextXp: 30 };
+                // 코인, 건물, 데코, 명예졸업(Prestige) 보존 & 도핑 버스터는 초기화
+                const coins = appData.user ? (appData.user.snuCoins || 0) : 0;
+                const blds = appData.user ? (appData.user.buildings || {}) : {};
+                const decors = appData.user ? (appData.user.decorations || []) : [];
+                const prestige = appData.user ? (appData.user.prestige || 0) : 0;
+
+                appData.user = {
+                    level: 1,
+                    xp: 0,
+                    nextXp: 30,
+                    snuCoins: coins,
+                    buildings: blds,
+                    decorations: decors,
+                    activeBoosters: {}, // 데일리 도핑 리셋
+                    prestige: prestige
+                };
+
                 appData.lastDate = currentStudyDate;
+                appData.lastYptTime = "00:00:00";
+
+                if (!appData.calendarHistory) appData.calendarHistory = {};
+                appData.calendarHistory[currentStudyDate] = { level: 1, time: "00:00:00" };
+
+                setDoc(doc(db, "users", USER_DOC_ID), { ypt_time: "00:00:00" }, { merge: true });
                 saveUserToCloud();
                 return true;
             }
@@ -3998,7 +4501,9 @@
             try {
                 await setDoc(doc(db, "users", USER_DOC_ID), {
                     user: appData.user,
-                    lastDate: appData.lastDate
+                    lastDate: appData.lastDate,
+                    calendarHistory: appData.calendarHistory || {},
+                    lastYptTime: appData.lastYptTime || "00:00:00"
                 }, { merge: true });
             } catch (e) {
                 console.error("saveUserToCloud Error:", e);
@@ -4006,7 +4511,7 @@
         }
 
         window.gainXp = function (amount) {
-            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30 };
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] };
             appData.user.xp += amount;
             let leveledUp = false;
             while (appData.user.xp >= appData.user.nextXp) {
@@ -4026,6 +4531,16 @@
             }
 
             showXpEffect(amount);
+
+            // calendarHistory에 오늘 레벨 갱신
+            const today = getStudyDateString();
+            if (!appData.calendarHistory) appData.calendarHistory = {};
+            if (appData.calendarHistory[today]) {
+                appData.calendarHistory[today].level = Math.max(appData.calendarHistory[today].level || 0, appData.user.level);
+            } else {
+                appData.calendarHistory[today] = { level: appData.user.level, time: appData.lastYptTime || "00:00:00" };
+            }
+
             saveUserToCloud();
 
             // 모달이 열려있는 상태라면 바로 갱신
@@ -4033,6 +4548,380 @@
             if (xpModal && xpModal.classList.contains('show')) {
                 renderXpModal();
             }
+        };
+
+        // 코인과 경험치를 동시에 처리하는 버프 통합 함수
+        window.gainXpAndCoins = function (xpAmount, coinAmount, isYpt = false) {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] };
+            if (appData.user.snuCoins === undefined) appData.user.snuCoins = 0;
+            if (!appData.user.buildings) appData.user.buildings = [];
+
+            let finalXp = xpAmount;
+            let finalCoins = coinAmount;
+
+            const hasHumanities = appData.user.buildings.includes('humanities');
+            const hasBusiness = appData.user.buildings.includes('business');
+            const hasEngineering = appData.user.buildings.includes('engineering');
+            const hasLibrary = appData.user.buildings.includes('library');
+
+            if (!isYpt) {
+                if (hasHumanities) finalXp = Math.round(finalXp * 1.1);
+                if (hasBusiness) finalCoins = Math.round(finalCoins * 1.1);
+            } else {
+                if (hasEngineering) finalCoins = Math.round(finalCoins * 1.2);
+            }
+
+            if (hasLibrary) {
+                finalXp = Math.round(finalXp * 1.3);
+                finalCoins = Math.round(finalCoins * 1.3);
+            }
+
+            window.gainXp(finalXp);
+            appData.user.snuCoins += finalCoins;
+
+            if (finalCoins > 0) {
+                showCoinEffect(finalCoins);
+            }
+
+            saveUserToCloud();
+            renderXpModal();
+        };
+
+        function showCoinEffect(amount) {
+            const container = document.getElementById('xpEffectsContainer');
+            if (!container) return;
+            const el = document.createElement('div');
+            el.className = 'xp-popup animate';
+            el.innerText = `+${amount} 🪙`;
+            el.style.color = '#F59E0B';
+            el.style.marginLeft = '60px'; // XP 이펙트와 겹치지 않게 오프셋 부여
+            container.appendChild(el);
+            setTimeout(() => { el.remove(); }, 1500);
+        }
+
+        const CAMPUS_BUILDINGS = [
+            { id: 'humanities', name: '인문관 🏛️', baseCost: 100, upgradeCostMultiplier: 2.2, buffDesc: '완료 XP +10% / 층', icon: '🏛️' },
+            { id: 'business', name: '경영대학 🏢', baseCost: 200, upgradeCostMultiplier: 2.5, buffDesc: '완료 코인 +10% / 층', icon: '🏢' },
+            { id: 'engineering', name: '공과대학 🚀', baseCost: 350, upgradeCostMultiplier: 2.3, buffDesc: '동기화 코인 +10% / 층', icon: '🚀' },
+            { id: 'kyujanggak', name: '규장각 📜', baseCost: 500, upgradeCostMultiplier: 2.4, buffDesc: '동기화 XP 보너스 +10% / 층', icon: '📜' },
+            { id: 'library', name: '중앙도서관 🎓', baseCost: 800, upgradeCostMultiplier: 2.5, buffDesc: '최종 XP&코인 곱배율 +10% / 층', icon: '🎓' }
+        ];
+
+        const CAMPUS_BOOSTERS = [
+            { id: 'hotSix', name: '🔋 핫식스', cost: 30, desc: '오늘 YPT 동기화 XP 1.5배', icon: '🔋' },
+            { id: 'midnightCoffee', name: '☕ 밤샘 아메리카노', cost: 50, desc: '오늘 밤 12시이후 완료 코인 2배', icon: '☕' },
+            { id: 'snuBlessing', name: '👑 샤의 가호', cost: 100, desc: '오늘 모든 계획 XP & 코인 1.5배', icon: '👑' }
+        ];
+
+        const CAMPUS_DECOR = [
+            { id: 'pond', name: '🦆 자하연 오리', cost: 150, icon: '🦆' },
+            { id: 'shuttle', name: '🚌 교내 셔틀버스', cost: 300, icon: '🚌' },
+            { id: 'maple', name: '🍁 관악산 단풍나무', cost: 400, icon: '🍁' },
+            { id: 'fountain', name: '⛲ 행정관 앞 분수대', cost: 600, icon: '⛲' }
+        ];
+
+        let activeTab = 'buildings';
+        window.changeTab = function (tabName) {
+            activeTab = tabName;
+            window.renderCampusBuilder();
+        };
+
+        window.renderCampusBuilder = function () {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: {}, decorations: [], activeBoosters: {}, prestige: 0 };
+
+            // 데이터 호환성 복구
+            if (Array.isArray(appData.user.buildings)) {
+                const bArray = appData.user.buildings;
+                appData.user.buildings = {};
+                bArray.forEach(id => { appData.user.buildings[id] = 1; });
+            }
+            if (!appData.user.buildings) appData.user.buildings = {};
+            if (appData.user.snuCoins === undefined) appData.user.snuCoins = 0;
+            if (!appData.user.decorations) appData.user.decorations = [];
+            if (!appData.user.activeBoosters) appData.user.activeBoosters = {};
+            if (appData.user.prestige === undefined) appData.user.prestige = 0;
+
+            // 1. 보유 코인 표시 및 환생 표시 갱신
+            const coinEl = document.getElementById('snuCoinDisplay');
+            if (coinEl) {
+                const badgeHtml = appData.user.prestige > 0 ? ` <span style="color:#D0872E; font-size:0.8rem; font-weight:800; background:rgba(253,224,71,0.15); padding:1px 6px; border-radius:10px; border:1px solid rgba(253,224,71,0.3)">🎖️ 시즌 졸업 ${appData.user.prestige}회</span>` : '';
+                coinEl.innerHTML = `${appData.user.snuCoins.toLocaleString()} SNU${badgeHtml}`;
+            }
+
+            // 2. 미니 캠퍼스 맵 보드 갱신
+            const mapGrid = document.getElementById('mapGrid');
+            if (mapGrid) {
+                mapGrid.innerHTML = '';
+                const builtIds = Object.keys(appData.user.buildings);
+                const decors = appData.user.decorations;
+
+                if (builtIds.length === 0 && decors.length === 0) {
+                    mapGrid.innerHTML = `<div style="color:rgba(255,255,255,0.4); font-size:0.85rem; font-weight:700; text-align:center;">아직 캠퍼스에 건물이 없습니다.<br>우측 상점에서 건물을 업그레이드해주세요!</div>`;
+                } else {
+                    // 단과대 그리기
+                    builtIds.forEach(bId => {
+                        const bData = CAMPUS_BUILDINGS.find(x => x.id === bId);
+                        const lvl = appData.user.buildings[bId] || 0;
+                        if (bData && lvl > 0) {
+                            const bDiv = document.createElement('div');
+                            bDiv.className = 'map-building-icon';
+                            bDiv.innerHTML = `
+                                <span>${bData.icon}</span>
+                                <div class="map-building-name">${bData.name.split(' ')[0]}</div>
+                                <span style="position:absolute; top:-4px; right:-4px; font-size:0.6rem; font-weight:900; background:#EF4444; color:#fff; padding:1px 4px; border-radius:6px; line-height:1;">L${lvl}</span>
+                            `;
+                            mapGrid.appendChild(bDiv);
+                        }
+                    });
+                    // 조경 그리기
+                    decors.forEach(dId => {
+                        const dData = CAMPUS_DECOR.find(x => x.id === dId);
+                        if (dData) {
+                            const bDiv = document.createElement('div');
+                            bDiv.className = 'map-building-icon';
+                            bDiv.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                            bDiv.innerHTML = `
+                                <span>${dData.icon}</span>
+                                <div class="map-building-name" style="color:#10B981;">${dData.name.split(' ')[1]}</div>
+                            `;
+                            mapGrid.appendChild(bDiv);
+                        }
+                    });
+                }
+            }
+
+            // 3. 건물 상점/도핑/졸업 탭 목록 갱신
+            const shopList = document.getElementById('buildingShopList');
+            if (shopList) {
+                shopList.innerHTML = '';
+
+                // 액티브 탭 클래스 및 버튼 갱신
+                const tabs = document.querySelectorAll('.shop-tab-btn');
+                tabs.forEach(t => {
+                    if (t.getAttribute('data-tab') === activeTab) t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+
+                if (activeTab === 'buildings') {
+                    // 단과대 업그레이드
+                    CAMPUS_BUILDINGS.forEach(b => {
+                        const lvl = appData.user.buildings[b.id] || 0;
+                        const nextCost = lvl === 0 ? b.baseCost : Math.round(b.baseCost * Math.pow(b.upgradeCostMultiplier, lvl));
+                        const canAfford = appData.user.snuCoins >= nextCost;
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = `shop-item ${lvl === 5 ? 'purchased' : ''}`;
+
+                        let buttonHtml = '';
+                        if (lvl === 5) {
+                            buttonHtml = `<button class="btn-buy" disabled>최종 완공 ✓</button>`;
+                        } else {
+                            buttonHtml = `<button class="btn-buy" onclick="window.buyOrUpgradeBuilding('${b.id}')" ${canAfford ? '' : 'disabled'}>${lvl === 0 ? '건설' : '증축'} (🪙 ${nextCost})</button>`;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <div style="display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; padding-right:10px;">
+                                <div style="font-weight:800; font-size:0.9rem; color:var(--text-main); display:flex; align-items:center; gap:5px;">
+                                    <span>${b.name}</span>
+                                    <span style="font-size:0.75rem; color:var(--accent); font-weight:800;">현재 층: ${lvl}/5F</span>
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--text-sub); font-weight:700;">${b.buffDesc}</div>
+                            </div>
+                            <div>${buttonHtml}</div>
+                        `;
+                        shopList.appendChild(itemDiv);
+                    });
+                } else if (activeTab === 'boosters') {
+                    // 도핑 포션
+                    CAMPUS_BOOSTERS.forEach(bo => {
+                        const isActive = appData.user.activeBoosters[bo.id] || false;
+                        const canAfford = appData.user.snuCoins >= bo.cost;
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = `shop-item ${isActive ? 'purchased' : ''}`;
+
+                        let buttonHtml = '';
+                        if (isActive) {
+                            buttonHtml = `<button class="btn-buy" disabled style="background:#10B981">활성 상태</button>`;
+                        } else {
+                            buttonHtml = `<button class="btn-buy" onclick="window.buyBooster('${bo.id}')" ${canAfford ? '' : 'disabled'}>복용 (🪙 ${bo.cost})</button>`;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <div style="display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; padding-right:10px;">
+                                <div style="font-weight:800; font-size:0.9rem; color:var(--text-main); display:flex; align-items:center; gap:5px;">
+                                    <span>${bo.name}</span>
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--text-sub); font-weight:700;">${bo.desc}</div>
+                            </div>
+                            <div>${buttonHtml}</div>
+                        `;
+                        shopList.appendChild(itemDiv);
+                    });
+                } else if (activeTab === 'decors') {
+                    // 조경 데코
+                    CAMPUS_DECOR.forEach(d => {
+                        const isOwned = appData.user.decorations.includes(d.id);
+                        const canAfford = appData.user.snuCoins >= d.cost;
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = `shop-item ${isOwned ? 'purchased' : ''}`;
+
+                        let buttonHtml = '';
+                        if (isOwned) {
+                            buttonHtml = `<button class="btn-buy" disabled>배치 완료 ✓</button>`;
+                        } else {
+                            buttonHtml = `<button class="btn-buy" onclick="window.buyDecoration('${d.id}')" ${canAfford ? '' : 'disabled'}>배치 (🪙 ${d.cost})</button>`;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <div style="display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; padding-right:10px;">
+                                <div style="font-weight:800; font-size:0.9rem; color:var(--text-main); display:flex; align-items:center; gap:5px;">
+                                    <span>${d.name}</span>
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--text-sub); font-weight:700;">캠퍼스를 아기자기하게 조경합니다.</div>
+                            </div>
+                            <div>${buttonHtml}</div>
+                        `;
+                        shopList.appendChild(itemDiv);
+                    });
+                } else if (activeTab === 'prestige') {
+                    // 환생(시즌 졸업) 탭
+                    const isAllMax = CAMPUS_BUILDINGS.every(b => (appData.user.buildings[b.id] || 0) === 5);
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'shop-item';
+                    itemDiv.style.flexDirection = 'column';
+                    itemDiv.style.alignItems = 'stretch';
+                    itemDiv.style.gap = '12px';
+                    itemDiv.style.padding = '16px';
+                    itemDiv.style.background = 'rgba(253, 224, 71, 0.03)';
+                    itemDiv.style.borderColor = 'rgba(253, 224, 71, 0.2)';
+
+                    itemDiv.innerHTML = `
+                        <div style="text-align:center; display:flex; flex-direction:column; gap:6px;">
+                            <div style="font-size:1.8rem;">🎓</div>
+                            <div style="font-weight:900; font-size:1.05rem; color:#FDE047;">관악산 졸업식 (시즌 졸업)</div>
+                            <div style="font-size:0.78rem; color:var(--text-sub); line-height:1.4; font-weight:700;">
+                                모든 단과대 건물(5개)을 5층 만렙까지 완공하면 졸업이 활성화됩니다.<br>
+                                졸업 시 캠퍼스 건물/데코/코인이 리셋되며, 영구 보너스 <b>명예 훈장 🏅 (공부 효율 +5% 패시브)</b>을 얻고 새 시즌을 시작합니다.
+                            </div>
+                            <div style="font-size:0.8rem; font-weight:800; color:var(--accent); margin-top:4px;">
+                                현재 진척도: ${CAMPUS_BUILDINGS.filter(b => (appData.user.buildings[b.id] || 0) === 5).length} / 5 개 만공 완료
+                            </div>
+                        </div>
+                        <button class="btn-buy" onclick="window.prestigeCampus()" ${isAllMax ? '' : 'disabled'} style="width:100%; background:linear-gradient(135deg, #F59E0B, #D97706); height:40px; font-size:0.9rem;">
+                            🎓 시즌 졸업장 받기
+                        </button>
+                    `;
+                    shopList.appendChild(itemDiv);
+                }
+            }
+        };
+
+        window.buyOrUpgradeBuilding = function (bId) {
+            if (!appData.user) return;
+            if (!appData.user.buildings || Array.isArray(appData.user.buildings)) {
+                appData.user.buildings = {};
+            }
+            const currentLvl = appData.user.buildings[bId] || 0;
+            const bData = CAMPUS_BUILDINGS.find(x => x.id === bId);
+            if (!bData) return;
+
+            if (currentLvl >= 5) return alert("이미 5층 만렙까지 완공되었습니다!");
+
+            const cost = currentLvl === 0 ? bData.baseCost : Math.round(bData.baseCost * Math.pow(bData.upgradeCostMultiplier, currentLvl));
+
+            if (appData.user.snuCoins < cost) return alert("SNU 코인이 부족합니다!");
+
+            appData.user.snuCoins -= cost;
+            appData.user.buildings[bId] = currentLvl + 1;
+
+            const toast = document.getElementById('capToast');
+            if (toast) {
+                toast.innerText = currentLvl === 0
+                    ? `🏗️ [${bData.name}] 1층이 신축되었습니다!`
+                    : `🏗️ [${bData.name}]이 ${currentLvl + 1}층으로 증축되었습니다!`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            }
+
+            saveUserToCloud();
+            renderXpModal();
+        };
+
+        window.buyBooster = function (boosterId) {
+            if (!appData.user) return;
+            if (!appData.user.activeBoosters) appData.user.activeBoosters = {};
+            if (appData.user.activeBoosters[boosterId]) return alert("이미 오늘 활성화한 도핑 보스터입니다!");
+
+            const bData = CAMPUS_BOOSTERS.find(x => x.id === boosterId);
+            if (!bData) return;
+
+            if (appData.user.snuCoins < bData.cost) return alert("SNU 코인이 부족합니다!");
+
+            appData.user.snuCoins -= bData.cost;
+            appData.user.activeBoosters[boosterId] = true;
+
+            const toast = document.getElementById('capToast');
+            if (toast) {
+                toast.innerText = `🔋 [${bData.name}] 버프가 적용되었습니다 (오늘 하루 유지)`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            }
+
+            saveUserToCloud();
+            renderXpModal();
+        };
+
+        window.buyDecoration = function (decorId) {
+            if (!appData.user) return;
+            if (!appData.user.decorations) appData.user.decorations = [];
+            if (appData.user.decorations.includes(decorId)) return alert("이미 구매한 조경 장식입니다!");
+
+            const dData = CAMPUS_DECOR.find(x => x.id === decorId);
+            if (!dData) return;
+
+            if (appData.user.snuCoins < dData.cost) return alert("SNU 코인이 부족합니다!");
+
+            appData.user.snuCoins -= dData.cost;
+            appData.user.decorations.push(decorId);
+
+            const toast = document.getElementById('capToast');
+            if (toast) {
+                toast.innerText = `⛲ 조경 [${dData.name}]이 캠퍼스 맵에 추가되었습니다!`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            }
+
+            saveUserToCloud();
+            renderXpModal();
+        };
+
+        window.prestigeCampus = function () {
+            if (!appData.user) return;
+
+            // 모든 건물이 만렙(Lv.5)인지 체크
+            const isAllMax = CAMPUS_BUILDINGS.every(b => (appData.user.buildings[b.id] || 0) === 5);
+            if (!isAllMax) return alert("모든 단과대 건물을 5층 만렙까지 건설해야 시즌 졸업이 가능합니다!");
+
+            if (!confirm("🎓 현재 캠퍼스를 시즌 졸업(환생)하시겠습니까?\n\n- 캠퍼스 건물과 데코레이션이 리셋됩니다.\n- 보유 SNU 코인이 0으로 초기화됩니다.\n- 영구 보너스 [서울대 명예 훈장 🏅] 1개를 획득합니다 (효율 +5% 누적).\n- 명예의 전당 보너스를 안고 새 시즌을 시작합니다.")) return;
+
+            appData.user.prestige = (appData.user.prestige || 0) + 1;
+            appData.user.buildings = {};
+            appData.user.decorations = [];
+            appData.user.snuCoins = 0;
+            appData.user.activeBoosters = {};
+
+            const toast = document.getElementById('capToast');
+            if (toast) {
+                toast.innerText = `🎓 축하합니다! 시즌 졸업 달성! 명예 훈장(🏅) 획득!`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            }
+
+            saveUserToCloud();
+            renderXpModal();
         };
 
         function showXpEffect(amount) {
@@ -4052,7 +4941,7 @@
         };
 
         function renderXpModal() {
-            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30 };
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] };
             const { level, xp, nextXp } = appData.user;
 
             // 모달 내부 갱신
@@ -4074,6 +4963,7 @@
             if (calBarEl) calBarEl.style.width = `${Math.min((xp / nextXp) * 100, 100)}%`;
 
             renderCampusEvolution();
+            window.renderCampusBuilder(); // 캠퍼스 빌더 동시 렌더링
         }
 
         function renderCampusEvolution() {
@@ -4083,14 +4973,42 @@
             const msg = document.getElementById('campusMsg');
             if (!widget || !msg) return;
 
-            widget.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5');
+            widget.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5', 'stage-6', 'stage-7', 'stage-8', 'stage-9', 'stage-10');
 
-            if (lvl <= 3) { widget.classList.add('stage-1'); msg.innerText = "오늘의 공부 씨앗을 심어주세요."; }
-            else if (lvl <= 7) { widget.classList.add('stage-2'); msg.innerText = "기초가 탄탄해지고 있습니다!"; }
-            else if (lvl <= 11) { widget.classList.add('stage-3'); msg.innerText = "구조가 완성되었습니다. (콘크리트 양생)"; }
-            else if (lvl <= 15) { widget.classList.add('stage-4'); msg.innerText = "지식이 뿌리내렸습니다. (조경 완료)"; }
-            else { widget.classList.add('stage-5'); msg.innerText = "완벽한 하루! 수고하셨습니다. 🎇"; }
+            if (lvl <= 1) {
+                widget.classList.add('stage-1');
+                msg.innerText = "오늘의 공부 씨앗을 심어주세요.";
+            } else if (lvl <= 3) {
+                widget.classList.add('stage-2');
+                msg.innerText = "새싹이 자라나며 기초 지반을 다지고 있습니다.";
+            } else if (lvl <= 5) {
+                widget.classList.add('stage-3');
+                msg.innerText = "정문 좌측 S자 형태의 거푸집 설치 공사가 시작되었습니다!";
+            } else if (lvl <= 7) {
+                widget.classList.add('stage-4');
+                msg.innerText = "정문 우측 ㄱ자 형태 구조물이 올라오며 균형을 맞춥니다.";
+            } else if (lvl <= 9) {
+                widget.classList.add('stage-5');
+                msg.innerText = "기둥을 잇는 상단 대들보 철골이 완성되었습니다!";
+            } else if (lvl <= 11) {
+                widget.classList.add('stage-6');
+                msg.innerText = "거푸집이 해체되고 백색 외벽의 '샤' 정문이 우뚝 섰습니다.";
+            } else if (lvl <= 13) {
+                widget.classList.add('stage-7');
+                msg.innerText = "정문 양옆으로 파란 잔디밭과 묘목이 심어졌습니다.";
+            } else if (lvl <= 15) {
+                widget.classList.add('stage-8');
+                msg.innerText = "정문 뒤로 푸른 관악산의 아침 햇살과 하늘이 펼쳐집니다!";
+            } else if (lvl <= 17) {
+                widget.classList.add('stage-9');
+                msg.innerText = "은은한 조명이 켜지며 밤하늘 아래 정문이 찬란하게 빛납니다.";
+            } else {
+                widget.classList.add('stage-10');
+                msg.innerText = "완벽 달성! 학사모 엠블럼과 오로라가 정문을 감싸 안습니다!";
+            }
         }
+
+
 
         document.addEventListener('DOMContentLoaded', () => {
             const docRef = doc(db, "users", USER_DOC_ID);
@@ -4126,9 +5044,17 @@
                     appData.inboxTasks = data.inboxTasks || [];
                     appData.user = data.user || { level: 1, xp: 0, nextXp: 30 };
                     appData.lastDate = data.lastDate || getRealTodayString();
+                    if (data.calendarHistory) appData.calendarHistory = data.calendarHistory;
+                    if (data.lastYptTime) appData.lastYptTime = data.lastYptTime;
 
                     // 일일 초기화(오전 5시 기준) 점검
-                    checkDailyReset();
+                    const isReset = checkDailyReset();
+
+                    // 열품타(YPT) 공부 시간 실시간 동기화
+                    if (!isReset) {
+                        const remoteYptTime = data.ypt_time || "00:00:00";
+                        window.processYptUpdate(remoteYptTime);
+                    }
                 }
 
                 try {
@@ -4464,8 +5390,8 @@
                 delete task.originalSpace;
             }
 
-            // 경험치 지급
-            window.gainXp(task.done ? 10 : -10);
+            // 경험치 및 코인 지급
+            window.gainXpAndCoins(task.done ? 10 : -10, task.done ? 10 : -10);
 
             renderInboxTasks();
             renderSpaces();
@@ -4701,7 +5627,7 @@
             });
 
             if (todayTaskFound || selectedDateStr === getStudyDateString()) {
-                window.gainXp(chapter.done ? 10 : -10);
+                window.gainXpAndCoins(chapter.done ? 10 : -10, chapter.done ? 10 : -10);
             }
 
             renderBooks();
@@ -5325,7 +6251,23 @@
             }
             previewHtml += '</div>';
 
+            // ✅ 히트맵 좌측 에지 스트립 (경험치 레벨 기반 - 단일 색상 진하기 변화)
+            let heatmapHtml = '';
+            if (!isOtherMonth) {
+                const historyEntry = appData.calendarHistory ? appData.calendarHistory[dateKey] : null;
+                if (historyEntry && typeof historyEntry === 'object' && (historyEntry.level || 0) > 0) {
+                    const level = historyEntry.level;
+                    // 레벨에 따라 높이(25%~100%)와 불투명도(0.2~1.0) 비례
+                    const maxLevel = 16;
+                    const ratio = Math.min(level / maxLevel, 1);
+                    const heightPct = Math.max(25, Math.round(ratio * 100));
+                    const opacity = Math.min(0.2 + (ratio * 0.8), 1).toFixed(2);
+                    heatmapHtml = `<div class="heatmap-edge" style="height:${heightPct}%; opacity:${opacity};"></div>`;
+                }
+            }
+
             cell.innerHTML = `
+                ${heatmapHtml}
                 <div class="cell-top-bar" style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:4px;">
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div class="date-num">${day}</div>
@@ -5464,6 +6406,28 @@
 
             document.getElementById('selectedDayName').innerText = dayNames[dateObj.getDay()];
             document.getElementById('selectedDateDisplay').innerText = selectedDateStr;
+
+            // ✅ 공부 기록 배지 렌더링
+            let studyBadgeContainer = document.getElementById('studyRecordBadge');
+            if (!studyBadgeContainer) {
+                studyBadgeContainer = document.createElement('div');
+                studyBadgeContainer.id = 'studyRecordBadge';
+                const dateDisplay = document.getElementById('selectedDateDisplay');
+                if (dateDisplay && dateDisplay.parentNode) {
+                    dateDisplay.parentNode.insertBefore(studyBadgeContainer, dateDisplay.nextSibling);
+                }
+            }
+            const histEntry = appData.calendarHistory ? appData.calendarHistory[selectedDateStr] : null;
+            if (histEntry && typeof histEntry === 'object' && (histEntry.level || 0) > 0) {
+                studyBadgeContainer.className = 'study-record-badge';
+                studyBadgeContainer.innerHTML = `
+                    <div class="badge-item"><span>🔥</span> <span class="badge-level">달성 Lv. ${histEntry.level}</span></div>
+                    <div class="badge-item"><span>🕒</span> <span class="badge-time">${histEntry.time || '00:00:00'}</span> 공부함</div>
+                `;
+            } else {
+                studyBadgeContainer.className = '';
+                studyBadgeContainer.innerHTML = '';
+            }
 
             const scheduleList = document.getElementById('scheduleList');
             const planList = document.getElementById('planList');
@@ -5652,9 +6616,9 @@
             const task = appData.dailyPlanner[dateKey].tasks[idx];
             task.done = !task.done;
 
-            // 경험치 지급 (오늘 날짜의 계획일 때만)
+            // 경험치 및 코인 지급 (오늘 날짜의 계획일 때만)
             if (dateKey === getStudyDateString()) {
-                window.gainXp(task.done ? 10 : -10);
+                window.gainXpAndCoins(task.done ? 10 : -10, task.done ? 10 : -10);
             }
 
             if (task.type === 'study' && task.bookId != null && task.chapterIdx != null) {
