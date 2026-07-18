@@ -4349,7 +4349,7 @@
             wrongNotes: [],
             spaces: ['Work', 'Personal', 'Routines', '미분류'],
             inboxTasks: [],
-            user: { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] },
+            user: { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: {} },
             lastDate: "",
             calendarHistory: {},
             lastYptTime: "00:00:00"
@@ -4510,8 +4510,8 @@
             }
         }
 
-        window.gainXp = function (amount) {
-            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] };
+        window.gainXp = function (amount, shouldSave = true) {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: {} };
             appData.user.xp += amount;
             let leveledUp = false;
             while (appData.user.xp >= appData.user.nextXp) {
@@ -4541,7 +4541,9 @@
                 appData.calendarHistory[today] = { level: appData.user.level, time: appData.lastYptTime || "00:00:00" };
             }
 
-            saveUserToCloud();
+            if (shouldSave) {
+                saveUserToCloud();
+            }
 
             // 모달이 열려있는 상태라면 바로 갱신
             const xpModal = document.getElementById('xpModal');
@@ -4551,18 +4553,26 @@
         };
 
         // 코인과 경험치를 동시에 처리하는 버프 통합 함수
-        window.gainXpAndCoins = function (xpAmount, coinAmount, isYpt = false) {
-            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] };
+        window.gainXpAndCoins = function (xpAmount, coinAmount, isYpt = false, shouldSave = true) {
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: {} };
             if (appData.user.snuCoins === undefined) appData.user.snuCoins = 0;
-            if (!appData.user.buildings) appData.user.buildings = [];
+            if (!appData.user.buildings) appData.user.buildings = {};
 
             let finalXp = xpAmount;
             let finalCoins = coinAmount;
 
-            const hasHumanities = appData.user.buildings.includes('humanities');
-            const hasBusiness = appData.user.buildings.includes('business');
-            const hasEngineering = appData.user.buildings.includes('engineering');
-            const hasLibrary = appData.user.buildings.includes('library');
+            const hasBuilding = (id) => {
+                if (!appData.user.buildings) return false;
+                if (Array.isArray(appData.user.buildings)) {
+                    return appData.user.buildings.includes(id);
+                }
+                return !!appData.user.buildings[id];
+            };
+
+            const hasHumanities = hasBuilding('humanities');
+            const hasBusiness = hasBuilding('business');
+            const hasEngineering = hasBuilding('engineering');
+            const hasLibrary = hasBuilding('library');
 
             if (!isYpt) {
                 if (hasHumanities) finalXp = Math.round(finalXp * 1.1);
@@ -4576,14 +4586,16 @@
                 finalCoins = Math.round(finalCoins * 1.3);
             }
 
-            window.gainXp(finalXp);
+            window.gainXp(finalXp, false);
             appData.user.snuCoins += finalCoins;
 
             if (finalCoins > 0) {
                 showCoinEffect(finalCoins);
             }
 
-            saveUserToCloud();
+            if (shouldSave) {
+                saveUserToCloud();
+            }
             renderXpModal();
         };
 
@@ -4594,7 +4606,7 @@
             el.className = 'xp-popup animate';
             el.innerText = `+${amount} 🪙`;
             el.style.color = '#F59E0B';
-            el.style.marginLeft = '60px'; // XP 이펙트와 겹치지 않게 오프셋 부여
+            el.style.left = '58%'; // 우측 58% 위치에 생성하여 XP와 겹침 방지
             container.appendChild(el);
             setTimeout(() => { el.remove(); }, 1500);
         }
@@ -4931,6 +4943,7 @@
             el.className = 'xp-popup animate';
             el.innerText = amount > 0 ? `+${amount} XP` : `${amount} XP`;
             el.style.color = amount > 0 ? '#F59E0B' : '#94A3B8';
+            el.style.left = '42%'; // 좌측 42% 위치에 생성하여 코인과 겹침 방지
             container.appendChild(el);
             setTimeout(() => { el.remove(); }, 1500);
         }
@@ -4941,7 +4954,7 @@
         };
 
         function renderXpModal() {
-            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: [] };
+            if (!appData.user) appData.user = { level: 1, xp: 0, nextXp: 30, snuCoins: 0, buildings: {} };
             const { level, xp, nextXp } = appData.user;
 
             // 모달 내부 갱신
@@ -5362,7 +5375,7 @@
 
                 div.innerHTML = `
                     <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
-                        <div class="inbox-task-checkbox" onclick="toggleInboxTaskDone(${task.id})">
+                        <div class="inbox-task-checkbox" onclick="toggleInboxTaskDone(${task.id}, event)">
                             ${task.done ? '<span class="inbox-task-checkbox-checked">✓</span>' : ''}
                         </div>
                         <span class="inbox-task-text truncate-text" style="flex:1;">${task.content}</span>
@@ -5376,8 +5389,9 @@
             });
         };
 
-        window.toggleInboxTaskDone = async function (taskId) {
-            const task = appData.inboxTasks.find(t => t.id === taskId);
+        window.toggleInboxTaskDone = async function (taskId, e) {
+            if (e) e.stopPropagation();
+            const task = appData.inboxTasks.find(t => t.id == taskId);
             if (!task) return;
             task.done = !task.done;
 
@@ -5390,13 +5404,17 @@
                 delete task.originalSpace;
             }
 
-            // 경험치 및 코인 지급
-            window.gainXpAndCoins(task.done ? 10 : -10, task.done ? 10 : -10);
+            // 경험치 및 코인 지급 (자체 저장을 미루고 일괄 저장)
+            window.gainXpAndCoins(task.done ? 10 : -10, task.done ? 10 : -10, false, false);
 
             renderInboxTasks();
             renderSpaces();
             try {
-                await setDoc(doc(db, "users", USER_DOC_ID), { inboxTasks: appData.inboxTasks }, { merge: true });
+                // 일괄 저장으로 레이스 컨디션 해결
+                await setDoc(doc(db, "users", USER_DOC_ID), { 
+                    user: appData.user, 
+                    inboxTasks: appData.inboxTasks 
+                }, { merge: true });
             } catch (err) {
                 console.error("Inbox Toggle Error:", err);
             }
@@ -5604,7 +5622,7 @@
         };
 
         window.toggleChapter = async (bookId, chIdx) => {
-            const idx = appData.books.findIndex(b => b.id === bookId);
+            const idx = appData.books.findIndex(b => b.id == bookId);
             if (idx === -1) return;
             const book = appData.books[idx];
             const chapter = book.chapters[chIdx];
@@ -5627,14 +5645,16 @@
             });
 
             if (todayTaskFound || selectedDateStr === getStudyDateString()) {
-                window.gainXpAndCoins(chapter.done ? 10 : -10, chapter.done ? 10 : -10);
+                window.gainXpAndCoins(chapter.done ? 10 : -10, chapter.done ? 10 : -10, false, false);
             }
 
             renderBooks();
             renderCalendarBody();
             renderDetailPanel();
             try {
+                // 일괄 저장으로 레이스 컨디션 해결
                 await setDoc(doc(db, "users", USER_DOC_ID), {
+                    user: appData.user,
                     books: appData.books,
                     dailyPlanner: appData.dailyPlanner
                 }, { merge: true });
@@ -6614,22 +6634,31 @@
         window.togglePlanDone = async (dateKey, idx, e) => {
             if (e) e.stopPropagation();
             const task = appData.dailyPlanner[dateKey].tasks[idx];
+            if (!task) return;
             task.done = !task.done;
 
             // 경험치 및 코인 지급 (오늘 날짜의 계획일 때만)
             if (dateKey === getStudyDateString()) {
-                window.gainXpAndCoins(task.done ? 10 : -10, task.done ? 10 : -10);
+                window.gainXpAndCoins(task.done ? 10 : -10, task.done ? 10 : -10, false, false);
             }
 
             if (task.type === 'study' && task.bookId != null && task.chapterIdx != null) {
                 const bookIndex = appData.books.findIndex(x => x.id == task.bookId);
                 if (bookIndex > -1 && appData.books[bookIndex].chapters[task.chapterIdx]) {
                     appData.books[bookIndex].chapters[task.chapterIdx].done = task.done;
-                    try { await setDoc(doc(db, "users", USER_DOC_ID), { books: appData.books }, { merge: true }); }
-                    catch (err) { console.error("Book Sync Error:", err); }
                 }
             }
-            renderCalendarBody(); renderDetailPanel(); await syncToFirebase();
+            renderCalendarBody(); renderDetailPanel(); 
+            try {
+                // 일괄 저장으로 레이스 컨디션 해결
+                await setDoc(doc(db, "users", USER_DOC_ID), { 
+                    user: appData.user,
+                    books: appData.books,
+                    dailyPlanner: appData.dailyPlanner 
+                }, { merge: true });
+            } catch (err) {
+                console.error("Plan Toggle Sync Error:", err);
+            }
         };
 
 
