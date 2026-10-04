@@ -10,47 +10,44 @@
 
     <style>
         :root {
-            /* ✅ 본문에 쓰일 밝고 모던한 색상 팔레트 */
-            --primary: #4B5563;
-            --primary-dark: #1F2937;
+            /* ⚡ 모던 엔지니어링 테크니컬 팔레트 (Linear / Raycast Style) */
+            --primary: #475569;
+            --primary-dark: #0F172A;
             --text-main: #0F172A;
             --text-sub: #475569;
             --text-muted: #94A3B8;
 
-            --border-outer: rgba(226, 232, 240, 0.8);
-            /* 깔끔하고 얇은 경계선 */
+            --border-outer: #E2E8F0;
             --border-inner: #F1F5F9;
 
             --success: #10B981;
             --danger: #EF4444;
             --accent: #2563EB;
-            --gemini: #A855F7;
+            --gemini: #8B5CF6;
 
             --bg-app: #F8FAFC;
-            /* 메인 본문 배경 산뜻한 연그레이 */
             --bg-panel: #FFFFFF;
-            /* 카드/패널 배경 */
-            --bg-offwhite: #F8FAFC;
-            /* 섹션 구분용 아주 밝은 회색 */
+            --bg-offwhite: #F1F5F9;
 
-            --radius-box: 24px;
-            --radius-item: 12px;
+            /* 샤프하고 단단한 엔지니어링 라운딩 */
+            --radius-box: 12px;
+            --radius-item: 6px;
 
-            /* 추가 테마 변수들 */
-            --bg-body: #E2E8F0;
-            --bg-shapes-1: radial-gradient(circle, #DBEAFE 0%, rgba(219, 234, 254, 0) 70%);
-            --bg-shapes-2: radial-gradient(circle, #FCE7F3 0%, rgba(252, 231, 243, 0) 70%);
+            /* 기본 테마 변수 */
+            --bg-body: #EEF2F6;
+            --bg-shapes-1: transparent;
+            --bg-shapes-2: transparent;
             --bg-loading: #FFFFFF;
 
-            --bg-sidenav: rgba(255, 255, 255, 0.65);
-            --border-sidenav: rgba(226, 232, 240, 0.8);
+            --bg-sidenav: #FFFFFF;
+            --border-sidenav: #E2E8F0;
             --text-nav-item: #64748B;
 
             --bg-btn-gemini: #FAF5FF;
             --border-btn-gemini: #E9D5FF;
             --bg-btn-gemini-hover: #F3E8FF;
 
-            --bg-cell-selected: #BFDBFE;
+            --bg-cell-selected: #EFF6FF;
             --bg-cell-other: #FAFAFA;
             --bg-cell-today-num: #DBEAFE;
 
@@ -79,9 +76,9 @@
             --bg-toolbar-btn-hover: rgba(0, 0, 0, 0.05);
             --divider-apple-toolbar: rgba(0, 0, 0, 0.1);
 
-            --bg-modal-overlay: rgba(17, 24, 39, 0.4);
+            --bg-modal-overlay: rgba(15, 23, 42, 0.45);
             --bg-modal-content: #FFFFFF;
-            --bg-btn-close-detail-hover: #E5E7EB;
+            --bg-btn-close-detail-hover: #F1F5F9;
 
             --bg-form-input: #FFFFFF;
             --border-form-input: var(--border-outer);
@@ -92,88 +89,85 @@
             --border-gemini-header: #E9D5FF;
             --bg-gemini-chat: #FFFFFF;
             --bg-gemini-input-area: #FFFFFF;
-            --bg-chat-bubble-bot: #F3F4F6;
-            --btn-save-hover: #111827;
+            --bg-chat-bubble-bot: #F8FAFC;
+            --btn-save-hover: #0F172A;
         }
 
         body.dark-theme {
             --primary: #94A3B8;
-            --primary-dark: #F1F5F9;
+            --primary-dark: #F8FAFC;
             --text-main: #F8FAFC;
-            --text-sub: #CBD5E1;
+            --text-sub: #94A3B8;
             --text-muted: #64748B;
 
-            --border-outer: rgba(255, 255, 255, 0.08);
-            --border-inner: #1E293B;
+            --border-outer: #1E293B;
+            --border-inner: #0F172A;
 
             --success: #34D399;
             --danger: #F87171;
             --accent: #3B82F6;
-            --gemini: #C084FC;
+            --gemini: #A78BFA;
 
-            --bg-app: #0B0F19;
-            /* Sleek slate-black */
-            --bg-panel: #111827;
-            /* Dark slate card background */
-            --bg-offwhite: #1F2937;
-            /* Dark gray for subtle section variation */
+            --bg-app: #090D16;
+            --bg-panel: #0F172A;
+            --bg-offwhite: #1E293B;
 
-            --bg-body: #030712;
-            --bg-shapes-1: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 70%);
-            --bg-shapes-2: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(168, 85, 247, 0) 70%);
-            --bg-loading: #0B0F19;
+            --bg-body: #050811;
+            --bg-shapes-1: transparent;
+            --bg-shapes-2: transparent;
+            --bg-loading: #090D16;
 
-            --bg-sidenav: rgba(17, 24, 39, 0.65);
-            --border-sidenav: rgba(255, 255, 255, 0.08);
+            --bg-sidenav: #0F172A;
+            --border-sidenav: #1E293B;
             --text-nav-item: #94A3B8;
 
             --bg-btn-gemini: #1E152A;
             --border-btn-gemini: #4C1D95;
             --bg-btn-gemini-hover: #2E1A47;
 
-            --bg-cell-selected: #1E3A8A;
-            --bg-cell-other: #0F172A;
+            --bg-cell-selected: #172554;
+            --bg-cell-other: #0B0F19;
             --bg-cell-today-num: #1E3A8A;
 
             --bg-mini-sch: #451A1A;
             --border-mini-sch: #991B1B;
             --bg-mini-task-hover: #1E293B;
 
-            --bg-week-header: #111827;
-            --bg-week-col: #111827;
+            --bg-week-header: #0F172A;
+            --bg-week-col: #0F172A;
 
-            --bg-day-card: #111827;
+            --bg-day-card: #0F172A;
             --border-day-card-hover: #334155;
 
-            --bg-list-card: #111827;
+            --bg-list-card: #0F172A;
             --border-list-card-hover: #334155;
             --border-checkbox: #475569;
 
             --bg-icon-hover: #1E293B;
 
-            --bg-memo-sidebar: #111827;
-            --bg-memo-item-hover: #1F2937;
+            --bg-memo-sidebar: #0F172A;
+            --bg-memo-item-hover: #1E293B;
             --bg-memo-item-active: #FFD230;
-            --bg-memo-editor: #0B0F19;
-            --bg-apple-toolbar: rgba(30, 41, 59, 0.85);
+            --bg-memo-editor: #090D16;
+            --bg-apple-toolbar: rgba(15, 23, 42, 0.9);
             --border-apple-toolbar: rgba(255, 255, 255, 0.1);
             --bg-toolbar-btn-hover: rgba(255, 255, 255, 0.08);
             --divider-apple-toolbar: rgba(255, 255, 255, 0.15);
 
-            --bg-modal-overlay: rgba(0, 0, 0, 0.6);
-            --bg-modal-content: #111827;
-            --bg-btn-close-detail-hover: #1F2937;
+            --bg-modal-overlay: rgba(0, 0, 0, 0.7);
+            --bg-modal-content: #0F172A;
+            --bg-btn-close-detail-hover: #1E293B;
 
-            --bg-form-input: #1F2937;
+            --bg-form-input: #1E293B;
             --border-form-input: #334155;
             --border-dark: #334155;
             --border-light: #1E293B;
 
             --bg-gemini-header: #1E152A;
             --border-gemini-header: #4C1D95;
-            --bg-gemini-chat: #111827;
-            --bg-gemini-input-area: #111827;
-            --bg-chat-bubble-bot: #1F2937;
+            --bg-gemini-chat: #0F172A;
+            --bg-gemini-input-area: #0F172A;
+            --bg-chat-bubble-bot: #1E293B;
             --btn-save-hover: #FFFFFF;
         }
 
@@ -412,52 +406,22 @@
             font-family: "Pretendard Variable", -apple-system, sans-serif !important;
         }
 
-        /* 바디 배경을 아주 미세한 연회색으로 처리하여 사이드바의 투명 유리 효과를 매치시킴 */
+        /* 바디 및 베이스 스타일 */
         body {
             font-size: 13px;
-            /* 14px -> 13px로 글로벌 폰트 축소 */
             height: 100vh;
             padding: 0;
             margin: 0;
             overflow: hidden;
             background-color: var(--bg-body);
             color: var(--text-main);
-            letter-spacing: -0.01em;
+            letter-spacing: -0.015em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .bg-shapes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.25;
-            border-radius: 50%;
-            filter: blur(80px);
-            transition: all 1s ease;
-        }
-
-        .shape-1 {
-            width: 80vw;
-            height: 80vw;
-            background: var(--bg-shapes-1);
-            bottom: -20%;
-            left: -10%;
-        }
-
-        .shape-2 {
-            width: 70vw;
-            height: 70vw;
-            background: var(--bg-shapes-2);
-            top: -30%;
-            right: -20%;
+            display: none !important;
         }
 
         #loadingScreen {
@@ -484,57 +448,62 @@
             position: relative;
         }
 
-        /* ✅ 사이드바 스타일 개편 (Arch Calendar 스타일) */
+        /* ✅ 엔지니어링 감성의 사이드바 스타일 (Linear Style) */
         .sidebar {
-            width: 230px;
+            width: 210px;
             background: var(--bg-sidenav);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
             border-right: 1px solid var(--border-sidenav);
             display: flex;
             flex-direction: column;
-            padding: 1.5rem 1rem;
+            padding: 1.1rem 0.75rem;
             z-index: 20;
             flex-shrink: 0;
-            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.02);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
 
         .sidebar.collapsed {
-            width: 65px;
-            padding: 1.5rem 0.5rem;
+            width: 58px;
+            padding: 1.1rem 0.4rem;
         }
 
         .sidebar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             width: 100%;
+            padding: 0 0.4rem;
         }
 
         .sidebar-title {
-            font-size: 1.15rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.03em;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .btn-sidebar-toggle {
             background: transparent;
             border: none;
-            color: var(--text-sub);
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.3s;
+            transition: transform 0.2s, color 0.2s;
+            border-radius: 4px;
+        }
+
+        .btn-sidebar-toggle:hover {
+            color: var(--text-main);
+            background: var(--bg-offwhite);
         }
 
         .sidebar.collapsed .btn-sidebar-toggle {
@@ -545,48 +514,55 @@
         .sidebar-menu {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.25rem;
             width: 100%;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .sidebar-menu-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: var(--text-nav-item);
             cursor: pointer;
-            padding: 0.6rem 0.8rem;
-            border-radius: 8px;
-            transition: all 0.2s;
+            padding: 0.45rem 0.65rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
             font-weight: 600;
+            font-size: 0.82rem;
             white-space: nowrap;
             overflow: hidden;
+            border: 1px solid transparent;
         }
 
-        .sidebar-menu-item:hover,
+        .sidebar-menu-item:hover {
+            color: var(--text-main);
+            background: var(--bg-offwhite);
+        }
+
         .sidebar-menu-item.active {
             color: var(--accent);
             background: rgba(37, 99, 235, 0.08);
+            font-weight: 700;
         }
 
         .sidebar-icon {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             stroke: currentColor;
-            stroke-width: 2.2;
+            stroke-width: 2;
             fill: none;
             flex-shrink: 0;
         }
 
         .sidebar-section-title {
-            font-size: 0.78rem;
-            font-weight: 800;
+            font-size: 0.68rem;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.8rem;
-            padding: 0 0.8rem;
+            letter-spacing: 0.07em;
+            margin-bottom: 0.6rem;
+            padding: 0 0.6rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -596,14 +572,18 @@
         .btn-add-space {
             background: transparent;
             border: none;
-            color: var(--text-sub);
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
+            padding: 0 4px;
+            border-radius: 4px;
+            line-height: 1;
         }
 
         .btn-add-space:hover {
             color: var(--accent);
+            background: var(--bg-offwhite);
         }
 
         .sidebar-space-list {
@@ -629,35 +609,35 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.5rem 0.8rem;
-            border-radius: 8px;
+            padding: 0.4rem 0.65rem;
+            border-radius: 6px;
             cursor: pointer;
             color: var(--text-sub);
             font-weight: 600;
-            transition: 0.2s;
+            transition: 0.15s ease;
             white-space: nowrap;
             overflow: hidden;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             border: 1px solid transparent;
         }
 
         .sidebar-space-item:hover {
-            background: var(--bg-icon-hover);
+            background: var(--bg-offwhite);
             color: var(--text-main);
         }
 
         .sidebar-space-item.active {
-            background: rgba(37, 99, 235, 0.16);
+            background: rgba(37, 99, 235, 0.08);
             color: var(--accent);
-            font-weight: 800;
+            font-weight: 700;
             border-color: transparent;
         }
 
         /* 스페이스 수정/삭제 이모지 버튼 스타일 */
         .space-actions {
             display: none;
-            gap: 6px;
-            margin-left: 8px;
+            gap: 4px;
+            margin-left: 6px;
             flex-shrink: 0;
         }
 
@@ -668,9 +648,9 @@
 
         .space-action-btn {
             font-size: 0.72rem;
-            opacity: 0.55;
+            opacity: 0.6;
             cursor: pointer;
-            transition: opacity 0.2s, transform 0.2s;
+            transition: opacity 0.15s, transform 0.15s;
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -681,13 +661,12 @@
 
         .space-action-btn:hover {
             opacity: 1;
-            transform: scale(1.15);
-            background: var(--bg-icon-hover);
+            background: var(--border-outer);
         }
 
         .sidebar-space-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             flex-shrink: 0;
         }
@@ -695,26 +674,27 @@
         .sidebar-footer {
             margin-top: auto;
             width: 100%;
-            border-top: 1px solid var(--border-inner);
-            padding-top: 1rem;
+            border-top: 1px solid var(--border-outer);
+            padding-top: 0.8rem;
         }
 
         .sidebar-footer-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: var(--text-nav-item);
             cursor: pointer;
-            padding: 0.6rem 0.8rem;
-            border-radius: 8px;
-            transition: all 0.2s;
+            padding: 0.45rem 0.65rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
             font-weight: 600;
+            font-size: 0.82rem;
             white-space: nowrap;
             overflow: hidden;
         }
 
         .sidebar-footer-item:hover {
-            background: var(--bg-icon-hover);
+            background: var(--bg-offwhite);
             color: var(--text-main);
         }
 
@@ -726,33 +706,33 @@
         .sidebar.collapsed .sidebar-menu-item,
         .sidebar.collapsed .sidebar-footer-item {
             justify-content: center;
-            padding: 0.6rem 0;
+            padding: 0.5rem 0;
         }
 
         .sidebar.collapsed .sidebar-space-item {
             justify-content: center;
-            padding: 0.5rem 0;
+            padding: 0.4rem 0;
         }
 
         .sidebar.collapsed .sidebar-space-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
         }
 
-        /* ✅ 인박스 패널 스타일 추가 */
+        /* ✅ 엔지니어링 감성의 인박스 패널 */
         .inbox-panel {
-            width: 220px;
+            width: 210px;
             background: var(--bg-panel);
             border-right: 1px solid var(--border-outer);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
             z-index: 10;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, border-color 0.3s;
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .inbox-header {
-            padding: 1.2rem 1rem 0.8rem 1rem;
+            padding: 1rem 0.85rem 0.65rem 0.85rem;
             border-bottom: 1px solid var(--border-inner);
         }
 
@@ -943,37 +923,38 @@
         .view-btn {
             border: none;
             background: transparent;
-            padding: 5px 12px;
-            font-size: 0.8rem;
-            font-weight: 700;
+            padding: 4px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
             color: var(--text-sub);
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
         .view-btn.active {
             background: var(--bg-panel);
             color: var(--text-main);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            font-weight: 700;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
         .btn-action {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-main);
             background: var(--bg-panel);
             border: 1px solid var(--border-outer);
-            padding: 5px 12px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: 0.2s;
-            font-weight: 700;
+            transition: all 0.15s ease;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -981,15 +962,13 @@
 
         .btn-action:hover {
             background: var(--bg-offwhite);
-            transform: translateY(-1px);
+            border-color: var(--border-dark);
         }
 
-
-        /* ✅ Padding 대폭 축소하여 캘린더 영역 확장 */
         .main-grid {
             display: flex;
-            gap: 1rem;
-            padding: 30px 20px 13px 20px;
+            gap: 0.85rem;
+            padding: 14px 16px;
             height: 100%;
             min-height: 0;
             overflow: hidden;
@@ -997,13 +976,13 @@
 
         .calendar-panel {
             flex: 1;
-            padding: 1.2rem 1.5rem;
+            padding: 1rem 1.25rem;
             display: flex;
             flex-direction: column;
             background: var(--bg-panel);
             border-radius: var(--radius-box);
             min-height: 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-outer);
         }
 
@@ -1011,40 +990,43 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             flex-shrink: 0;
         }
 
         .month-title {
-            font-size: 1.6rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--text-main);
-            letter-spacing: -0.02em;
-            transition: 0.3s ease;
+            letter-spacing: -0.025em;
+            transition: 0.2s ease;
         }
 
         .cal-nav {
             display: flex;
-            gap: 0.4rem;
+            gap: 0.3rem;
         }
 
         .btn-nav {
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            background: var(--bg-icon-hover);
-            border: none;
-            font-size: 1.1rem;
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-outer);
+            font-size: 0.85rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: 0.2s;
-            color: var(--text-main);
+            transition: all 0.15s ease;
+            color: var(--text-sub);
         }
 
         .btn-nav:hover {
-            background: var(--border-outer);
+            background: var(--bg-offwhite);
+            color: var(--text-main);
+            border-color: var(--border-dark);
         }
 
         #calendarBody {
@@ -1218,38 +1200,38 @@
 
         .mini-schedule {
             flex-shrink: 0;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 4px 8px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            padding: 3px 6px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 6px;
+            transition: all 0.15s ease;
+            border-radius: 4px;
             border: none !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
 
         .mini-schedule:hover {
-            opacity: 0.9;
-            transform: translateY(-0.5px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0.88;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         }
 
         .mini-task {
             flex-shrink: 0;
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             background: var(--bg-offwhite);
             padding: 3px 6px;
             border-radius: 4px;
             font-weight: 600;
             color: var(--text-main);
             border: 1px solid var(--border-outer);
-            border-left: 3px solid var(--primary-dark);
+            border-left: 2.5px solid var(--primary-dark);
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.15s ease;
         }
 
         .mini-task:hover {
             background: var(--bg-mini-task-hover);
+            border-color: var(--border-dark);
         }
 
         .mini-task.done {
@@ -1381,11 +1363,11 @@
         }
 
         .week-day-name {
-            font-size: 0.75rem;
+            font-size: 0.67rem;
             font-weight: 700;
-            color: var(--text-sub);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.08em;
             transition: color 0.15s ease;
         }
 
@@ -1395,25 +1377,25 @@
         }
 
         .week-day-num {
-            font-size: 1.2rem;
-            font-weight: 800;
+            font-size: 1.15rem;
+            font-weight: 700;
             color: var(--text-main);
-            margin: 4px auto 0;
-            width: 36px;
-            height: 36px;
+            margin: 3px auto 0;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             border: 2px solid transparent;
             box-sizing: border-box;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .week-header-cell.today .week-day-num {
             color: var(--accent);
-            border: 2px solid var(--accent);
-            font-weight: 900;
+            border: 1.5px solid var(--accent);
+            font-weight: 800;
         }
 
         /* ✅ 선택된 날짜는 Week뷰 상단 날짜(숫자)를 뚜렷한 동그라미로 둘러싸서 강조 */
@@ -1422,8 +1404,8 @@
             background: var(--accent) !important;
             color: #ffffff !important;
             border: 2px solid var(--accent) !important;
-            font-weight: 900 !important;
-            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45) !important;
+            font-weight: 800 !important;
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.3) !important;
         }
 
         .week-header-cell.today.selected .week-day-num,
@@ -1431,8 +1413,8 @@
             background: var(--accent) !important;
             color: #ffffff !important;
             border: 2px solid #ffffff !important;
-            outline: 2px solid var(--accent) !important;
-            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5) !important;
+            outline: 1.5px solid var(--accent) !important;
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35) !important;
         }
 
         .week-grid-body {
@@ -1443,23 +1425,22 @@
             overflow-y: auto;
             min-height: 0;
             align-items: stretch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
         .week-grid-body::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .week-grid-body::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 3px;
+            display: none;
+            width: 0px;
+            height: 0px;
         }
 
         .week-col {
             background: var(--bg-week-col);
-            padding: 10px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             min-height: 100%;
             cursor: pointer;
             min-width: 0;
@@ -1580,27 +1561,27 @@
         }
 
         .detail-header {
-            padding: 1rem 1.2rem;
+            padding: 0.85rem 1rem;
             text-align: left;
             border-bottom: 1px solid var(--border-outer);
             flex-shrink: 0;
-            background: var(--bg-offwhite);
+            background: var(--bg-panel);
         }
 
         .selected-day-display {
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             color: var(--accent);
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
         }
 
         .selected-date-display {
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--text-main);
-            letter-spacing: -0.03em;
-            margin-top: 2px;
+            letter-spacing: -0.025em;
+            margin-top: 1px;
         }
 
         /* ✅ 수정 4: Schedules 세로 길이 대폭 연장 */
@@ -1609,8 +1590,8 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
-            padding: 1rem;
-            gap: 1rem;
+            padding: 0.85rem 1rem;
+            gap: 0.85rem;
         }
 
         .section-wrapper {
@@ -1620,40 +1601,36 @@
         }
 
         .section-schedules {
-            flex: 0.6;
+            flex: 0.7;
         }
 
-        /* 기존 0.6에서 1로 비율 확대 */
         .section-plans {
-            flex: 1.4;
+            flex: 1.3;
         }
-
-        /* 기존 1.4에서 1로 조절하여 50:50 분배 */
 
         .section-title {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--text-sub);
-            margin-bottom: 0.8rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
         }
 
         .btn-add-sm {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 0.3rem 0.6rem;
+            padding: 2px 7px;
             border-radius: 4px;
-            font-weight: 700;
-            font-size: 0.75rem;
+            font-weight: 600;
+            font-size: 0.72rem;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+            transition: all 0.15s ease;
         }
 
         .btn-add-sm:hover {
@@ -1664,12 +1641,12 @@
             background: var(--bg-panel);
             color: var(--text-main);
             border: 1px solid var(--border-outer);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
 
         .btn-add-sch:hover {
             background: var(--bg-offwhite);
-            color: var(--primary);
+            color: var(--text-main);
+            border-color: var(--border-dark);
         }
 
         .item-list {
@@ -1677,9 +1654,9 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.35rem;
             min-height: 0;
-            padding-right: 4px;
+            padding-right: 2px;
         }
 
         .item-list::-webkit-scrollbar {
@@ -1687,40 +1664,40 @@
         }
 
         .item-list::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 2px;
         }
 
         .list-card {
             background: var(--bg-list-card);
             border: 1px solid var(--border-outer);
-            padding: 0.6rem 0.8rem;
-            border-radius: 8px;
+            padding: 0.45rem 0.65rem;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
-            gap: 10px;
-            transition: 0.2s;
+            gap: 8px;
+            transition: all 0.15s ease;
         }
 
         .list-card:hover {
-            border-color: var(--border-list-card-hover);
-            transform: translateX(2px);
+            border-color: var(--border-dark);
+            background: var(--bg-offwhite);
         }
 
         .custom-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border-checkbox);
-            border-radius: 5px;
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--border-checkbox);
+            border-radius: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             flex-shrink: 0;
             background: transparent;
-            transition: 0.2s;
+            transition: 0.15s ease;
         }
 
         .custom-checkbox:hover {
@@ -1735,16 +1712,16 @@
         .list-card.done .custom-checkbox::after {
             content: '✓';
             color: white;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
         }
 
         .list-content {
             flex: 1;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-main);
             font-size: 0.8rem;
-            line-height: 1.3;
+            line-height: 1.35;
             word-break: break-word;
         }
 
@@ -2022,17 +1999,252 @@
 
         .modal-content {
             background: var(--bg-modal-content);
-            padding: 2.5rem;
+            padding: 2rem;
             width: 420px;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            transform: scale(0.95) translateY(10px);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: var(--radius-box);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+            transform: scale(0.96) translateY(8px);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 1px solid var(--border-outer);
         }
 
         .modal-overlay.show .modal-content {
             transform: scale(1) translateY(0);
+        }
+
+        /* 📊 Dashboard Modal Styles (Engineering Analytics Look) */
+        .dashboard-modal-content {
+            width: 860px;
+            max-width: 92vw;
+            max-height: 88vh;
+            padding: 1.5rem 1.8rem;
+            border-radius: var(--radius-box);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-inner);
+            padding-bottom: 0.85rem;
+            margin-bottom: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .dash-body {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding-right: 2px;
+        }
+
+        .dash-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .dash-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+        }
+
+        .dash-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .dash-card {
+            background: var(--bg-offwhite);
+            border: 1px solid var(--border-outer);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.15s ease;
+        }
+
+        .dash-card:hover {
+            border-color: var(--border-dark);
+        }
+
+        .dash-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dash-card-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .dash-card-icon {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .dash-card-value {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            margin: 5px 0 2px 0;
+        }
+
+        .dash-card-sub {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dash-progress-track {
+            width: 100%;
+            height: 4px;
+            background: var(--border-inner);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .dash-progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+
+        .dash-grid-2col {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 10px;
+        }
+
+        .dash-section-box {
+            background: var(--bg-offwhite);
+            border: 1px solid var(--border-outer);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dash-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dash-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .dash-chart-wrap {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 110px;
+            padding-top: 8px;
+            gap: 8px;
+        }
+
+        .dash-bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .dash-bar-val {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .dash-bar-track {
+            width: 100%;
+            max-width: 26px;
+            flex: 1;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-inner);
+            border-radius: 4px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .dash-bar-fill {
+            width: 100%;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 2px;
+        }
+
+        .dash-bar-fill.today-bar {
+            background: #2563EB;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+        }
+
+        .dash-bar-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        .dash-space-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-inner);
+            font-size: 0.78rem;
+        }
+
+        .dash-space-row:last-child {
+            border-bottom: none;
+        }
+
+        .dash-action-btn {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-outer);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .dash-action-btn:hover {
+            background: var(--bg-offwhite);
+            border-color: var(--border-dark);
+            color: var(--accent);
         }
 
         /* 디테일 팝업 디자인 변경 */
@@ -3617,6 +3829,16 @@
                     </svg>
                     <span class="sidebar-text">캘린더</span>
                 </div>
+                <div class="sidebar-menu-item" id="nav-dashboard" onclick="openDashboardModal()">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                        <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                        <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                    </svg>
+                    <span class="sidebar-text">대시보드</span>
+                </div>
                 <div class="sidebar-menu-item" id="nav-memo" onclick="openMemoModal()">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -3722,7 +3944,7 @@
                                         onclick="changeViewMode('month')">Month</button>
                                 </div>
                                 <button class="btn-action" id="btnOpenAssign" onclick="window.toggleAssignPanel()"
-                                    style="background: linear-gradient(135deg, #EEF2FF, #F5F3FF); color: #4F46E5; border-color: #C7D2FE; font-weight: 800; padding: 4px 12px; font-size: 0.8rem;">단원배정</button>
+                                    style="color: var(--accent); font-weight: 700; border-color: var(--border-outer);">단원배정</button>
                             </div>
                         </div>
                         <div id="calendarBody"></div>
@@ -4148,6 +4370,106 @@
                     style="font-weight:700; color:var(--text-sub); font-size:0.8rem; display:flex; align-items:center; gap:8px; flex-shrink:0;">
                     <span id="calXpBarText">0 / 30 XP</span>
                     <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">상세보기 ➔</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📊 대시보드 모달 (Analytics Dashboard) -->
+    <div id="dashboardModal" class="modal-overlay">
+        <div class="modal-content dashboard-modal-content">
+            <div class="dash-header">
+                <div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <span>📊 학습 분석 & 현황 대시보드</span>
+                        <span id="dashTodayBadge" style="font-size: 0.72rem; font-weight: 700; background: var(--bg-offwhite); color: var(--accent); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-outer);">Today</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">실시간 플랜 이행률 및 학습 진도 개요</div>
+                </div>
+                <button onclick="closeModal('dashboardModal')"
+                    style="background:transparent; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-sub); line-height:1; padding: 2px 6px; border-radius: 4px;">&times;</button>
+            </div>
+
+            <div class="dash-body">
+                <!-- Row 1: 4대 핵심 KPI 지표 -->
+                <div class="dash-kpi-grid">
+                    <div class="dash-card">
+                        <div class="dash-card-header">
+                            <span class="dash-card-title">오늘 순공 시간</span>
+                            <span class="dash-card-icon">⏱</span>
+                        </div>
+                        <div class="dash-card-value" id="dashKpiStudyTime">00:00:00</div>
+                        <div class="dash-card-sub" id="dashKpiStudySub">YPT 실시간 연동 중</div>
+                    </div>
+
+                    <div class="dash-card">
+                        <div class="dash-card-header">
+                            <span class="dash-card-title">주간 플랜 달성률</span>
+                            <span class="dash-card-icon">🎯</span>
+                        </div>
+                        <div class="dash-card-value" id="dashKpiWeekRate">0%</div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill" id="dashKpiWeekBar" style="width: 0%;"></div>
+                        </div>
+                        <div class="dash-card-sub" id="dashKpiWeekCount" style="margin-top: 6px;">0/0 완료</div>
+                    </div>
+
+                    <div class="dash-card">
+                        <div class="dash-card-header">
+                            <span class="dash-card-title">문제집 단원 진도</span>
+                            <span class="dash-card-icon">📚</span>
+                        </div>
+                        <div class="dash-card-value" id="dashKpiBookRate">0%</div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill" id="dashKpiBookBar" style="width: 0%;"></div>
+                        </div>
+                        <div class="dash-card-sub" id="dashKpiBookCount" style="margin-top: 6px;">0/0 단원 완료</div>
+                    </div>
+
+                    <div class="dash-card">
+                        <div class="dash-card-header">
+                            <span class="dash-card-title">오답 & 레벨</span>
+                            <span class="dash-card-icon">⚡</span>
+                        </div>
+                        <div class="dash-card-value" id="dashKpiLevel">Lv. 1</div>
+                        <div class="dash-card-sub" id="dashKpiWrongCount">오답노트 0문항 등록됨</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: 7일간의 플랜 추이 & 스페이스별 분포 -->
+                <div class="dash-grid-2col">
+                    <div class="dash-section-box">
+                        <div class="dash-section-header">
+                            <span class="dash-section-title">📈 최근 7일간 일별 플랜 달성 추이</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted);">완료 태스크 (개)</span>
+                        </div>
+                        <div class="dash-chart-wrap" id="dashChartWrap">
+                            <!-- 7일 막대 차트 동적 렌더링 -->
+                        </div>
+                    </div>
+
+                    <div class="dash-section-box">
+                        <div class="dash-section-header">
+                            <span class="dash-section-title">🏷 스페이스별 할 일 분포</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted);" id="dashTotalTasksCount">총 0개</span>
+                        </div>
+                        <div id="dashSpaceList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; max-height: 120px;">
+                            <!-- 스페이스별 리스트 동적 렌더링 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: 빠른 액션 툴바 -->
+                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center; padding-top: 4px;">
+                    <button class="dash-action-btn" onclick="closeModal('dashboardModal'); window.toggleAssignPanel();">
+                        <span>📋</span> 단원 배정 열기
+                    </button>
+                    <button class="dash-action-btn" onclick="closeModal('dashboardModal'); openBookModal();">
+                        <span>📚</span> 문제집 관리
+                    </button>
+                    <button class="dash-action-btn" onclick="closeModal('dashboardModal'); openWrongNoteModal();">
+                        <span>📝</span> 오답노트 확인
+                    </button>
                 </div>
             </div>
         </div>
@@ -6532,6 +6854,194 @@
             document.getElementById(id).classList.add('show');
         };
         window.closeModal = (id) => { document.getElementById(id).classList.remove('show'); };
+
+        // ================================================================
+        //  📊 대시보드 모달 오픈 & 렌더링
+        // ================================================================
+        window.openDashboardModal = function () {
+            renderDashboardModal();
+            openModal('dashboardModal');
+        };
+
+        function renderDashboardModal() {
+            const today = getStudyDateString();
+            const todayReal = getRealTodayString();
+
+            // ── 오늘 날짜 배지 ──
+            const badge = document.getElementById('dashTodayBadge');
+            if (badge) {
+                const parts = todayReal.split('.');
+                badge.textContent = `${parts[1]}/${parts[2]}`;
+            }
+
+            // ══════════════════════════════════════════
+            //  KPI 1 : 오늘 순공 시간
+            // ══════════════════════════════════════════
+            const studyTimeEl = document.getElementById('dashKpiStudyTime');
+            const studySubEl  = document.getElementById('dashKpiStudySub');
+            const yptTime = (appData.calendarHistory && appData.calendarHistory[today] && appData.calendarHistory[today].time)
+                ? appData.calendarHistory[today].time
+                : (appData.lastYptTime || '00:00:00');
+            if (studyTimeEl) studyTimeEl.textContent = yptTime;
+            if (studySubEl) {
+                const secs = timeToSeconds(yptTime);
+                const hrs = Math.floor(secs / 3600);
+                const mins = Math.floor((secs % 3600) / 60);
+                studySubEl.textContent = hrs > 0 ? `${hrs}시간 ${mins}분 공부 완료` : `${mins}분 공부 완료`;
+            }
+
+            // ══════════════════════════════════════════
+            //  KPI 2 : 주간 플랜 달성률
+            // ══════════════════════════════════════════
+            const parts0 = selectedDateStr.split('.').map(Number);
+            let baseDate = new Date(parts0[0], parts0[1] - 1, parts0[2], 12, 0, 0);
+            let dow = baseDate.getDay();
+            let weekStart = new Date(baseDate);
+            weekStart.setDate(baseDate.getDate() - dow);
+
+            let totalTasks = 0, doneTasks = 0;
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(weekStart);
+                d.setDate(weekStart.getDate() + i);
+                const key = getFixedDateKey(d);
+                const dayData = appData.dailyPlanner[key];
+                if (dayData && dayData.tasks) {
+                    totalTasks += dayData.tasks.length;
+                    doneTasks  += dayData.tasks.filter(t => t.done).length;
+                }
+            }
+            const weekRate = totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
+            const weekRateEl  = document.getElementById('dashKpiWeekRate');
+            const weekBarEl   = document.getElementById('dashKpiWeekBar');
+            const weekCountEl = document.getElementById('dashKpiWeekCount');
+            if (weekRateEl)  weekRateEl.textContent  = `${weekRate}%`;
+            if (weekBarEl)   weekBarEl.style.width   = `${weekRate}%`;
+            if (weekCountEl) weekCountEl.textContent = `${doneTasks}/${totalTasks} 완료`;
+
+            // ══════════════════════════════════════════
+            //  KPI 3 : 문제집 단원 진도
+            // ══════════════════════════════════════════
+            let totalChapters = 0, doneChapters = 0;
+            (appData.books || []).forEach(book => {
+                (book.chapters || []).forEach(ch => {
+                    totalChapters++;
+                    if (ch.done) doneChapters++;
+                });
+            });
+            const bookRate = totalChapters === 0 ? 0 : Math.round((doneChapters / totalChapters) * 100);
+            const bookRateEl  = document.getElementById('dashKpiBookRate');
+            const bookBarEl   = document.getElementById('dashKpiBookBar');
+            const bookCountEl = document.getElementById('dashKpiBookCount');
+            if (bookRateEl)  bookRateEl.textContent  = `${bookRate}%`;
+            if (bookBarEl)   bookBarEl.style.width   = `${bookRate}%`;
+            if (bookCountEl) bookCountEl.textContent = `${doneChapters}/${totalChapters} 단원 완료`;
+
+            // ══════════════════════════════════════════
+            //  KPI 4 : 오답 & 레벨
+            // ══════════════════════════════════════════
+            const lvl = (appData.user && appData.user.level) ? appData.user.level : 1;
+            const wnCount = (appData.wrongNotes || []).length;
+            const lvlEl   = document.getElementById('dashKpiLevel');
+            const wnCntEl = document.getElementById('dashKpiWrongCount');
+            if (lvlEl)   lvlEl.textContent   = `Lv. ${lvl}`;
+            if (wnCntEl) wnCntEl.textContent = `오답노트 ${wnCount}문항 등록됨`;
+
+            // ══════════════════════════════════════════
+            //  차트 : 최근 7일 일별 완료 태스크 바 차트
+            // ══════════════════════════════════════════
+            const chartWrap = document.getElementById('dashChartWrap');
+            if (chartWrap) {
+                chartWrap.innerHTML = '';
+
+                const days7 = [];
+                const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    days7.push({ key: getFixedDateKey(d), label: `${d.getMonth()+1}/${d.getDate()}`, dayName: dayNames[d.getDay()] });
+                }
+
+                const counts = days7.map(dObj => {
+                    const dd = appData.dailyPlanner[dObj.key];
+                    return (dd && dd.tasks) ? dd.tasks.filter(t => t.done).length : 0;
+                });
+                const maxCount = Math.max(...counts, 1);
+
+                days7.forEach((dObj, i) => {
+                    const cnt = counts[i];
+                    const barPct = Math.round((cnt / maxCount) * 100);
+                    const isToday = (dObj.key === todayReal);
+
+                    const col = document.createElement('div');
+                    col.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0;';
+
+                    const countLabel = document.createElement('div');
+                    countLabel.style.cssText = `font-size:0.68rem; font-weight:800; color:${isToday ? 'var(--accent)' : 'var(--text-muted)'};`;
+                    countLabel.textContent = cnt > 0 ? cnt : '';
+
+                    const barTrack = document.createElement('div');
+                    barTrack.style.cssText = 'width:100%; flex:1; background:var(--bg-offwhite); border-radius:4px; overflow:hidden; display:flex; align-items:flex-end; min-height:80px; border:1px solid var(--border-inner);';
+
+                    const barFill = document.createElement('div');
+                    barFill.style.cssText = `width:100%; height:${barPct}%; background:${isToday ? 'var(--accent)' : 'var(--primary)'}; opacity:${isToday ? 1 : 0.5}; border-radius:3px; transition:height 0.4s ease; min-height:${cnt > 0 ? 3 : 0}px;`;
+
+                    barTrack.appendChild(barFill);
+
+                    const dateLabel = document.createElement('div');
+                    dateLabel.style.cssText = `font-size:0.62rem; color:${isToday ? 'var(--accent)' : 'var(--text-muted)'}; font-weight:${isToday ? 800 : 600}; text-align:center; line-height:1.2;`;
+                    dateLabel.innerHTML = `${dObj.dayName}<br>${dObj.label}`;
+
+                    col.appendChild(countLabel);
+                    col.appendChild(barTrack);
+                    col.appendChild(dateLabel);
+                    chartWrap.appendChild(col);
+                });
+            }
+
+            // ══════════════════════════════════════════
+            //  스페이스별 할 일 분포
+            // ══════════════════════════════════════════
+            const spaceListEl = document.getElementById('dashSpaceList');
+            const totalTasksCountEl = document.getElementById('dashTotalTasksCount');
+            if (spaceListEl) {
+                spaceListEl.innerHTML = '';
+                const spaces = appData.spaces || [];
+                const allInboxTasks = appData.inboxTasks || [];
+
+                // 전체 플래너 미완료 태스크도 포함
+                let allPlannerTasks = [];
+                Object.values(appData.dailyPlanner || {}).forEach(dd => {
+                    if (dd && dd.tasks) allPlannerTasks = allPlannerTasks.concat(dd.tasks.filter(t => !t.done));
+                });
+                const pendingInbox = allInboxTasks.filter(t => !t.done && t.space !== '완료');
+                const totalAll = pendingInbox.length + allPlannerTasks.length;
+                if (totalTasksCountEl) totalTasksCountEl.textContent = `총 ${totalAll}개`;
+
+                // 스페이스별 인박스 할 일 개수
+                spaces.filter(s => s !== '완료').forEach((space, idx) => {
+                    const cnt = pendingInbox.filter(t => t.space === space).length;
+                    const color = getSpaceColor(space, idx);
+                    const pct = totalAll === 0 ? 0 : Math.round((cnt / totalAll) * 100);
+
+                    const row = document.createElement('div');
+                    row.style.cssText = 'display:flex; align-items:center; gap:8px;';
+
+                    row.innerHTML = `
+                        <div style="width:8px; height:8px; border-radius:50%; background:${color}; flex-shrink:0;"></div>
+                        <div style="flex:1; font-size:0.78rem; font-weight:700; color:var(--text-sub); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${space}</div>
+                        <div style="font-size:0.75rem; font-weight:800; color:var(--text-main);">${cnt}</div>
+                        <div style="width:60px; height:5px; background:var(--bg-offwhite); border-radius:3px; overflow:hidden; flex-shrink:0;">
+                            <div style="width:${pct}%; height:100%; background:${color}; border-radius:3px;"></div>
+                        </div>
+                    `;
+                    spaceListEl.appendChild(row);
+                });
+
+                if (spaces.filter(s => s !== '완료').length === 0) {
+                    spaceListEl.innerHTML = `<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding:1rem 0;">스페이스 없음</div>`;
+                }
+            }
+        }
 
         async function syncToFirebase() {
             try { await setDoc(doc(db, "users", USER_DOC_ID), { dailyPlanner: appData.dailyPlanner }, { merge: true }); }
