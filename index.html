@@ -1108,16 +1108,9 @@
             min-width: 0;
         }
 
-        /* ✅ 히트맵 좌측 에지 스트립 (경험치 레벨 기반) */
+        /* ✅ 히트맵 좌측 에지 스트립 (경험치 레벨 기반) - 월간 뷰 제거 요청 반영 */
         .cal-cell .heatmap-edge {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 7px;
-            border-radius: 0 4px 4px 0;
-            background: var(--accent);
-            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
-            z-index: 4;
+            display: none !important;
         }
 
         .cal-cell:hover {
@@ -1360,16 +1353,31 @@
         .week-grid-header {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 1px;
-            background: var(--border-outer);
+            background: var(--bg-week-header);
             border-bottom: 1px solid var(--border-outer);
             flex-shrink: 0;
         }
 
         .week-header-cell {
             background: var(--bg-week-header);
-            padding: 8px;
+            padding: 8px 4px;
             text-align: center;
+            position: relative;
+            transition: all 0.15s ease;
+            user-select: none;
+            border-right: 1px solid var(--border-outer);
+        }
+
+        .week-header-cell:last-child {
+            border-right: none;
+        }
+
+        .week-header-cell:hover {
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .week-header-cell.selected {
+            background: rgba(37, 99, 235, 0.03);
         }
 
         .week-day-name {
@@ -1377,28 +1385,64 @@
             font-weight: 700;
             color: var(--text-sub);
             text-transform: uppercase;
+            letter-spacing: 0.03em;
+            transition: color 0.15s ease;
+        }
+
+        .week-header-cell.selected .week-day-name {
+            color: var(--accent);
+            font-weight: 800;
         }
 
         .week-day-num {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: var(--text-main);
-            margin-top: 2px;
+            margin: 4px auto 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .week-header-cell.today .week-day-num {
             color: var(--accent);
+            border: 2px solid var(--accent);
+            font-weight: 900;
+        }
+
+        /* ✅ 선택된 날짜는 Week뷰 상단 날짜(숫자)를 뚜렷한 동그라미로 둘러싸서 강조 */
+        .week-day-num.selected-num,
+        .week-header-cell.selected .week-day-num {
+            background: var(--accent) !important;
+            color: #ffffff !important;
+            border: 2px solid var(--accent) !important;
+            font-weight: 900 !important;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45) !important;
+        }
+
+        .week-header-cell.today.selected .week-day-num,
+        .week-header-cell.today .week-day-num.selected-num {
+            background: var(--accent) !important;
+            color: #ffffff !important;
+            border: 2px solid #ffffff !important;
+            outline: 2px solid var(--accent) !important;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5) !important;
         }
 
         .week-grid-body {
             flex: 1;
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 1px;
-            background: var(--border-outer);
+            background: var(--bg-week-col);
             overflow-y: auto;
             min-height: 0;
-            align-items: start;
+            align-items: stretch;
         }
 
         .week-grid-body::-webkit-scrollbar {
@@ -1419,19 +1463,33 @@
             min-height: 100%;
             cursor: pointer;
             min-width: 0;
+            border-right: 1px solid var(--border-outer);
+            transition: background 0.15s ease;
+            box-sizing: border-box;
         }
 
-        /* ✅ 주간/일간 뷰 안의 미니 블록들도 겹침 방지 */
+        .week-col:last-child {
+            border-right: none;
+        }
+
+        .week-col.selected {
+            background: rgba(37, 99, 235, 0.025);
+        }
+
+        /* ✅ Week뷰에서 각 플랜마다 길이가 길어져도 ...으로 자르지 않고 줄바꿈으로 전체 표시 */
         .week-col .mini-schedule,
         .week-col .mini-task {
             flex-shrink: 0;
             font-size: 0.8rem;
-            padding: 4px 6px;
-            border-radius: 4px;
+            padding: 5px 8px;
+            border-radius: 6px;
             display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            line-height: 1.4;
         }
 
         /* ✅ Day View (일간 뷰 CSS 완벽 복원 및 테마 적용) */
@@ -3658,12 +3716,10 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <div class="view-toggles">
-                                    <button class="view-btn active" id="btnViewMonth"
-                                        onclick="changeViewMode('month')">Month</button>
-                                    <button class="view-btn" id="btnViewWeek"
+                                    <button class="view-btn active" id="btnViewWeek"
                                         onclick="changeViewMode('week')">Week</button>
-                                    <button class="view-btn" id="btnViewDay"
-                                        onclick="changeViewMode('day')">Day</button>
+                                    <button class="view-btn" id="btnViewMonth"
+                                        onclick="changeViewMode('month')">Month</button>
                                 </div>
                                 <button class="btn-action" id="btnOpenAssign" onclick="window.toggleAssignPanel()"
                                     style="background: linear-gradient(135deg, #EEF2FF, #F5F3FF); color: #4F46E5; border-color: #C7D2FE; font-weight: 800; padding: 4px 12px; font-size: 0.8rem;">단원배정</button>
@@ -4367,7 +4423,7 @@
             if (SPACE_COLORS[spaceName]) return SPACE_COLORS[spaceName];
             return PALETTE[idx % PALETTE.length];
         }
-        let currentViewMode = 'month';
+        let currentViewMode = 'week';
         let currentDisplayDate = new Date();
         let miniDisplayDate = new Date();
         let selectedDateStr = getRealTodayString();
@@ -5067,6 +5123,13 @@
                     if (!isReset) {
                         const remoteYptTime = data.ypt_time || "00:00:00";
                         window.processYptUpdate(remoteYptTime);
+                    }
+
+                    // ON-A(I)SCS 앱 연동을 위한 로컬 스토리지 데이터 자동 백업
+                    try {
+                        localStorage.setItem('ONPlan2SNU27_data', JSON.stringify(appData));
+                    } catch (e) {
+                        console.warn("ONPlan2SNU27 LocalStorage Cache Error:", e);
                     }
                 }
 
@@ -6125,11 +6188,6 @@
                     d.setDate(d.getDate() + (offset * 7));
                     selectedDateStr = getFixedDateKey(d);
                     currentDisplayDate = new Date(d);
-                } else if (currentViewMode === 'day') {
-                    let d = new Date(selectedDateStr.replace(/\./g, '-'));
-                    d.setDate(d.getDate() + offset);
-                    selectedDateStr = getFixedDateKey(d);
-                    currentDisplayDate = new Date(d);
                 }
                 miniDisplayDate = new Date(currentDisplayDate);
                 renderCalendarBody();
@@ -6140,7 +6198,8 @@
 
         window.changeMiniMonth = function (offset) {
             miniDisplayDate.setMonth(miniDisplayDate.getMonth() + offset);
-            renderMiniCalendar(document.getElementById('miniCalContainer'));
+            const miniCalEl = document.getElementById('miniCalContainer');
+            if (miniCalEl) renderMiniCalendar(miniCalEl);
         };
 
         window.goToToday = function () {
@@ -6200,22 +6259,9 @@
                     <div class="cal-grid" id="mainCalGrid"></div>
                 `;
                 renderMonthGrid(document.getElementById('mainCalGrid'));
-            } else {
-                container.innerHTML = `
-                    <div class="split-view-container">
-                        <div class="mini-cal-container" id="miniCalContainer"></div>
-                        <div id="subViewContainer" style="flex:1; min-width:0; display:flex; flex-direction:column;"></div>
-                    </div>
-                `;
-                renderMiniCalendar(document.getElementById('miniCalContainer'));
-
-                if (currentViewMode === 'week') {
-                    monthDisplay.innerText = `Week of ${monthNames[currentDisplayDate.getMonth()]} ${currentDisplayDate.getFullYear()}`;
-                    renderWeekView(document.getElementById('subViewContainer'));
-                } else if (currentViewMode === 'day') {
-                    monthDisplay.innerText = `${selectedDateStr.replace(/\./g, ' / ')}`;
-                    renderDayView(document.getElementById('subViewContainer'));
-                }
+            } else if (currentViewMode === 'week') {
+                monthDisplay.innerText = `${monthNames[currentDisplayDate.getMonth()]} ${currentDisplayDate.getFullYear()}`;
+                renderWeekView(container);
             }
         }
 
@@ -6271,23 +6317,7 @@
             }
             previewHtml += '</div>';
 
-            // ✅ 히트맵 좌측 에지 스트립 (경험치 레벨 기반 - 단일 색상 진하기 변화)
-            let heatmapHtml = '';
-            if (!isOtherMonth) {
-                const historyEntry = appData.calendarHistory ? appData.calendarHistory[dateKey] : null;
-                if (historyEntry && typeof historyEntry === 'object' && (historyEntry.level || 0) > 0) {
-                    const level = historyEntry.level;
-                    // 레벨에 따라 높이(25%~100%)와 불투명도(0.2~1.0) 비례
-                    const maxLevel = 16;
-                    const ratio = Math.min(level / maxLevel, 1);
-                    const heightPct = Math.max(25, Math.round(ratio * 100));
-                    const opacity = Math.min(0.2 + (ratio * 0.8), 1).toFixed(2);
-                    heatmapHtml = `<div class="heatmap-edge" style="height:${heightPct}%; opacity:${opacity};"></div>`;
-                }
-            }
-
             cell.innerHTML = `
-                ${heatmapHtml}
                 <div class="cell-top-bar" style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:4px;">
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div class="date-num">${day}</div>
@@ -6342,7 +6372,8 @@
         }
 
         function renderWeekView(container) {
-            let d = new Date(selectedDateStr.replace(/\./g, '-'));
+            const parts = selectedDateStr.split('.').map(Number);
+            let d = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
             let day = d.getDay();
             let startOfWeek = new Date(d);
             startOfWeek.setDate(d.getDate() - day);
@@ -6356,21 +6387,22 @@
                 currentDay.setDate(startOfWeek.getDate() + i);
                 const dateKey = getFixedDateKey(currentDay);
                 const isToday = (dateKey === getRealTodayString());
+                const isSelected = (dateKey === selectedDateStr);
 
                 headerHtml += `
-                    <div class="week-header-cell ${isToday ? 'today' : ''}" style="cursor:pointer;" onclick="selectDate('${dateKey}')">
+                    <div class="week-header-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" style="cursor:pointer;" onclick="selectDate('${dateKey}')">
                         <div class="week-day-name">${dayNames[i]}</div>
-                        <div class="week-day-num">${currentDay.getDate()}</div>
+                        <div class="week-day-num ${isSelected ? 'selected-num' : ''}">${currentDay.getDate()}</div>
                     </div>`;
 
-                let colHtml = `<div class="week-col" data-datekey="${dateKey}" onclick="selectDate('${dateKey}')" ondragover="allowDrop(event)" ondrop="handleDropOnDate(event, '${dateKey}')" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">`;
+                let colHtml = `<div class="week-col ${isSelected ? 'selected' : ''}" data-datekey="${dateKey}" onclick="selectDate('${dateKey}')" ondragover="allowDrop(event)" ondrop="handleDropOnDate(event, '${dateKey}')" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">`;
                 const dayData = appData.dailyPlanner[dateKey];
                 if (dayData) {
                     (dayData.schedules || []).forEach((sch, idx) => {
-                        colHtml += `<div class="mini-schedule truncate-text" style="background-color:${sch.color || '#EF4444'}; color:#fff;" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'schedule')" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
+                        colHtml += `<div class="mini-schedule" style="background-color:${sch.color || '#EF4444'}; color:#fff;" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'schedule')" onclick="showItemDetail('schedule', '${dateKey}', ${idx}, event)">${sch.content}</div>`;
                     });
                     (dayData.tasks || []).forEach((task, idx) => {
-                        colHtml += `<div class="mini-task truncate-text ${task.done ? 'done' : ''}" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'task')" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
+                        colHtml += `<div class="mini-task ${task.done ? 'done' : ''}" draggable="true" ondragstart="handleCalendarItemDragStart(event, '${dateKey}', ${idx}, 'task')" onclick="showItemDetail('task', '${dateKey}', ${idx}, event)">${task.content}</div>`;
                     });
                 }
                 colHtml += `</div>`;
